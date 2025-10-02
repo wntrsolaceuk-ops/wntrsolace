@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>WinterSolace - Shopping Cart</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap');
@@ -448,33 +448,228 @@
             transform: translateY(-2px);
         }
 
-        /* Responsive */
+        /* Mobile Responsive */
         @media (max-width: 768px) {
-            .cart-content {
-                grid-template-columns: 1fr;
-                gap: 2rem;
+            .header {
+                padding: 1rem;
+            }
+            
+            .nav {
+                flex-direction: column;
+                align-items: flex-start;
+                width: 100%;
+            }
+            
+            .nav-menu {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                padding: 1rem;
+                margin-top: 1rem;
+                border-radius: 8px;
+            }
+            
+            .nav-menu.active {
+                display: flex;
+            }
+            
+            .nav-menu li {
+                margin: 0.5rem 0;
+                text-align: center;
+            }
+            
+            .nav-right {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                display: flex;
+                gap: 1rem;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+                margin-left: auto;
             }
             
             .page-title {
                 font-size: 2rem;
+                text-align: center;
+                margin: 2rem 0;
+            }
+            
+            .cart-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                padding: 2rem 1rem;
+            }
+            
+            .cart-items {
+                margin-bottom: 2rem;
             }
             
             .cart-item {
                 flex-direction: column;
                 text-align: center;
+                padding: 1rem;
+                gap: 1rem;
             }
             
             .item-image {
                 width: 150px;
                 height: 150px;
+                margin: 0 auto;
             }
             
-            .nav {
-                grid-template-columns: 1fr 1fr 1fr;
+            .item-details {
+                text-align: center;
             }
             
-            .nav-menu {
-                display: none;
+            .item-name {
+                font-size: 1.1rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .item-size {
+                font-size: 0.9rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .item-price {
+                font-size: 1.2rem;
+                margin-bottom: 1rem;
+            }
+            
+            .quantity-controls {
+                justify-content: center;
+                margin-bottom: 1rem;
+            }
+            
+            .quantity-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+            
+            .quantity-input {
+                width: 50px;
+                height: 35px;
+                font-size: 0.9rem;
+            }
+            
+            .remove-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+            }
+            
+            .cart-summary {
+                padding: 1.5rem;
+            }
+            
+            .summary-title {
+                font-size: 1.3rem;
+                margin-bottom: 1rem;
+            }
+            
+            .summary-row {
+                font-size: 0.9rem;
+                margin-bottom: 0.8rem;
+            }
+            
+            .summary-total {
+                font-size: 1.4rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .checkout-btn {
+                width: 100%;
+                padding: 1rem;
+                font-size: 1rem;
+            }
+            
+            .empty-cart {
+                padding: 3rem 1rem;
+                text-align: center;
+            }
+            
+            .empty-cart h2 {
+                font-size: 1.8rem;
+                margin-bottom: 1rem;
+            }
+            
+            .empty-cart p {
+                font-size: 1rem;
+                margin-bottom: 2rem;
+            }
+            
+            .continue-shopping-btn {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .cart-content {
+                padding: 1rem 0.5rem;
+            }
+            
+            .page-title {
+                font-size: 1.8rem;
+            }
+            
+            .cart-item {
+                padding: 0.8rem;
+            }
+            
+            .item-image {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .item-name {
+                font-size: 1rem;
+            }
+            
+            .item-price {
+                font-size: 1.1rem;
+            }
+            
+            .quantity-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 0.9rem;
+            }
+            
+            .quantity-input {
+                width: 40px;
+                height: 30px;
+                font-size: 0.8rem;
+            }
+            
+            .cart-summary {
+                padding: 1rem;
+            }
+            
+            .summary-title {
+                font-size: 1.2rem;
+            }
+            
+            .summary-row {
+                font-size: 0.8rem;
+            }
+            
+            .summary-total {
+                font-size: 1.3rem;
+            }
+            
+            .checkout-btn {
+                padding: 0.8rem;
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -492,7 +687,8 @@
     <header class="header">
         <nav class="nav">
             <img src="assets/Wntrsolace.png" alt="WinterSolace Logo" class="logo">
-            <ul class="nav-menu">
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+            <ul class="nav-menu" id="navMenu">
                 <li><a href="layout-winter-frost.html">Home</a></li>
                 <li><a href="collections.html">Collection</a></li>
                 <li><a href="#about">About</a></li>
@@ -677,6 +873,22 @@
                 window.location.href = 'auth.html';
             }
         }
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const navMenu = document.getElementById('navMenu');
+            navMenu.classList.toggle('active');
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const navMenu = document.getElementById('navMenu');
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            
+            if (!navMenu.contains(event.target) && !mobileToggle.contains(event.target)) {
+                navMenu.classList.remove('active');
+            }
+        });
 
         function goToCheckout() {
             if (cart.length === 0) {

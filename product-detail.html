@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>WinterSolace - Product Detail</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap');
@@ -665,15 +665,69 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Responsive */
+        /* Mobile Responsive */
         @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+            
+            .nav {
+                flex-direction: column;
+                align-items: flex-start;
+                width: 100%;
+            }
+            
+            .nav-menu {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                padding: 1rem;
+                margin-top: 1rem;
+                border-radius: 8px;
+            }
+            
+            .nav-menu.active {
+                display: flex;
+            }
+            
+            .nav-menu li {
+                margin: 0.5rem 0;
+                text-align: center;
+            }
+            
+            .nav-right {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                display: flex;
+                gap: 1rem;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+                margin-left: auto;
+            }
+            
             .product-detail {
                 grid-template-columns: 1fr;
                 gap: 2rem;
+                padding: 2rem 1rem;
             }
             
             .product-image-section {
                 flex-direction: column;
+            }
+            
+            .main-image {
+                width: 100%;
+                height: 300px;
+                object-fit: cover;
             }
             
             .thumbnail-gallery {
@@ -681,6 +735,7 @@
                 flex-direction: row;
                 justify-content: center;
                 flex-wrap: wrap;
+                gap: 0.5rem;
             }
             
             .thumbnail {
@@ -688,20 +743,117 @@
                 height: 60px;
             }
             
+            .product-info {
+                padding: 1rem;
+            }
+            
             .product-title {
                 font-size: 2rem;
+                margin-bottom: 1rem;
+            }
+            
+            .product-price {
+                font-size: 1.8rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .size-selector {
+                margin-bottom: 1.5rem;
+            }
+            
+            .size-options {
+                gap: 0.5rem;
+            }
+            
+            .size-option {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .quantity-selector {
+                margin-bottom: 1.5rem;
+            }
+            
+            .quantity-controls {
+                gap: 0.5rem;
+            }
+            
+            .quantity-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+            
+            .quantity-input {
+                width: 60px;
+                height: 40px;
+                font-size: 1rem;
             }
             
             .action-buttons {
                 flex-direction: column;
+                gap: 1rem;
             }
             
-            .nav {
-                grid-template-columns: 1fr 1fr 1fr;
+            .add-to-cart-btn, .wishlist-btn {
+                width: 100%;
+                padding: 1rem;
+                font-size: 1rem;
             }
             
-            .nav-menu {
-                display: none;
+            .product-description {
+                margin-top: 2rem;
+                padding: 1rem;
+            }
+            
+            .description-content {
+                font-size: 0.9rem;
+                line-height: 1.6;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .product-detail {
+                padding: 1rem 0.5rem;
+            }
+            
+            .product-title {
+                font-size: 1.8rem;
+            }
+            
+            .product-price {
+                font-size: 1.6rem;
+            }
+            
+            .main-image {
+                height: 250px;
+            }
+            
+            .thumbnail {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .size-option {
+                padding: 0.6rem 0.8rem;
+                font-size: 0.8rem;
+            }
+            
+            .quantity-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+            
+            .quantity-input {
+                width: 50px;
+                height: 35px;
+                font-size: 0.9rem;
+            }
+            
+            .add-to-cart-btn, .wishlist-btn {
+                padding: 0.8rem;
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -719,7 +871,8 @@
     <header class="header">
         <nav class="nav">
             <img src="assets/Wntrsolace.png" alt="WinterSolace Logo" class="logo">
-            <ul class="nav-menu">
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+            <ul class="nav-menu" id="navMenu">
                 <li><a href="layout-winter-frost.html">Home</a></li>
                 <li><a href="collections.html">Collection</a></li>
                 <li><a href="contact.html">Contact</a></li>
@@ -1223,6 +1376,22 @@
                 window.location.href = 'auth.html';
             }
         }
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const navMenu = document.getElementById('navMenu');
+            navMenu.classList.toggle('active');
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const navMenu = document.getElementById('navMenu');
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            
+            if (!navMenu.contains(event.target) && !mobileToggle.contains(event.target)) {
+                navMenu.classList.remove('active');
+            }
+        });
 
         async function updateUserProfile() {
             const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
