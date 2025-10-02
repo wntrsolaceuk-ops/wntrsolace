@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard - WinterSolace Admin</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Heavy Fog overlay effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 120%;
+            height: 120%;
+            background: 
+                radial-gradient(ellipse 800px 400px at 20% 10%, rgba(255, 255, 255, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse 600px 300px at 80% 30%, rgba(200, 230, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 700px 350px at 10% 80%, rgba(220, 240, 255, 0.18) 0%, transparent 55%),
+                radial-gradient(ellipse 900px 450px at 90% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 65%);
+            pointer-events: none;
+            z-index: 1;
+            animation: heavyFogDrift 20s ease-in-out infinite;
+        }
+
+        @keyframes heavyFogDrift {
+            0% { 
+                transform: translateX(-50px) translateY(0) scale(1);
+                opacity: 0.8;
+            }
+            25% { 
+                transform: translateX(-20px) translateY(-30px) scale(1.1);
+                opacity: 1;
+            }
+            50% { 
+                transform: translateX(30px) translateY(20px) scale(0.9);
+                opacity: 0.7;
+            }
+            75% { 
+                transform: translateX(-10px) translateY(-15px) scale(1.05);
+                opacity: 0.9;
+            }
+            100% { 
+                transform: translateX(-50px) translateY(0) scale(1);
+                opacity: 0.8;
+            }
+        }
+
+        /* Ice crystals overlay */
+        .ice-crystals {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .ice-crystal {
+            position: absolute;
+            color: rgba(200, 230, 255, 0.6);
+            font-size: 20px;
+            animation: crystalFloat 8s linear infinite;
+        }
+
+        @keyframes crystalFloat {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .ice-crystal:nth-child(1) { left: 10%; animation-delay: 0s; font-size: 16px; }
+        .ice-crystal:nth-child(2) { left: 20%; animation-delay: 2s; font-size: 24px; }
+        .ice-crystal:nth-child(3) { left: 30%; animation-delay: 4s; font-size: 18px; }
+        .ice-crystal:nth-child(4) { left: 40%; animation-delay: 1s; font-size: 22px; }
+        .ice-crystal:nth-child(5) { left: 50%; animation-delay: 3s; font-size: 20px; }
+        .ice-crystal:nth-child(6) { left: 60%; animation-delay: 5s; font-size: 16px; }
+        .ice-crystal:nth-child(7) { left: 70%; animation-delay: 2.5s; font-size: 26px; }
+        .ice-crystal:nth-child(8) { left: 80%; animation-delay: 4.5s; font-size: 19px; }
+        .ice-crystal:nth-child(9) { left: 90%; animation-delay: 1.5s; font-size: 21px; }
+
+        /* Admin Layout */
+        .admin-container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            grid-template-rows: 60px 1fr;
+            grid-template-areas: 
+                "sidebar header"
+                "sidebar main";
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            grid-area: sidebar;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(200, 230, 255, 0.1);
+            padding: 2rem 0;
+        }
+
+        .sidebar-logo {
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid rgba(200, 230, 255, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-logo img {
+            height: 40px;
+            filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.1));
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 1rem 2rem;
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: rgba(200, 230, 255, 0.1);
+            border-left-color: #c8e6ff;
+            color: #c8e6ff;
+        }
+
+        .sidebar-nav svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 1rem;
+        }
+
+        /* Header */
+        .admin-header {
+            grid-area: header;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(200, 230, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+        }
+
+        .header-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #c8e6ff;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(200, 230, 255, 0.1);
+            border: 1px solid rgba(200, 230, 255, 0.2);
+            border-radius: 8px;
+            color: #c8e6ff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .header-btn:hover {
+            background: rgba(200, 230, 255, 0.2);
+            box-shadow: 0 0 15px rgba(200, 230, 255, 0.3);
+        }
+
+        /* Main Content */
+        .admin-main {
+            grid-area: main;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        /* Analytics Grid */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .analytics-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .analytics-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(200, 230, 255, 0.5), transparent);
+        }
+
+        .analytics-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(200, 230, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .card-icon {
+            width: 24px;
+            height: 24px;
+            color: #c8e6ff;
+            opacity: 0.6;
+        }
+
+        .chart-placeholder {
+            height: 200px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #c8e6ff;
+            opacity: 0.6;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .metric-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #c8e6ff;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-change {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .metric-change.positive {
+            color: #28a745;
+        }
+
+        .metric-change.negative {
+            color: #dc3545;
+        }
+
+        .metric-change.neutral {
+            color: #c8e6ff;
+            opacity: 0.7;
+        }
+
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .chart-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+        }
+
+        .chart-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-container {
+            height: 300px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #c8e6ff;
+            opacity: 0.6;
+            font-size: 0.9rem;
+        }
+
+        /* Reports Section */
+        .reports-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+        }
+
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+        }
+
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .report-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .report-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        .report-title {
+            font-weight: 600;
+            color: #c8e6ff;
+            margin-bottom: 0.5rem;
+        }
+
+        .report-description {
+            font-size: 0.85rem;
+            color: #ffffff;
+            opacity: 0.7;
+            margin-bottom: 1rem;
+        }
+
+        .report-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(200, 230, 255, 0.1);
+            border: 1px solid rgba(200, 230, 255, 0.2);
+            border-radius: 8px;
+            color: #c8e6ff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .report-btn:hover {
+            background: rgba(200, 230, 255, 0.2);
+            box-shadow: 0 0 15px rgba(200, 230, 255, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .admin-container {
+                grid-template-columns: 1fr;
+                grid-template-areas: 
+                    "header"
+                    "main";
+            }
+
+            .admin-sidebar {
+                display: none;
+            }
+
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-main {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Ice crystals overlay -->
+    <div class="ice-crystals">
+        <div class="ice-crystal">✦</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">✦</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">✦</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">✦</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">✦</div>
+    </div>
+
+    <!-- Admin Layout -->
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <nav class="admin-sidebar">
+            <div class="sidebar-logo">
+                <img src="assets/Wntrsolace.png" alt="WinterSolace Admin">
+            </div>
+            
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="admin-dashboard.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9,22 9,12 15,12 15,22"></polyline>
+                        </svg>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-products.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                        </svg>
+                        Products
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-orders.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 11V7a4 4 0 0 0-8 0v4"></path>
+                            <rect x="5" y="9" width="14" height="10" rx="2" ry="2"></rect>
+                        </svg>
+                        Orders
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-customers.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        Customers
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-analytics.html" class="active">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 20V10"></path>
+                            <path d="M12 20V4"></path>
+                            <path d="M6 20v-6"></path>
+                        </svg>
+                        Analytics
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-settings.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        </svg>
+                        Settings
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Header -->
+        <header class="admin-header">
+            <h1 class="header-title">Analytics Dashboard</h1>
+            <div class="header-actions">
+                <a href="collections.html" class="header-btn">View Site</a>
+                <a href="admin-logout.html" class="header-btn">Logout</a>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Analytics Cards -->
+            <div class="analytics-grid">
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Total Revenue</h3>
+                        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                    </div>
+                    <div class="metric-value" id="totalRevenue">£0</div>
+                    <div class="metric-change positive">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="23,6 13.5,15.5 8.5,10.5 1,18"></polyline>
+                            <polyline points="17,6 23,6 23,12"></polyline>
+                        </svg>
+                        +15% from last month
+                    </div>
+                </div>
+
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Orders This Month</h3>
+                        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 11V7a4 4 0 0 0-8 0v4"></path>
+                            <rect x="5" y="9" width="14" height="10" rx="2" ry="2"></rect>
+                        </svg>
+                    </div>
+                    <div class="metric-value" id="monthlyOrders">0</div>
+                    <div class="metric-change positive">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="23,6 13.5,15.5 8.5,10.5 1,18"></polyline>
+                            <polyline points="17,6 23,6 23,12"></polyline>
+                        </svg>
+                        +8% from last month
+                    </div>
+                </div>
+
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Average Order Value</h3>
+                        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                        </svg>
+                    </div>
+                    <div class="metric-value" id="avgOrderValue">£0</div>
+                    <div class="metric-change neutral">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                        No change
+                    </div>
+                </div>
+
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Conversion Rate</h3>
+                        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12,6 12,12 16,14"></polyline>
+                        </svg>
+                    </div>
+                    <div class="metric-value" id="conversionRate">0%</div>
+                    <div class="metric-change positive">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="23,6 13.5,15.5 8.5,10.5 1,18"></polyline>
+                            <polyline points="17,6 23,6 23,12"></polyline>
+                        </svg>
+                        +2% from last month
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="chart-card">
+                    <h3 class="chart-title">Sales Trend</h3>
+                    <div class="chart-container">
+                        📈 Sales Trend Chart (Chart.js integration coming soon)
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <h3 class="chart-title">Order Status Distribution</h3>
+                    <div class="chart-container">
+                        🥧 Status Pie Chart (Chart.js integration coming soon)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Section -->
+            <div class="reports-section">
+                <h3 class="section-title">Reports & Exports</h3>
+                <div class="reports-grid">
+                    <div class="report-item">
+                        <div class="report-icon">📊</div>
+                        <div class="report-title">Sales Report</div>
+                        <div class="report-description">Download detailed sales data for any date range</div>
+                        <a href="#" class="report-btn">Generate Report</a>
+                    </div>
+                    
+                    <div class="report-item">
+                        <div class="report-icon">👥</div>
+                        <div class="report-title">Customer Report</div>
+                        <div class="report-description">Export customer data and order history</div>
+                        <a href="#" class="report-btn">Generate Report</a>
+                    </div>
+                    
+                    <div class="report-item">
+                        <div class="report-icon">📦</div>
+                        <div class="report-title">Inventory Report</div>
+                        <div class="report-description">Product performance and stock levels</div>
+                        <a href="#" class="report-btn">Generate Report</a>
+                    </div>
+                    
+                    <div class="report-item">
+                        <div class="report-icon">💰</div>
+                        <div class="report-title">Revenue Report</div>
+                        <div class="report-description">Financial summary and profit analysis</div>
+                        <a href="#" class="report-btn">Generate Report</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://pbbmrajuptceokpjnynz.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiYm1yYWp1cHRjZW9rcGpueW56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NzY1MzcsImV4cCI6MjA3NDA1MjUzN30.BYxGzM6G7MROTDTdj6KN3gCcrs6nxUaa_ylFZwMBT9o';
+        
+        let supabase;
+
+        // Initialize Supabase
+        async function initSupabase() {
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('Supabase initialized successfully');
+                return true;
+            } catch (error) {
+                console.error('Error initializing Supabase:', error);
+                return false;
+            }
+        }
+
+        // Load analytics data
+        async function loadAnalyticsData() {
+            try {
+                const { data: orders, error } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error('Error loading analytics data:', error);
+                    return;
+                }
+
+                updateAnalyticsMetrics(orders);
+            } catch (error) {
+                console.error('Error loading analytics data:', error);
+            }
+        }
+
+        // Update analytics metrics
+        function updateAnalyticsMetrics(orders) {
+            // Total Revenue
+            const totalRevenue = orders.reduce((sum, order) => sum + (order.total || 0), 0);
+            document.getElementById('totalRevenue').textContent = `£${totalRevenue.toFixed(2)}`;
+
+            // Monthly Orders
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+            const monthlyOrders = orders.filter(order => {
+                const orderDate = new Date(order.created_at);
+                return orderDate.getMonth() === currentMonth && orderDate.getFullYear() === currentYear;
+            }).length;
+            document.getElementById('monthlyOrders').textContent = monthlyOrders;
+
+            // Average Order Value
+            const avgOrderValue = orders.length > 0 ? totalRevenue / orders.length : 0;
+            document.getElementById('avgOrderValue').textContent = `£${avgOrderValue.toFixed(2)}`;
+
+            // Conversion Rate (placeholder - would need visitor data)
+            const conversionRate = orders.length > 0 ? Math.min((orders.length / 100) * 100, 100) : 0;
+            document.getElementById('conversionRate').textContent = `${conversionRate.toFixed(1)}%`;
+
+            // Update charts with real data
+            updateAnalyticsCharts(orders);
+        }
+
+        // Update analytics charts with real data
+        function updateAnalyticsCharts(orders) {
+            // Calculate order status distribution
+            const statusCounts = orders.reduce((acc, order) => {
+                acc[order.status] = (acc[order.status] || 0) + 1;
+                return acc;
+            }, {});
+
+            // Update order status chart placeholder
+            const statusChartPlaceholder = document.querySelector('.chart-container');
+            if (statusChartPlaceholder) {
+                statusChartPlaceholder.innerHTML = `
+                    <div style="text-align: center;">
+                        <h4 style="margin-bottom: 1rem; color: #c8e6ff;">Order Status Distribution</h4>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            ${Object.entries(statusCounts).map(([status, count]) => `
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                                    <span style="text-transform: capitalize; color: #ffffff;">${status}</span>
+                                    <span style="color: #c8e6ff; font-weight: 600;">${count}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Calculate monthly revenue
+            const monthlyRevenue = calculateMonthlyRevenue(orders);
+            
+            // Update sales trend chart placeholder
+            const salesChartPlaceholder = document.querySelector('.chart-container');
+            if (salesChartPlaceholder) {
+                salesChartPlaceholder.innerHTML = `
+                    <div style="text-align: center;">
+                        <h4 style="margin-bottom: 1rem; color: #c8e6ff;">Sales Trend (Last 6 Months)</h4>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            ${Object.entries(monthlyRevenue).slice(-6).map(([month, revenue]) => `
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                                    <span style="color: #ffffff;">${month}</span>
+                                    <span style="color: #c8e6ff; font-weight: 600;">£${revenue.toFixed(2)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Calculate monthly revenue
+        function calculateMonthlyRevenue(orders) {
+            const monthlyRevenue = {};
+            
+            orders.forEach(order => {
+                const date = new Date(order.created_at);
+                const monthKey = date.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+                
+                if (!monthlyRevenue[monthKey]) {
+                    monthlyRevenue[monthKey] = 0;
+                }
+                
+                monthlyRevenue[monthKey] += order.total || 0;
+            });
+            
+            return monthlyRevenue;
+        }
+
+        // Initialize admin analytics page
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Admin Analytics - Starting initialization...');
+            
+            // Initialize Supabase
+            const supabaseReady = await initSupabase();
+            
+            if (supabaseReady) {
+                // Load analytics data
+                await loadAnalyticsData();
+            }
+            
+            console.log('Admin Analytics initialization complete!');
+        });
+    </script>
+</body>
+</html>

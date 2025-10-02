@@ -1,0 +1,27 @@
+{
+  "name": "wintersolace-email-notifications",
+  "version": "1.0.0",
+  "description": "Email notification server for WinterSolace contact form",
+  "main": "email-notification-server.js",
+  "scripts": {
+    "start": "node email-notification-server.js",
+    "dev": "nodemon email-notification-server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "nodemailer": "^6.9.7",
+    "pdfkit": "^0.14.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "email",
+    "notifications",
+    "contact-form",
+    "wintersolace"
+  ],
+  "author": "WinterSolace",
+  "license": "MIT"
+}

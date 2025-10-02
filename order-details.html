@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details - WinterSolace</title>
+    <!-- Supabase JavaScript Client -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <!-- Track123 Tracking Service -->
+    <script src="tracking-service.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Heavy Fog overlay effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 120%;
+            height: 120%;
+            background: 
+                radial-gradient(ellipse 800px 400px at 20% 10%, rgba(255, 255, 255, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse 600px 300px at 80% 30%, rgba(200, 230, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 700px 350px at 10% 80%, rgba(220, 240, 255, 0.18) 0%, transparent 55%);
+            pointer-events: none;
+            z-index: 1;
+            animation: heavyFogDrift 20s ease-in-out infinite;
+        }
+
+        @keyframes heavyFogDrift {
+            0% { transform: translateX(-5%) translateY(-3%) rotate(0deg); }
+            25% { transform: translateX(2%) translateY(-1%) rotate(0.5deg); }
+            50% { transform: translateX(-1%) translateY(2%) rotate(-0.3deg); }
+            75% { transform: translateX(3%) translateY(1%) rotate(0.2deg); }
+            100% { transform: translateX(-5%) translateY(-3%) rotate(0deg); }
+        }
+
+        /* Ice Crystal Effects */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(200, 230, 255, 0.1) 1px, transparent 1px),
+                radial-gradient(circle at 80% 40%, rgba(220, 240, 255, 0.08) 1px, transparent 1px),
+                radial-gradient(circle at 40% 80%, rgba(180, 220, 255, 0.12) 1px, transparent 1px);
+            background-size: 200px 200px, 300px 300px, 250px 250px;
+            pointer-events: none;
+            z-index: 1;
+            animation: crystalShimmer 15s ease-in-out infinite;
+        }
+
+        @keyframes crystalShimmer {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-left {
+            justify-self: start;
+        }
+
+        .logo {
+            height: 60px;
+            filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.1));
+            transition: all 0.3s ease;
+            justify-self: center;
+        }
+
+        .logo:hover {
+            filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.2));
+            transform: scale(1.05);
+        }
+
+        .nav-menu {
+            display: contents;
+            justify-self: center;
+        }
+
+        .nav-link {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 400;
+            font-size: 0.95rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            margin: 0 0.5rem;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #c8e6ff;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            justify-self: end;
+        }
+
+        .cart-icon {
+            position: relative;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .cart-icon:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #c8e6ff;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .user-name {
+            color: #ffffff;
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-right: 0.5rem;
+        }
+
+        .profile-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #ffffff;
+        }
+
+        .profile-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .profile-button svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .logout-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #dc3545;
+            flex-shrink: 0;
+        }
+
+        .logout-button:hover {
+            background: rgba(220, 53, 69, 0.2);
+            border-color: rgba(220, 53, 69, 0.5);
+        }
+
+        .logout-button svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #c8e6ff;
+        }
+
+        .user-profile {
+            position: relative;
+        }
+
+        .profile-button {
+            background: rgba(200, 230, 255, 0.1);
+            border: 1px solid rgba(200, 230, 255, 0.2);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-button:hover {
+            background: rgba(200, 230, 255, 0.2);
+            border-color: rgba(200, 230, 255, 0.4);
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(200, 230, 255, 0.2);
+            border-radius: 12px;
+            padding: 0.5rem 0;
+            min-width: 200px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .profile-dropdown.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 0.75rem 1rem;
+            color: #ffffff;
+            text-decoration: none;
+            display: block;
+            transition: background 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(200, 230, 255, 0.1);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: rgba(200, 230, 255, 0.1);
+            margin: 0.5rem 0;
+        }
+
+        /* Main Content */
+        .main-content {
+            position: relative;
+            z-index: 5;
+            padding: 2rem;
+            padding-top: 6rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #c8e6ff;
+            text-decoration: none;
+            margin-bottom: 2rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid rgba(200, 230, 255, 0.2);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(200, 230, 255, 0.1);
+            border-color: rgba(200, 230, 255, 0.4);
+        }
+
+        .order-header {
+            background: rgba(200, 230, 255, 0.05);
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(20px);
+        }
+
+        .order-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #c8e6ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .order-number {
+            color: #c8e6ff;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .order-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .status-processing {
+            background: rgba(0, 123, 255, 0.2);
+            color: #007bff;
+            border: 1px solid rgba(0, 123, 255, 0.3);
+        }
+
+        .status-shipped {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .status-delivered {
+            background: rgba(108, 117, 125, 0.2);
+            color: #6c757d;
+            border: 1px solid rgba(108, 117, 125, 0.3);
+        }
+
+        .status-cancelled {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+
+        .order-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .order-section {
+            background: rgba(200, 230, 255, 0.05);
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(20px);
+        }
+
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #c8e6ff;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(200, 230, 255, 0.1);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .info-label {
+            color: #aaa;
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: #ffffff;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .order-items {
+            background: rgba(200, 230, 255, 0.05);
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(20px);
+        }
+
+        .item-card {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .item-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .item-image {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #333 0%, #555 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+            font-size: 0.8rem;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: #ffffff;
+        }
+
+        .item-size {
+            color: #c8e6ff;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .item-price {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .item-quantity {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        /* Tracking Section - Truck Design */
+
+        /* Full-width tracking section */
+        .tracking-section {
+            grid-column: 1 / -1;
+            width: 100%;
+            margin-top: 2rem;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(20, 20, 20, 0.9));
+            border: 2px solid rgba(200, 230, 255, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tracking-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .carrier-track-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0, 123, 255, 0.1);
+            border: 1px solid rgba(0, 123, 255, 0.3);
+            color: #007bff;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .carrier-track-btn:hover {
+            background: rgba(0, 123, 255, 0.2);
+            border-color: rgba(0, 123, 255, 0.5);
+            color: #c8e6ff;
+            text-decoration: none;
+        }
+
+        /* Enhanced 4-Step Checkmark Design */
+        .shipping-progress {
+            position: relative;
+            height: 150px;
+            margin: 2rem 0;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            border: 2px solid rgba(200, 230, 255, 0.3);
+            padding: 2rem 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            min-height: 150px;
+            width: 100%;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            right: 10%;
+            height: 12px;
+            background: #333;
+            transform: translateY(-50%);
+            border-radius: 6px;
+            box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .progress-line-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #007bff, #28a745);
+            border-radius: 6px;
+            transition: width 1s ease-in-out;
+            box-shadow: 0 0 20px rgba(0, 123, 255, 0.6);
+        }
+
+        .shipping-steps {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 100%;
+        }
+
+        .shipping-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .step-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #333;
+            border: 4px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 0.8rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .step-icon.completed {
+            background: #28a745;
+            border-color: #28a745;
+            box-shadow: 0 4px 16px rgba(40, 167, 69, 0.4);
+        }
+
+        .step-icon.active {
+            background: #007bff;
+            border-color: #007bff;
+            box-shadow: 0 0 20px rgba(0, 123, 255, 0.8);
+            animation: activePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes activePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .step-label {
+            color: #c8e6ff;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Enhanced Tracking Details Section */
+        .tracking-details {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(200, 230, 255, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .details-title {
+            color: #c8e6ff;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .details-content {
+            color: #ffffff;
+        }
+
+        .details-status {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: #28a745;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .details-description {
+            font-size: 1rem;
+            color: #ccc;
+            margin-bottom: 0.8rem;
+            line-height: 1.5;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .details-time {
+            font-size: 0.9rem;
+            color: #007bff;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .current-status {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: #ffffff;
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            border: 2px solid rgba(200, 230, 255, 0.3);
+            text-align: center;
+            min-width: 300px;
+        }
+
+        .status-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #c8e6ff;
+        }
+
+        .status-description {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-time {
+            font-size: 0.8rem;
+            color: #007bff;
+            font-weight: 600;
+        }
+
+        .tracking-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .tracking-link:hover {
+            color: #0056b3;
+        }
+
+        .no-tracking {
+            text-align: center;
+            color: #aaa;
+            padding: 2rem;
+        }
+
+        /* Loading States */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: #aaa;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(200, 230, 255, 0.3);
+            border-top: 2px solid #c8e6ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .order-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-left">
+                <img src="assets/Wntrsolace.png" alt="WinterSolace Logo" class="logo">
+            </div>
+            
+            <div class="nav-menu">
+                <a href="collections.html" class="nav-link">Home</a>
+                <a href="collections.html" class="nav-link">Collection</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </div>
+            
+            <div class="nav-right">
+                <a href="cart.html" class="cart-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
+                    </svg>
+                    <span class="cart-count" id="cartCount">0</span>
+                </a>
+                
+                <div class="user-name" id="userName">Loading...</div>
+                
+                <div class="user-profile">
+                    <div class="profile-button" onclick="toggleProfileDropdown()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <a href="profile.html" class="dropdown-item">My Profile</a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item" onclick="logoutUser()" style="background: none; border: none; width: 100%; text-align: left; color: #dc3545;">Logout</button>
+                    </div>
+                </div>
+                
+                <div class="logout-button" onclick="logoutUser()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16,17 21,12 16,7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <a href="profile.html" class="back-button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Back to Orders
+        </a>
+
+        <div id="loadingState" class="loading">
+            <div class="spinner"></div>
+            Loading order details...
+        </div>
+
+        <div id="orderContent" style="display: none;">
+            <!-- Order Header -->
+            <div class="order-header">
+                <h1 class="order-title" id="orderTitle">Order Details</h1>
+                <div class="order-number" id="orderNumber">Order #</div>
+                <div class="order-status" id="orderStatus">Status</div>
+            </div>
+
+            <!-- Order Information Grid -->
+            <div class="order-grid">
+                <!-- Customer Information -->
+                <div class="order-section">
+                    <h3 class="section-title">Customer Information</h3>
+                    <div class="info-item">
+                        <span class="info-label">Name:</span>
+                        <span class="info-value" id="customerName">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value" id="customerEmail">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Phone:</span>
+                        <span class="info-value" id="customerPhone">-</span>
+                    </div>
+                </div>
+
+                <!-- Shipping Address -->
+                <div class="order-section">
+                    <h3 class="section-title">Shipping Address</h3>
+                    <div class="info-item">
+                        <span class="info-label">Address:</span>
+                        <span class="info-value" id="shippingAddress">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">City:</span>
+                        <span class="info-value" id="shippingCity">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Country:</span>
+                        <span class="info-value" id="shippingCountry">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Postal Code:</span>
+                        <span class="info-value" id="shippingPostal">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="order-items">
+                <h3 class="section-title">Order Items</h3>
+                <div id="orderItemsList">
+                    <!-- Items will be populated here -->
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="order-grid">
+                <div class="order-section">
+                    <h3 class="section-title">Order Summary</h3>
+                    <div class="info-item">
+                        <span class="info-label">Subtotal:</span>
+                        <span class="info-value" id="orderSubtotal">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Shipping:</span>
+                        <span class="info-value" id="orderShipping">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Total:</span>
+                        <span class="info-value" id="orderTotal">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Payment Method:</span>
+                        <span class="info-value" id="paymentMethod">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Order Date:</span>
+                        <span class="info-value" id="orderDate">-</span>
+                    </div>
+                </div>
+
+                <!-- Live Tracking - 4-Step Shipping -->
+                <div class="tracking-section" id="trackingSection" style="display: block;">
+                <div class="tracking-header">
+                    <h3 class="section-title">🚚 Shipping Progress</h3>
+                    <div class="tracking-controls">
+                        <div class="tracking-number" id="trackingNumber">
+                            <span id="trackingNumberText">Tracking: -</span>
+                        </div>
+                        <a href="#" id="carrierTrackingLink" class="carrier-track-btn" target="_blank" style="display: none;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                                <polyline points="15,3 21,3 21,9"/>
+                                <line x1="10" y1="14" x2="21" y2="3"/>
+                            </svg>
+                            Track on Carrier Site
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="shipping-progress" id="shippingProgress">
+                    <div class="progress-line">
+                        <div class="progress-line-fill" id="progressLineFill" style="width: 100%;"></div>
+                    </div>
+                    <div class="shipping-steps" id="shippingSteps">
+                        <div class="shipping-step">
+                            <div class="step-icon completed">✓</div>
+                            <div class="step-label">Shipped</div>
+                        </div>
+                        <div class="shipping-step">
+                            <div class="step-icon completed">✓</div>
+                            <div class="step-label">Sorting Center</div>
+                        </div>
+                        <div class="shipping-step">
+                            <div class="step-icon completed">✓</div>
+                            <div class="step-label">Local Depot</div>
+                        </div>
+                        <div class="shipping-step">
+                            <div class="step-icon active">✓</div>
+                            <div class="step-label">Delivered</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tracking Details at Bottom -->
+                <div class="tracking-details" id="trackingDetails" style="display: block;">
+                    <h4 class="details-title">Latest Update</h4>
+                    <div class="details-content" id="trackingDetailsContent">
+                        <div class="details-status" id="detailsStatus">Loading...</div>
+                        <div class="details-description" id="detailsDescription">Getting latest tracking information</div>
+                        <div class="details-time" id="detailsTime">-</div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="errorState" style="display: none;" class="loading">
+            <p>Error loading order details. Please try again.</p>
+        </div>
+    </main>
+
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://pbbmrajuptceokpjnynz.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiYm1yYWp1cHRjZW9rcGpueW56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NzY1MzcsImV4cCI6MjA3NDA1MjUzN30.BYxGzM6G7MROTDTdj6KN3gCcrs6nxUaa_ylFZwMBT9o';
+
+        let supabase;
+        let currentOrder = null;
+
+        // Initialize Supabase
+        async function initSupabase() {
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('Supabase initialized successfully');
+                return true;
+            } catch (error) {
+                console.error('Error initializing Supabase:', error);
+                return false;
+            }
+        }
+
+        // Get order ID from URL parameters
+        function getOrderIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        // Load order details
+        async function loadOrderDetails() {
+            const orderId = getOrderIdFromUrl();
+            if (!orderId) {
+                showError('No order ID provided');
+                return;
+            }
+
+            try {
+                // Load order and order items
+                const { data: order, error: orderError } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .eq('id', orderId)
+                    .single();
+
+                if (orderError) {
+                    console.error('Error loading order:', orderError);
+                    showError('Error loading order details');
+                    return;
+                }
+
+                const { data: orderItems, error: itemsError } = await supabase
+                    .from('order_items')
+                    .select('*')
+                    .eq('order_id', orderId);
+
+                if (itemsError) {
+                    console.error('Error loading order items:', itemsError);
+                    showError('Error loading order items');
+                    return;
+                }
+
+                currentOrder = { ...order, items: orderItems };
+                displayOrderDetails();
+                loadTrackingInfo();
+
+            } catch (error) {
+                console.error('Error loading order details:', error);
+                showError('Error loading order details');
+            }
+        }
+
+        // Display order details
+        function displayOrderDetails() {
+            if (!currentOrder) return;
+
+            // Order header
+            document.getElementById('orderTitle').textContent = `Order #${currentOrder.order_number}`;
+            document.getElementById('orderNumber').textContent = `Order #${currentOrder.order_number}`;
+            
+            const statusElement = document.getElementById('orderStatus');
+            statusElement.textContent = currentOrder.status.charAt(0).toUpperCase() + currentOrder.status.slice(1);
+            statusElement.className = `order-status status-${currentOrder.status}`;
+
+            // Customer information
+            document.getElementById('customerName').textContent = `${currentOrder.first_name} ${currentOrder.last_name}`;
+            document.getElementById('customerEmail').textContent = currentOrder.email;
+            document.getElementById('customerPhone').textContent = currentOrder.phone || '-';
+
+            // Shipping address
+            document.getElementById('shippingAddress').textContent = currentOrder.address;
+            document.getElementById('shippingCity').textContent = currentOrder.city;
+            document.getElementById('shippingCountry').textContent = currentOrder.country;
+            document.getElementById('shippingPostal').textContent = currentOrder.zip_code;
+
+            // Order summary
+            document.getElementById('orderSubtotal').textContent = `£${parseFloat(currentOrder.subtotal || 0).toFixed(2)}`;
+            document.getElementById('orderShipping').textContent = `£${parseFloat(currentOrder.shipping || 0).toFixed(2)}`;
+            document.getElementById('orderTotal').textContent = `£${parseFloat(currentOrder.total || 0).toFixed(2)}`;
+            document.getElementById('paymentMethod').textContent = currentOrder.payment_method || '-';
+            document.getElementById('orderDate').textContent = new Date(currentOrder.created_at).toLocaleDateString();
+
+            // Order items
+            displayOrderItems();
+        }
+
+        // Display order items
+        function displayOrderItems() {
+            const itemsList = document.getElementById('orderItemsList');
+            itemsList.innerHTML = '';
+
+            currentOrder.items.forEach(item => {
+                const itemCard = document.createElement('div');
+                itemCard.className = 'item-card';
+
+                const imageUrl = getCloudinaryUrl(item.product_image_public_id, 80, 80);
+                
+                itemCard.innerHTML = `
+                    <div class="item-image" style="background-image: url('${imageUrl}')">
+                        ${!item.product_image_public_id ? 'IMG' : ''}
+                    </div>
+                    <div class="item-details">
+                        <div class="item-name">${item.product_name}</div>
+                        <div class="item-size">Size: ${item.size}</div>
+                        <div class="item-price">£${parseFloat(item.product_price).toFixed(2)}</div>
+                        <div class="item-quantity">Quantity: ${item.quantity}</div>
+                    </div>
+                `;
+
+                itemsList.appendChild(itemCard);
+            });
+        }
+
+        // Load tracking information
+        function loadTrackingInfo() {
+            if (!currentOrder.tracking_number) {
+                return;
+            }
+
+            // Show tracking section
+            document.getElementById('trackingSection').style.display = 'block';
+            document.getElementById('trackingNumberText').textContent = `Tracking: ${currentOrder.tracking_number}`;
+
+            // Generate tracking link
+            const trackingUrls = {
+                'ups': 'https://www.ups.com/track?track=yes&trackNums=',
+                'fedex': 'https://www.fedex.com/fedextrack/?trknbr=',
+                'dhl': 'https://www.dhl.com/en/express/tracking.html?AWB=',
+                'royal-mail': 'https://www.royalmail.com/track-your-item#/tracking-results/',
+                'dpd': 'https://www.dpd.co.uk/apps/tracking/?reference=',
+                'hermes': 'https://www.myhermes.co.uk/tracking.html#/parcel/',
+                'yodel': 'https://www.yodel.co.uk/track/parcel/'
+            };
+
+            const trackingLink = trackingUrls[currentOrder.shipping_company] 
+                ? trackingUrls[currentOrder.shipping_company] + currentOrder.tracking_number
+                : null;
+
+            if (trackingLink) {
+                const trackingHeader = document.querySelector('.tracking-header');
+                const linkElement = document.createElement('a');
+                linkElement.href = trackingLink;
+                linkElement.target = '_blank';
+                linkElement.className = 'tracking-link';
+                linkElement.textContent = 'Track Package';
+                trackingHeader.appendChild(linkElement);
+            }
+
+            // Load live tracking data
+            loadLiveTracking();
+        }
+
+        // Load live tracking data from Track123 API
+        async function loadLiveTracking() {
+            if (!currentOrder.tracking_number) {
+                document.getElementById('trackingDetails').style.display = 'block';
+                document.getElementById('detailsStatus').textContent = 'No tracking number available';
+                document.getElementById('detailsDescription').textContent = 'No tracking number provided for this order';
+                document.getElementById('detailsTime').textContent = '-';
+                return;
+            }
+
+            // Show loading state
+            document.getElementById('trackingDetails').style.display = 'block';
+            document.getElementById('detailsStatus').textContent = 'Loading...';
+            document.getElementById('detailsDescription').textContent = 'Getting latest tracking information';
+            document.getElementById('detailsTime').textContent = '-';
+
+            try {
+                // Get real tracking data from Track123 API
+                const response = await fetch('http://localhost:3001/api/track', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        trackingNumber: currentOrder.tracking_number,
+                        carrier: currentOrder.shipping_company
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const trackingData = await response.json();
+                console.log('Track123 response:', trackingData);
+
+                // Store tracking data globally for history access
+                window.currentTrackingData = trackingData;
+
+                // Update tracking details with real data
+                updateTrackingDetails(trackingData);
+
+                // Format Track123 data for display
+                const formattedData = formatTrack123Data(trackingData);
+                displayTrackingTimeline(formattedData);
+
+            } catch (error) {
+                console.error('Error loading tracking data:', error);
+                console.log('Falling back to simulated tracking...');
+                
+                // Fallback to simulated tracking if API fails
+                const trackingEvents = generateTrackingEvents(currentOrder.status, currentOrder.created_at);
+                displayTrackingTimeline({ events: trackingEvents });
+            }
+        }
+
+        // Format Track123 data for display
+        function formatTrack123Data(trackingData) {
+            console.log('Formatting Track123 data:', trackingData);
+            
+            // Check if we have tracking data
+            if (!trackingData.data || !trackingData.data.accepted || !trackingData.data.accepted.content) {
+                console.log('No tracking content found in Track123 response');
+                return { events: [] };
+            }
+
+            const content = trackingData.data.accepted.content;
+            if (!Array.isArray(content) || content.length === 0) {
+                console.log('No tracking events in content array');
+                return { events: [] };
+            }
+
+            // Get the first tracking item (should be our tracking number)
+            const trackingItem = content[0];
+            if (!trackingItem || !trackingItem.localLogisticsInfo || !trackingItem.localLogisticsInfo.trackingDetails) {
+                console.log('No tracking details found in tracking item');
+                return { events: [] };
+            }
+
+            // Convert Track123 events to our format
+            const events = trackingItem.localLogisticsInfo.trackingDetails.map(event => ({
+                title: event.eventDetail || 'Status Update',
+                description: event.eventDetail || 'Package status updated',
+                location: event.address || null,
+                date: event.eventTime ? new Date(event.eventTime).toLocaleString() : 'Unknown date'
+            }));
+
+            // Sort events by date (newest first)
+            events.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            console.log('Formatted events:', events);
+            return { events };
+        }
+
+        // Display 4-step shipping progress
+        function displayTrackingTimeline(trackingData) {
+            if (!trackingData.events || trackingData.events.length === 0) {
+                showNoTrackingData();
+                return;
+            }
+
+            // Create 4 shipping steps
+            createShippingSteps();
+            
+            // Update progress based on latest event
+            updateShippingProgress(trackingData.events[0]);
+            
+            // Show tracking details at bottom
+            showTrackingDetails(trackingData.events[0]);
+        }
+
+        // Create 4 shipping steps
+        function createShippingSteps() {
+            const shippingSteps = document.getElementById('shippingSteps');
+            shippingSteps.innerHTML = '';
+
+            const steps = [
+                { icon: '✓', label: 'Shipped', position: 0 },
+                { icon: '✓', label: 'Sorting Center', position: 1 },
+                { icon: '✓', label: 'Local Depot', position: 2 },
+                { icon: '✓', label: 'Delivered', position: 3 }
+            ];
+
+            steps.forEach((step, index) => {
+                const stepElement = document.createElement('div');
+                stepElement.className = 'shipping-step';
+                
+                const iconElement = document.createElement('div');
+                iconElement.className = 'step-icon';
+                iconElement.textContent = step.icon;
+                
+                const labelElement = document.createElement('div');
+                labelElement.className = 'step-label';
+                labelElement.textContent = step.label;
+                
+                stepElement.appendChild(iconElement);
+                stepElement.appendChild(labelElement);
+                shippingSteps.appendChild(stepElement);
+            });
+        }
+
+        // Update shipping progress based on tracking status
+        function updateShippingProgress(latestEvent) {
+            const eventTitle = latestEvent.title.toLowerCase();
+            const eventDescription = latestEvent.description.toLowerCase();
+            
+            let currentStep = 0;
+            let progressWidth = 0;
+
+            // Determine current step based on tracking data
+            if (eventTitle.includes('delivered') || eventDescription.includes('delivered')) {
+                currentStep = 3;
+                progressWidth = 100;
+            } else if (eventDescription.includes('local depot') || eventDescription.includes('arrival center') || 
+                      eventDescription.includes('out for delivery') || eventDescription.includes('arrived at destination')) {
+                currentStep = 2;
+                progressWidth = 75;
+            } else if (eventDescription.includes('sorting center') || eventDescription.includes('picked up') || 
+                      eventDescription.includes('in transit') || eventDescription.includes('departed')) {
+                currentStep = 1;
+                progressWidth = 50;
+            } else if (eventTitle.includes('shipped') || eventDescription.includes('shipped') || 
+                      eventDescription.includes('processing') || eventDescription.includes('prepared')) {
+                currentStep = 0;
+                progressWidth = 25;
+            }
+
+            // Update progress line
+            document.getElementById('progressLineFill').style.width = `${progressWidth}%`;
+            
+            // Update step icons
+            const stepIcons = document.querySelectorAll('.step-icon');
+            stepIcons.forEach((icon, index) => {
+                icon.classList.remove('completed', 'active');
+                if (index < currentStep) {
+                    icon.classList.add('completed');
+                } else if (index === currentStep) {
+                    icon.classList.add('active');
+                }
+            });
+        }
+
+        // Show tracking details at bottom
+        function showTrackingDetails(latestEvent) {
+            document.getElementById('trackingDetails').style.display = 'block';
+            document.getElementById('detailsStatus').textContent = latestEvent.title;
+            document.getElementById('detailsDescription').textContent = latestEvent.description;
+            document.getElementById('detailsTime').textContent = latestEvent.date;
+        }
+
+        // Show no tracking data message
+        function showNoTrackingData() {
+            document.getElementById('trackingDetails').style.display = 'block';
+            document.getElementById('detailsStatus').textContent = 'No tracking data';
+            document.getElementById('detailsDescription').textContent = 'No tracking events available';
+            document.getElementById('detailsTime').textContent = '-';
+        }
+
+        // Generate tracking events based on order status
+        function generateTrackingEvents(status, orderDate) {
+            const events = [];
+            const orderDateTime = new Date(orderDate);
+            
+            // Order placed
+            events.push({
+                title: 'Order Placed',
+                description: 'Your order has been received and is being processed.',
+                date: orderDateTime.toLocaleString()
+            });
+            
+            // Processing
+            if (['processing', 'shipped', 'delivered'].includes(status)) {
+                events.push({
+                    title: 'Order Processing',
+                    description: 'Your order is being prepared for shipment.',
+                    date: new Date(orderDateTime.getTime() + 2 * 60 * 60 * 1000).toLocaleString()
+                });
+            }
+            
+            // Shipped
+            if (['shipped', 'delivered'].includes(status)) {
+                events.push({
+                    title: 'Order Shipped',
+                    description: `Your order has been shipped via ${currentOrder.shipping_company || 'carrier'}.`,
+                    date: new Date(orderDateTime.getTime() + 24 * 60 * 60 * 1000).toLocaleString()
+                });
+            }
+            
+            // In transit
+            if (['shipped', 'delivered'].includes(status)) {
+                events.push({
+                    title: 'In Transit',
+                    description: 'Your package is on its way to you.',
+                    date: new Date(orderDateTime.getTime() + 48 * 60 * 60 * 1000).toLocaleString()
+                });
+            }
+            
+            // Delivered
+            if (status === 'delivered') {
+                events.push({
+                    title: 'Delivered',
+                    description: 'Your package has been delivered successfully.',
+                    date: new Date(orderDateTime.getTime() + 72 * 60 * 60 * 1000).toLocaleString()
+                });
+            }
+            
+            return events;
+        }
+
+        // Cloudinary URL helper
+        function getCloudinaryUrl(publicId, width, height) {
+            if (!publicId) return '';
+            return `https://res.cloudinary.com/dlfsfybx3/image/upload/w_${width},h_${height},q_auto,f_auto/${publicId}`;
+        }
+
+        // Show error state
+        function showError(message) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('orderContent').style.display = 'none';
+            document.getElementById('errorState').style.display = 'block';
+            document.getElementById('errorState').innerHTML = `<p>${message}</p>`;
+        }
+
+        // Show content
+        function showContent() {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('errorState').style.display = 'none';
+            document.getElementById('orderContent').style.display = 'block';
+        }
+
+        // Profile dropdown toggle
+        function toggleProfileDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('profileDropdown');
+            const profileButton = document.querySelector('.profile-button');
+            
+            if (!profileButton.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Logout function
+        async function logoutUser() {
+            try {
+                if (supabase) {
+                    await supabase.auth.signOut();
+                }
+                localStorage.removeItem('userLoggedIn');
+                localStorage.removeItem('username');
+                localStorage.removeItem('userEmail');
+                window.location.href = 'auth.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+                // Force redirect even if logout fails
+                window.location.href = 'auth.html';
+            }
+        }
+
+        // Load user name from Supabase
+        async function loadUserName() {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                
+                if (user) {
+                    let userName = 'User';
+                    
+                    // Check user metadata first (most reliable)
+                    if (user.user_metadata?.full_name) {
+                        userName = user.user_metadata.full_name;
+                    } else if (user.user_metadata?.name) {
+                        userName = user.user_metadata.name;
+                    } else if (user.user_metadata?.first_name && user.user_metadata?.last_name) {
+                        userName = `${user.user_metadata.first_name} ${user.user_metadata.last_name}`;
+                    } else if (user.user_metadata?.first_name) {
+                        userName = user.user_metadata.first_name;
+                    } else {
+                        // Fallback to email username
+                        userName = user.email?.split('@')[0] || 'User';
+                    }
+                    
+                    document.getElementById('userName').textContent = userName;
+                } else {
+                    document.getElementById('userName').textContent = 'Guest';
+                }
+            } catch (error) {
+                console.error('Error loading user name:', error);
+                document.getElementById('userName').textContent = 'User';
+            }
+        }
+
+        function updateTrackingDetails(trackingData) {
+            const detailsStatus = document.getElementById('detailsStatus');
+            const detailsDescription = document.getElementById('detailsDescription');
+            const detailsTime = document.getElementById('detailsTime');
+            const carrierTrackingLink = document.getElementById('carrierTrackingLink');
+            
+            console.log('Full tracking data:', JSON.stringify(trackingData, null, 2));
+            
+            if (!trackingData || !trackingData.data || !trackingData.data.accepted) {
+                detailsStatus.textContent = 'No tracking data available';
+                detailsDescription.textContent = 'Unable to load tracking information';
+                detailsTime.textContent = '-';
+                carrierTrackingLink.style.display = 'none';
+                return;
+            }
+
+            const trackingEvents = trackingData.data.accepted.content || [];
+            console.log('Tracking events array:', trackingEvents);
+            
+            if (trackingEvents.length === 0) {
+                detailsStatus.textContent = 'No updates available';
+                detailsDescription.textContent = 'No tracking information found';
+                detailsTime.textContent = '-';
+                carrierTrackingLink.style.display = 'none';
+                return;
+            }
+
+            // Show only the latest event
+            const latestEvent = trackingEvents[0];
+            console.log('Latest event:', latestEvent);
+            
+            // Set up carrier tracking link
+            if (latestEvent.localLogisticsInfo && latestEvent.localLogisticsInfo.courierTrackingLink) {
+                carrierTrackingLink.href = latestEvent.localLogisticsInfo.courierTrackingLink;
+                carrierTrackingLink.style.display = 'flex';
+                console.log('Carrier tracking link:', latestEvent.localLogisticsInfo.courierTrackingLink);
+            } else {
+                carrierTrackingLink.style.display = 'none';
+            }
+            
+            // Look for actual tracking details/events within the event
+            let actualTrackingInfo = null;
+            
+            // Check if there are detailed tracking events within the main event
+            if (latestEvent.trackingDetails && Array.isArray(latestEvent.trackingDetails) && latestEvent.trackingDetails.length > 0) {
+                actualTrackingInfo = latestEvent.trackingDetails[0]; // Get the latest detailed event
+            } else if (latestEvent.events && Array.isArray(latestEvent.events) && latestEvent.events.length > 0) {
+                actualTrackingInfo = latestEvent.events[0];
+            } else if (latestEvent.history && Array.isArray(latestEvent.history) && latestEvent.history.length > 0) {
+                actualTrackingInfo = latestEvent.history[0];
+            }
+            
+            console.log('Actual tracking info:', actualTrackingInfo);
+            
+            if (actualTrackingInfo) {
+                // Use the detailed tracking information
+                const status = actualTrackingInfo.status || actualTrackingInfo.event || actualTrackingInfo.description || 'Unknown Status';
+                const description = actualTrackingInfo.description || actualTrackingInfo.details || actualTrackingInfo.message || actualTrackingInfo.location || 'No description available';
+                const time = actualTrackingInfo.time || actualTrackingInfo.timestamp || actualTrackingInfo.datetime || actualTrackingInfo.date || '-';
+                
+                detailsStatus.textContent = status;
+                detailsDescription.textContent = description;
+                detailsTime.textContent = time;
+            } else {
+                // Fallback to main event data
+                const status = latestEvent.transitStatus || latestEvent.trackingStatus || 'Unknown Status';
+                const description = latestEvent.transitSubStatus || latestEvent.shipmentType || latestEvent.localLogisticsInfo?.courierNameEN || 'No description available';
+                const time = latestEvent.lastTrackingTime || latestEvent.deliveredTime || latestEvent.createTime || '-';
+
+                detailsStatus.textContent = status;
+                detailsDescription.textContent = description;
+                detailsTime.textContent = time;
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Order Details - Starting initialization...');
+            
+            const supabaseInitialized = await initSupabase();
+            if (!supabaseInitialized) {
+                showError('Failed to initialize database connection');
+                return;
+            }
+
+            // Load user name
+            await loadUserName();
+            
+            // Track123 API is now handled by our server-side proxy
+            
+            await loadOrderDetails();
+            showContent();
+            
+            console.log('Order Details initialization complete!');
+        });
+    </script>
+</body>
+</html>

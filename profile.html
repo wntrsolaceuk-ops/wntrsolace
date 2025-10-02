@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order History - WinterSolace</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Heavy Fog overlay effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 120%;
+            height: 120%;
+            background: 
+                radial-gradient(ellipse 800px 400px at 20% 10%, rgba(255, 255, 255, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse 600px 300px at 80% 30%, rgba(200, 230, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 700px 350px at 10% 80%, rgba(220, 240, 255, 0.18) 0%, transparent 55%),
+                radial-gradient(ellipse 900px 450px at 90% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 65%);
+            pointer-events: none;
+            z-index: 1;
+            animation: heavyFogDrift 20s ease-in-out infinite;
+        }
+
+        @keyframes heavyFogDrift {
+            0% { 
+                transform: translateX(-50px) translateY(0) scale(1);
+                opacity: 0.8;
+            }
+            25% { 
+                transform: translateX(-20px) translateY(-30px) scale(1.1);
+                opacity: 1;
+            }
+            50% { 
+                transform: translateX(30px) translateY(20px) scale(0.9);
+                opacity: 0.7;
+            }
+            75% { 
+                transform: translateX(-10px) translateY(-15px) scale(1.05);
+                opacity: 0.9;
+            }
+            100% { 
+                transform: translateX(-50px) translateY(0) scale(1);
+                opacity: 0.8;
+            }
+        }
+
+        /* Ice crystals overlay */
+        .ice-crystals {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .ice-crystal {
+            position: absolute;
+            color: rgba(200, 230, 255, 0.6);
+            font-size: 20px;
+            animation: crystalFloat 8s linear infinite;
+        }
+
+        @keyframes crystalFloat {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .ice-crystal:nth-child(1) { left: 10%; animation-delay: 0s; font-size: 16px; }
+        .ice-crystal:nth-child(2) { left: 20%; animation-delay: 2s; font-size: 24px; }
+        .ice-crystal:nth-child(3) { left: 30%; animation-delay: 4s; font-size: 18px; }
+        .ice-crystal:nth-child(4) { left: 40%; animation-delay: 1s; font-size: 22px; }
+        .ice-crystal:nth-child(5) { left: 50%; animation-delay: 3s; font-size: 20px; }
+        .ice-crystal:nth-child(6) { left: 60%; animation-delay: 5s; font-size: 16px; }
+        .ice-crystal:nth-child(7) { left: 70%; animation-delay: 2.5s; font-size: 26px; }
+        .ice-crystal:nth-child(8) { left: 80%; animation-delay: 4.5s; font-size: 19px; }
+        .ice-crystal:nth-child(9) { left: 90%; animation-delay: 1.5s; font-size: 21px; }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-left {
+            justify-self: start;
+        }
+
+        .logo {
+            height: 60px;
+            filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.1));
+            transition: all 0.3s ease;
+            justify-self: center;
+        }
+
+        .logo:hover {
+            filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.2));
+            transform: scale(1.05);
+        }
+
+        .nav-menu {
+            display: contents;
+            justify-self: center;
+        }
+
+        .nav-link {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 400;
+            font-size: 0.95rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            margin: 0 0.5rem;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #c8e6ff;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            justify-self: end;
+        }
+
+        .cart-icon {
+            position: relative;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .cart-icon:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #c8e6ff;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #c8e6ff;
+            color: #000000;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .username {
+            color: #ffffff;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .person-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .person-icon:hover {
+            background: rgba(200, 230, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-radius: 50%;
+            color: #dc3545;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 8px;
+        }
+
+        .logout-btn:hover {
+            background: rgba(220, 53, 69, 0.2);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(220, 53, 69, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            position: relative;
+            z-index: 10;
+            padding-top: 120px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            color: #c8e6ff;
+            opacity: 0.8;
+        }
+
+        /* Filter Buttons */
+        .filter-section {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 3rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(200, 230, 255, 0.2);
+            border-radius: 25px;
+            color: #ffffff;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: rgba(200, 230, 255, 0.1);
+            border-color: #c8e6ff;
+            color: #c8e6ff;
+            box-shadow: 0 0 20px rgba(200, 230, 255, 0.2);
+        }
+
+        /* Orders Grid */
+        .orders-grid {
+            display: grid;
+            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        }
+
+        .order-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .order-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(200, 230, 255, 0.5), transparent);
+        }
+
+        .order-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(200, 230, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .order-number {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #c8e6ff;
+        }
+
+        .order-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .status-confirmed {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .status-shipped {
+            background: rgba(0, 123, 255, 0.1);
+            color: #007bff;
+            border: 1px solid rgba(0, 123, 255, 0.3);
+        }
+
+        .status-delivered {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .order-date {
+            color: #ffffff;
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .order-items {
+            margin-bottom: 1.5rem;
+        }
+
+        .order-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #333333, #555555);
+            background-size: cover;
+            background-position: center;
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-name {
+            color: #ffffff;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .item-specs {
+            color: #c8e6ff;
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .item-price {
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .order-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .order-total {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #c8e6ff;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .action-btn {
+            padding: 0.75rem 1.25rem;
+            background: rgba(200, 230, 255, 0.1);
+            border: 1px solid rgba(200, 230, 255, 0.2);
+            border-radius: 20px;
+            color: #c8e6ff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: rgba(200, 230, 255, 0.2);
+            box-shadow: 0 0 15px rgba(200, 230, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            margin: 2rem 0;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.6;
+        }
+
+        .empty-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: #c8e6ff;
+        }
+
+        .empty-subtitle {
+            color: #ffffff;
+            opacity: 0.7;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        .shop-btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, rgba(200, 230, 255, 0.1), rgba(200, 230, 255, 0.05));
+            border: 1px solid rgba(200, 230, 255, 0.3);
+            border-radius: 25px;
+            color: #c8e6ff;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .shop-btn:hover {
+            background: linear-gradient(135deg, rgba(200, 230, 255, 0.2), rgba(200, 230, 255, 0.1));
+            box-shadow: 0 0 25px rgba(200, 230, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #c8e6ff;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(200, 230, 255, 0.3);
+            border-top: 3px solid #c8e6ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav {
+                padding: 0 1rem;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 1rem;
+            }
+
+            .nav-menu {
+                display: none;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .orders-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .order-card {
+                padding: 1.5rem;
+            }
+
+            .order-header {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .filter-section {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .filter-btn {
+                width: 200px;
+            }
+
+            .logo {
+                height: 45px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Ice crystals overlay -->
+    <div class="ice-crystals">
+        <div class="ice-crystal">✦</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">✦</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">✦</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">✦</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">✦</div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-left">
+                <img src="assets/Wntrsolace.png" alt="WinterSolace Logo" class="logo">
+            </div>
+            
+            <div class="nav-menu">
+                <a href="collections.html" class="nav-link">Home</a>
+                <a href="collections.html" class="nav-link">Collection</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </div>
+            
+            <div class="nav-right">
+                <a href="cart.html" class="cart-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
+                    </svg>
+                    <span class="cart-count" id="cartCount">0</span>
+                </a>
+                
+                <div class="user-profile" id="userProfile" style="display: none;">
+                    <span class="username" id="username">User</span>
+                    <a href="profile.html" class="person-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </a>
+                    <button class="logout-btn" onclick="logoutUser()" title="Logout">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16,17 21,12 16,7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                    </button>
+                </div>
+                
+                <a href="auth.html" class="person-icon" id="loginIcon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">Order History</h1>
+                <p class="page-subtitle">Track your WinterSolace orders</p>
+            </div>
+
+            <div class="filter-section">
+                <button class="filter-btn active" data-filter="all">All Orders</button>
+                <button class="filter-btn" data-filter="pending">Pending</button>
+                <button class="filter-btn" data-filter="confirmed">Confirmed</button>
+                <button class="filter-btn" data-filter="shipped">Shipped</button>
+                <button class="filter-btn" data-filter="delivered">Delivered</button>
+            </div>
+
+            <div id="ordersContainer">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading your orders...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://pbbmrajuptceokpjnynz.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiYm1yYWp1cHRjZW9rcGpueW56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NzY1MzcsImV4cCI6MjA3NDA1MjUzN30.BYxGzM6G7MROTDTdj6KN3gCcrs6nxUaa_ylFZwMBT9o';
+        
+        let supabase;
+        let currentUser = null;
+        let orders = [];
+
+        // Cloudinary configuration
+        const CLOUDINARY_CLOUD_NAME = 'dlfsfybx3';
+        
+        // Cloudinary URL helper function
+        function getCloudinaryUrl(publicId, width = 200, height = 200, quality = 'auto') {
+            if (!publicId) return null;
+            return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/w_${width},h_${height},c_fill,q_${quality},f_auto/${publicId}`;
+        }
+
+        // Initialize Supabase
+        async function initSupabase() {
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('Supabase initialized successfully');
+                return true;
+            } catch (error) {
+                console.error('Error initializing Supabase:', error);
+                return false;
+            }
+        }
+
+        // Update user profile
+        async function updateUserProfile() {
+            try {
+                if (!supabase) {
+                    console.log('Supabase not available, using localStorage fallback');
+                    const username = localStorage.getItem('username') || 'User';
+                    document.getElementById('username').textContent = username;
+                    document.getElementById('userProfile').style.display = 'flex';
+                    document.getElementById('loginIcon').style.display = 'none';
+                    return;
+                }
+
+                const { data: { user } } = await supabase.auth.getUser();
+                
+                if (user) {
+                    currentUser = user;
+                    const username = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
+                    document.getElementById('username').textContent = username;
+                    document.getElementById('userProfile').style.display = 'flex';
+                    document.getElementById('loginIcon').style.display = 'none';
+                    
+                    // Store username in localStorage for consistency
+                    localStorage.setItem('username', username);
+                } else {
+                    document.getElementById('userProfile').style.display = 'none';
+                    document.getElementById('loginIcon').style.display = 'flex';
+                }
+            } catch (error) {
+                console.log('Error updating user profile:', error);
+                // Fallback to localStorage
+                const username = localStorage.getItem('username') || 'User';
+                document.getElementById('username').textContent = username;
+                document.getElementById('userProfile').style.display = 'flex';
+                document.getElementById('loginIcon').style.display = 'none';
+            }
+        }
+
+        // Load orders from Supabase
+        async function loadOrders() {
+            try {
+                if (!supabase || !currentUser) {
+                    console.log('Supabase or user not available');
+                    showEmptyState();
+                    return;
+                }
+
+                console.log('Loading orders for user:', currentUser.id);
+                const { data: ordersData, error } = await supabase
+                    .from('orders')
+                    .select(`
+                        *,
+                        order_items (*)
+                    `)
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error('Error loading orders:', error);
+                    console.log('Orders table might not exist. Creating sample data...');
+                    showEmptyState();
+                    return;
+                }
+
+                orders = ordersData || [];
+                console.log('Orders loaded:', orders.length);
+                console.log('Sample order data:', orders[0]); // Debug: see what data we actually have
+                renderOrders();
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                showEmptyState();
+            }
+        }
+
+        // Render orders
+        function renderOrders(filter = 'all') {
+            const container = document.getElementById('ordersContainer');
+            
+            if (!orders || orders.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            const filteredOrders = filter === 'all' ? orders : orders.filter(order => order.status === filter);
+            
+            if (filteredOrders.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📦</div>
+                        <h3 class="empty-title">No ${filter} orders</h3>
+                        <p class="empty-subtitle">You don't have any ${filter} orders yet.</p>
+                        <a href="collections.html" class="shop-btn">Start Shopping</a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filteredOrders.map(order => `
+                <div class="order-card">
+                    <div class="order-header">
+                        <div class="order-number">${order.order_number}</div>
+                        <div class="order-status status-${order.status}">${order.status}</div>
+                    </div>
+                    
+                    <div class="order-date">
+                        ${new Date(order.created_at).toLocaleDateString('en-GB', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })}
+                    </div>
+                    
+                    <div class="order-items">
+                        ${order.order_items.map(item => {
+                            console.log('Order item data:', item); // Debug: see what fields we have
+                            return `
+                            <div class="order-item">
+                                <div class="item-image" style="${item.product_image_public_id ? `background-image: url('${getCloudinaryUrl(item.product_image_public_id, 60, 60)}'); background-size: cover; background-position: center;` : ''}">${!item.product_image_public_id ? 'IMG' : ''}</div>
+                                <div class="item-details">
+                                    <div class="item-name">${item.product_name || 'Product'}</div>
+                                    <div class="item-specs">Size: ${item.size} • Qty: ${item.quantity}</div>
+                                </div>
+                                <div class="item-price">£${item.total_price.toFixed(2)}</div>
+                            </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    
+                    <div class="order-summary">
+                        <div class="order-total">Total: £${order.total.toFixed(2)}</div>
+                        <div class="order-actions">
+                            <a href="order-details.html?id=${order.id}" class="action-btn">View Details</a>
+                            ${order.status === 'delivered' ? '<a href="#" class="action-btn" onclick="reorderItems(\'' + order.id + '\')">Reorder</a>' : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Show empty state
+        function showEmptyState() {
+            const container = document.getElementById('ordersContainer');
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">📦</div>
+                    <h3 class="empty-title">No Orders Yet</h3>
+                    <p class="empty-subtitle">You haven't placed any orders yet. Start shopping to see your order history here.</p>
+                    <a href="collections.html" class="shop-btn">Start Shopping</a>
+                </div>
+            `;
+        }
+
+        // Filter orders
+        function filterOrders(filter) {
+            // Update active filter button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-filter="${filter}"]`).classList.add('active');
+            
+            // Render filtered orders
+            renderOrders(filter);
+        }
+
+        // View order details
+        function viewOrderDetails(orderId) {
+            // Redirect to order confirmation page with order ID
+            window.location.href = `order-confirmation.html?orderId=${orderId}`;
+        }
+
+        // Reorder items
+        function reorderItems(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+
+            // Add items to cart
+            order.order_items.forEach(item => {
+                const cartItem = {
+                    id: item.product_id,
+                    name: item.products?.name || 'Product',
+                    price: item.unit_price,
+                    size: item.size,
+                    quantity: item.quantity,
+                    image_public_id: item.products?.image_public_id
+                };
+                
+                // Add to cart (you'll need to implement this)
+                addToCart(cartItem);
+            });
+
+            // Redirect to cart
+            window.location.href = 'cart.html';
+        }
+
+        // Add to cart function (placeholder)
+        function addToCart(item) {
+            // This would integrate with your existing cart system
+            console.log('Adding to cart:', item);
+        }
+
+        // Update cart count
+        function updateCartCount() {
+            try {
+                const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                document.getElementById('cartCount').textContent = cart.length;
+            } catch (error) {
+                console.log('Error updating cart count:', error);
+                document.getElementById('cartCount').textContent = '0';
+            }
+        }
+
+        // User logout function
+        async function logoutUser() {
+            if (confirm('Are you sure you want to logout?')) {
+                try {
+                    // Clear Supabase session if available
+                    if (supabase) {
+                        const { error } = await supabase.auth.signOut()
+                        if (error) {
+                            console.error('Supabase logout error:', error)
+                        }
+                    }
+                    
+                    // Clear localStorage
+                    localStorage.removeItem('userLoggedIn')
+                    localStorage.removeItem('username')
+                    localStorage.removeItem('userEmail')
+                    
+                    console.log('User logged out successfully')
+                    
+                    // Redirect to auth page
+                    window.location.href = 'auth.html'
+                    
+                } catch (error) {
+                    console.error('Logout error:', error)
+                    alert('Logout failed. Please try again.')
+                }
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('DOM Content Loaded - Starting initialization...');
+            
+            // Initialize Supabase
+            const supabaseReady = await initSupabase();
+            
+            // Update user profile
+            await updateUserProfile();
+            console.log('User profile updated, current user:', currentUser);
+            
+            // Update cart count
+            updateCartCount();
+            
+            // Load orders
+            await loadOrders();
+            
+            // Add filter event listeners
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    console.log('Filter clicked:', btn.dataset.filter);
+                    filterOrders(btn.dataset.filter);
+                });
+            });
+            
+            console.log('Initialization complete!');
+        });
+    </script>
+</body>
+</html>

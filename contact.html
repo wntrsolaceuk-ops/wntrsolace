@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - WinterSolace</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Heavy Fog overlay effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 120%;
+            height: 120%;
+            background: 
+                radial-gradient(ellipse 800px 400px at 20% 10%, rgba(255, 255, 255, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse 600px 300px at 80% 30%, rgba(200, 230, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 700px 350px at 10% 80%, rgba(220, 240, 255, 0.18) 0%, transparent 55%),
+                radial-gradient(ellipse 900px 450px at 90% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 65%);
+            pointer-events: none;
+            z-index: 1;
+            animation: heavyFogDrift 20s ease-in-out infinite;
+        }
+
+        @keyframes heavyFogDrift {
+            0% { 
+                transform: translateX(-50px) translateY(0) scale(1);
+                opacity: 0.8;
+            }
+            25% { 
+                transform: translateX(-20px) translateY(-30px) scale(1.1);
+                opacity: 1;
+            }
+            50% { 
+                transform: translateX(30px) translateY(20px) scale(0.9);
+                opacity: 0.7;
+            }
+            75% { 
+                transform: translateX(-10px) translateY(-15px) scale(1.05);
+                opacity: 0.9;
+            }
+            100% { 
+                transform: translateX(-50px) translateY(0) scale(1);
+                opacity: 0.8;
+            }
+        }
+
+        /* Ice crystals overlay */
+        .ice-crystals {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .ice-crystal {
+            position: absolute;
+            color: rgba(200, 230, 255, 0.6);
+            font-size: 20px;
+            animation: crystalFloat 8s linear infinite;
+        }
+
+        @keyframes crystalFloat {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .ice-crystal:nth-child(1) { left: 10%; animation-delay: 0s; font-size: 16px; }
+        .ice-crystal:nth-child(2) { left: 20%; animation-delay: 2s; font-size: 24px; }
+        .ice-crystal:nth-child(3) { left: 35%; animation-delay: 4s; font-size: 18px; }
+        .ice-crystal:nth-child(4) { left: 50%; animation-delay: 1s; font-size: 22px; }
+        .ice-crystal:nth-child(5) { left: 65%; animation-delay: 3s; font-size: 20px; }
+        .ice-crystal:nth-child(6) { left: 80%; animation-delay: 5s; font-size: 16px; }
+        .ice-crystal:nth-child(7) { left: 90%; animation-delay: 2.5s; font-size: 26px; }
+
+        /* Header Styles */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            align-items: center;
+            width: 100%;
+        }
+
+        .logo {
+            height: 60px;
+            filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.1));
+            transition: all 0.3s ease;
+            justify-self: center;
+        }
+
+        .logo:hover {
+            filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.2));
+            transform: scale(1.05);
+        }
+
+        .nav-menu {
+            display: contents;
+            list-style: none;
+        }
+
+        .nav-menu li {
+            justify-self: center;
+            list-style: none;
+        }
+
+        .nav-menu a {
+            color: #cccccc;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-menu a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-menu a:hover::before {
+            opacity: 1;
+        }
+
+        .nav-menu a:hover {
+            color: #ffffff;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            justify-self: end;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .user-profile:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .user-profile svg {
+            width: 20px;
+            height: 20px;
+            stroke: #cccccc;
+            transition: all 0.3s ease;
+        }
+
+        .user-profile:hover svg {
+            stroke: #ffffff;
+        }
+
+        .user-name {
+            color: #ffffff;
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-right: 0.5rem;
+        }
+
+        .cart-icon {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            padding: 12px !important;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(135, 206, 235, 0.1), rgba(173, 216, 230, 0.05));
+            border: 1px solid rgba(135, 206, 235, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .cart-icon:hover {
+            background: linear-gradient(135deg, rgba(135, 206, 235, 0.2), rgba(173, 216, 230, 0.1));
+            border-color: rgba(135, 206, 235, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(135, 206, 235, 0.2);
+        }
+
+        .cart-icon svg {
+            width: 22px;
+            height: 22px;
+            stroke: #87ceeb;
+            transition: all 0.3s ease;
+        }
+
+        .cart-icon:hover svg {
+            stroke: #ffffff;
+            transform: scale(1.1);
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 100px;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #c8e6ff, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .page-title p {
+            color: rgba(200, 230, 255, 0.8);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 4rem;
+        }
+
+        .contact-form-card {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(200, 230, 255, 0.2);
+            border-radius: 20px;
+            padding: 2.5rem;
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-form-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #c8e6ff, transparent);
+        }
+
+        .form-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #c8e6ff;
+            margin-bottom: 2rem;
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            color: #c8e6ff;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(200, 230, 255, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            color: #ffffff;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #c8e6ff;
+            box-shadow: 0 0 0 2px rgba(200, 230, 255, 0.2);
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(200, 230, 255, 0.5);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #c8e6ff;
+        }
+
+        .checkbox-group label {
+            color: rgba(200, 230, 255, 0.8);
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #c8e6ff, #007bff);
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            color: #000000;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(200, 230, 255, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Contact Info */
+        .contact-info-card {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(200, 230, 255, 0.2);
+            border-radius: 20px;
+            padding: 2.5rem;
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #c8e6ff, transparent);
+        }
+
+        .info-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #c8e6ff;
+            margin-bottom: 2rem;
+        }
+
+        .contact-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .contact-method {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .contact-method:hover {
+            border-color: rgba(200, 230, 255, 0.3);
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .method-icon {
+            background: rgba(200, 230, 255, 0.1);
+            border: 1px solid rgba(200, 230, 255, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            color: #c8e6ff;
+            flex-shrink: 0;
+        }
+
+        .method-content h3 {
+            color: #c8e6ff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .method-content p {
+            color: #ffffff;
+            margin-bottom: 0.25rem;
+            font-size: 0.95rem;
+        }
+
+        .method-content small {
+            color: rgba(200, 230, 255, 0.7);
+            font-size: 0.8rem;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(200, 230, 255, 0.2);
+            border-radius: 20px;
+            padding: 2.5rem;
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .faq-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #c8e6ff, transparent);
+        }
+
+        .faq-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #c8e6ff;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .faq-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .faq-item {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            border-color: rgba(200, 230, 255, 0.3);
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .faq-item h3 {
+            color: #c8e6ff;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .faq-item p {
+            color: rgba(200, 230, 255, 0.8);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Success Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(200, 230, 255, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            backdrop-filter: blur(20px);
+            text-align: center;
+        }
+
+        .modal-content h2 {
+            color: #c8e6ff;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .modal-content p {
+            color: rgba(200, 230, 255, 0.8);
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .modal-btn {
+            background: linear-gradient(135deg, #c8e6ff, #007bff);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            color: #000000;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(200, 230, 255, 0.3);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav {
+                padding: 0 1rem;
+            }
+
+            .nav-menu {
+                display: none;
+            }
+            
+            .logo {
+                height: 45px;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .page-title h1 {
+                font-size: 2rem;
+            }
+
+            .contact-section {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .contact-form-card,
+            .contact-info-card,
+            .faq-section {
+                padding: 1.5rem;
+            }
+
+            .faq-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <!-- Ice Crystals Animation -->
+    <div class="ice-crystals">
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">❅</div>
+        <div class="ice-crystal">❆</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">❅</div>
+        <div class="ice-crystal">❆</div>
+        <div class="ice-crystal">❄</div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <img src="assets/Wntrsolace.png" alt="WinterSolace Logo" class="logo">
+            <ul class="nav-menu">
+                <li><a href="layout-winter-frost.html">Home</a></li>
+                <li><a href="collections.html">Collection</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="nav-right">
+                <div class="cart-icon" onclick="goToCart()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m0 0h8M17 18a2 2 0 100 4 2 2 0 000-4zM9 18a2 2 0 100 4 2 2 0 000-4z"/>
+                    </svg>
+                    <span class="cart-count" id="cartCount">0</span>
+                </div>
+                <div class="user-profile" onclick="handlePersonClick()" id="userProfile" style="display: none;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span class="user-name" id="userName">User Name</span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="page-title">
+                <h1>Get in Touch</h1>
+                <p>We're here to help with any questions or concerns you may have</p>
+            </div>
+
+            <div class="contact-section">
+                <!-- Contact Form -->
+                <div class="contact-form-card">
+                    <h2 class="form-title">Send us a Message</h2>
+                    <form id="contactForm" class="contact-form">
+                        <div class="form-group">
+                            <label for="name">Full Name *</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subject">Subject *</label>
+                            <select id="subject" name="subject" required>
+                                <option value="">Select a subject</option>
+                                <option value="order_inquiry">Order Inquiry</option>
+                                <option value="shipping_question">Shipping Question</option>
+                                <option value="product_question">Product Question</option>
+                                <option value="return_refund">Return & Refund</option>
+                                <option value="technical_support">Technical Support</option>
+                                <option value="feedback">Feedback</option>
+                                <option value="complaint">Complaint</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="orderNumber">Order Number (if applicable)</label>
+                            <input type="text" id="orderNumber" name="orderNumber" placeholder="e.g., WS-2024-001">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message">Message *</label>
+                            <textarea id="message" name="message" rows="6" required placeholder="Please describe your inquiry in detail..."></textarea>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="newsletter" name="newsletter">
+                            <label for="newsletter">Subscribe to our newsletter for updates and special offers</label>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="contact-info-card">
+                    <h2 class="info-title">Contact Information</h2>
+                    <div class="contact-methods">
+                        <div class="contact-method">
+                            <div class="method-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                    <polyline points="22,6 12,13 2,6"/>
+                                </svg>
+                            </div>
+                            <div class="method-content">
+                                <h3>Email</h3>
+                                <p>support@wintersolace.com</p>
+                                <small>We'll respond within 24 hours</small>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ Section -->
+            <div class="faq-section">
+                <h2 class="faq-title">Frequently Asked Questions</h2>
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <h3>How long does shipping take?</h3>
+                        <p>Standard shipping takes 3-5 business days, while express shipping takes 1-2 business days.</p>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <h3>Can I track my order?</h3>
+                        <p>Yes! You can track your order in real-time using the tracking number provided in your order confirmation email.</p>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <h3>What's your return policy?</h3>
+                        <p>We offer a 30-day return policy for unused items in original packaging. Contact us to initiate a return.</p>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <h3>Do you ship internationally?</h3>
+                        <p>Currently, we only ship within the United States. International shipping will be available soon.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <h2>✅ Message Sent Successfully!</h2>
+            <p>Thank you for contacting us! We've received your message and will get back to you within 24 hours.</p>
+            <p>You should receive a confirmation email shortly.</p>
+            <button class="modal-btn" onclick="closeSuccessModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://pbbmrajuptceokpjnynz.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiYm1yYWp1cHRjZW9rcGpueW56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NzY1MzcsImV4cCI6MjA3NDA1MjUzN30.BYxGzM6G7MROTDTdj6KN3gCcrs6nxUaa_ylFZwMBT9o';
+        
+        let supabase;
+
+        // Initialize Supabase
+        async function initSupabase() {
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('Supabase initialized successfully');
+                return true;
+            } catch (error) {
+                console.error('Error initializing Supabase:', error);
+                return false;
+            }
+        }
+
+        // Load user name from Supabase
+        async function loadUserName() {
+            try {
+                console.log('Loading user name...');
+                const { data: { user } } = await supabase.auth.getUser();
+                console.log('User data:', user);
+                
+                if (user) {
+                    let userName = 'User';
+                    
+                    // Check user metadata first (most reliable)
+                    if (user.user_metadata?.full_name) {
+                        userName = user.user_metadata.full_name;
+                    } else if (user.user_metadata?.name) {
+                        userName = user.user_metadata.name;
+                    } else if (user.user_metadata?.first_name && user.user_metadata?.last_name) {
+                        userName = `${user.user_metadata.first_name} ${user.user_metadata.last_name}`;
+                    } else if (user.user_metadata?.first_name) {
+                        userName = user.user_metadata.first_name;
+                    } else {
+                        // Fallback to email username
+                        userName = user.email?.split('@')[0] || 'User';
+                    }
+                    
+                    console.log('Setting user name to:', userName);
+                    document.getElementById('userName').textContent = userName;
+                    document.getElementById('userProfile').style.display = 'flex';
+                } else {
+                    console.log('No user found, showing Guest');
+                    document.getElementById('userName').textContent = 'Guest';
+                    document.getElementById('userProfile').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error loading user name:', error);
+                document.getElementById('userName').textContent = 'User';
+            }
+        }
+
+        // Handle contact form submission
+        async function handleContactForm(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const submitBtn = form.querySelector('.submit-btn');
+            
+            // Show loading state
+            submitBtn.textContent = 'Sending...';
+            submitBtn.disabled = true;
+            
+            try {
+                // Get form data
+                const formData = new FormData(form);
+                const contactData = {
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    subject: formData.get('subject'),
+                    order_number: formData.get('orderNumber') || null,
+                    message: formData.get('message'),
+                    newsletter_subscription: formData.get('newsletter') === 'on',
+                    user_id: null,
+                    status: 'new',
+                    created_at: new Date().toISOString()
+                };
+                
+                // Get current user if logged in
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    contactData.user_id = user.id;
+                }
+                
+                // Insert contact message into database
+                const { data, error } = await supabase
+                    .from('contact_messages')
+                    .insert([contactData])
+                    .select();
+                
+                if (error) {
+                    throw error;
+                }
+                
+                console.log('Contact message saved:', data);
+                
+                // Send email notification
+                try {
+                    console.log('Sending email notification with data:', contactData);
+                    const emailResponse = await fetch('http://localhost:3003/api/send-contact-notification', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(contactData)
+                    });
+                    
+                    console.log('Email response status:', emailResponse.status);
+                    const emailResult = await emailResponse.json();
+                    console.log('Email result:', emailResult);
+                    
+                    if (emailResult.success) {
+                        console.log('✅ Email notification sent successfully:', emailResult.messageId);
+                        showNotification('✅ Email notification sent! Check your inbox.', 'success');
+                    } else {
+                        console.warn('❌ Email notification failed:', emailResult.error);
+                        showNotification('❌ Email notification failed: ' + emailResult.error, 'error');
+                    }
+                } catch (emailError) {
+                    console.warn('❌ Email notification server error:', emailError);
+                    showNotification('❌ Email server error: ' + emailError.message, 'error');
+                }
+                
+                // Show success modal
+                showSuccessModal();
+                
+                // Reset form
+                form.reset();
+                
+            } catch (error) {
+                console.error('Error saving contact message:', error);
+                showNotification('Sorry, there was an error sending your message. Please try again or contact us directly.', 'error');
+            } finally {
+                // Reset button state
+                submitBtn.textContent = 'Send Message';
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Show success modal
+        function showSuccessModal() {
+            document.getElementById('successModal').style.display = 'flex';
+        }
+
+        // Close success modal
+        function closeSuccessModal() {
+            document.getElementById('successModal').style.display = 'none';
+        }
+
+        // Go to cart function
+        function goToCart() {
+            window.location.href = 'cart.html';
+        }
+
+        // Handle person click function
+        function handlePersonClick() {
+            window.location.href = 'profile.html';
+        }
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            // Remove existing notifications
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notification => notification.remove());
+            
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <span class="notification-message">${message}</span>
+                    <button class="notification-close">&times;</button>
+                </div>
+            `;
+            
+            // Add styles
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'error' ? '#ff4757' : type === 'success' ? '#2ed573' : '#3742fa'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                max-width: 400px;
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            // Add animation styles
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+                .notification-content {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                }
+                .notification-close {
+                    background: none;
+                    border: none;
+                    color: white;
+                    font-size: 18px;
+                    cursor: pointer;
+                    margin-left: 10px;
+                    opacity: 0.8;
+                }
+                .notification-close:hover {
+                    opacity: 1;
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Add to page
+            document.body.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.animation = 'slideOut 0.3s ease-in';
+                    setTimeout(() => notification.remove(), 300);
+                }
+            }, 5000);
+            
+            // Close button functionality
+            notification.querySelector('.notification-close').addEventListener('click', () => {
+                notification.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => notification.remove(), 300);
+            });
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Contact page - Starting initialization...');
+            
+            const supabaseInitialized = await initSupabase();
+            if (!supabaseInitialized) {
+                console.error('Failed to initialize Supabase');
+                return;
+            }
+
+            // Load user name
+            await loadUserName();
+
+            // Set up form submission
+            document.getElementById('contactForm').addEventListener('submit', handleContactForm);
+            
+            console.log('Contact page initialized successfully');
+        });
+    </script>
+</body>
+</html>

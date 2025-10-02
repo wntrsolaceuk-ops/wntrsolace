@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Management - WinterSolace Admin</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Heavy Fog overlay effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 120%;
+            height: 120%;
+            background: 
+                radial-gradient(ellipse 800px 400px at 20% 10%, rgba(255, 255, 255, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse 600px 300px at 80% 30%, rgba(200, 230, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 700px 350px at 10% 80%, rgba(220, 240, 255, 0.18) 0%, transparent 55%),
+                radial-gradient(ellipse 900px 450px at 90% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 65%);
+            pointer-events: none;
+            z-index: 1;
+            animation: heavyFogDrift 20s ease-in-out infinite;
+        }
+
+        @keyframes heavyFogDrift {
+            0% { 
+                transform: translateX(-50px) translateY(0) scale(1);
+                opacity: 0.8;
+            }
+            25% { 
+                transform: translateX(-20px) translateY(-30px) scale(1.1);
+                opacity: 1;
+            }
+            50% { 
+                transform: translateX(30px) translateY(20px) scale(0.9);
+                opacity: 0.7;
+            }
+            75% { 
+                transform: translateX(-10px) translateY(-15px) scale(1.05);
+                opacity: 0.9;
+            }
+            100% { 
+                transform: translateX(-50px) translateY(0) scale(1);
+                opacity: 0.8;
+            }
+        }
+
+        /* Ice crystals overlay */
+        .ice-crystals {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .ice-crystal {
+            position: absolute;
+            color: rgba(200, 230, 255, 0.6);
+            font-size: 20px;
+            animation: crystalFloat 8s linear infinite;
+        }
+
+        @keyframes crystalFloat {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .ice-crystal:nth-child(1) { left: 10%; animation-delay: 0s; font-size: 16px; }
+        .ice-crystal:nth-child(2) { left: 20%; animation-delay: 2s; font-size: 24px; }
+        .ice-crystal:nth-child(3) { left: 30%; animation-delay: 4s; font-size: 18px; }
+        .ice-crystal:nth-child(4) { left: 40%; animation-delay: 1s; font-size: 22px; }
+        .ice-crystal:nth-child(5) { left: 50%; animation-delay: 3s; font-size: 20px; }
+        .ice-crystal:nth-child(6) { left: 60%; animation-delay: 5s; font-size: 16px; }
+        .ice-crystal:nth-child(7) { left: 70%; animation-delay: 2.5s; font-size: 26px; }
+        .ice-crystal:nth-child(8) { left: 80%; animation-delay: 4.5s; font-size: 19px; }
+        .ice-crystal:nth-child(9) { left: 90%; animation-delay: 1.5s; font-size: 21px; }
+
+        /* Admin Layout */
+        .admin-container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            grid-template-rows: 60px 1fr;
+            grid-template-areas: 
+                "sidebar header"
+                "sidebar main";
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            grid-area: sidebar;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(200, 230, 255, 0.1);
+            padding: 2rem 0;
+        }
+
+        .sidebar-logo {
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid rgba(200, 230, 255, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-logo img {
+            height: 40px;
+            filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.1));
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 1rem 2rem;
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: rgba(200, 230, 255, 0.1);
+            border-left-color: #c8e6ff;
+            color: #c8e6ff;
+        }
+
+        .sidebar-nav svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 1rem;
+        }
+
+        /* Header */
+        .admin-header {
+            grid-area: header;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(200, 230, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+        }
+
+        .header-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #c8e6ff;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(200, 230, 255, 0.1);
+            border: 1px solid rgba(200, 230, 255, 0.2);
+            border-radius: 8px;
+            color: #c8e6ff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .header-btn:hover {
+            background: rgba(200, 230, 255, 0.2);
+            box-shadow: 0 0 15px rgba(200, 230, 255, 0.3);
+        }
+
+        /* Main Content */
+        .admin-main {
+            grid-area: main;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        /* Customer Cards */
+        .customers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .customer-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .customer-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(200, 230, 255, 0.5), transparent);
+        }
+
+        .customer-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(200, 230, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .customer-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .customer-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #c8e6ff, #87ceeb);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #000000;
+            margin-right: 1rem;
+        }
+
+        .customer-info h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.25rem;
+        }
+
+        .customer-email {
+            color: #c8e6ff;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .customer-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #c8e6ff;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #ffffff;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .customer-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(200, 230, 255, 0.1);
+            border: 1px solid rgba(200, 230, 255, 0.2);
+            border-radius: 8px;
+            color: #c8e6ff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            background: rgba(200, 230, 255, 0.2);
+            box-shadow: 0 0 15px rgba(200, 230, 255, 0.3);
+        }
+
+        .view-btn {
+            background: rgba(40, 167, 69, 0.1);
+            border-color: rgba(40, 167, 69, 0.3);
+            color: #28a745;
+        }
+
+        .view-btn:hover {
+            background: rgba(40, 167, 69, 0.2);
+            box-shadow: 0 0 15px rgba(40, 167, 69, 0.3);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            margin: 2rem 0;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.6;
+        }
+
+        .empty-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: #c8e6ff;
+        }
+
+        .empty-subtitle {
+            color: #ffffff;
+            opacity: 0.7;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .admin-container {
+                grid-template-columns: 1fr;
+                grid-template-areas: 
+                    "header"
+                    "main";
+            }
+
+            .admin-sidebar {
+                display: none;
+            }
+
+            .customers-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-main {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Ice crystals overlay -->
+    <div class="ice-crystals">
+        <div class="ice-crystal">✦</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">✦</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">✦</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">✦</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">✦</div>
+    </div>
+
+    <!-- Admin Layout -->
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <nav class="admin-sidebar">
+            <div class="sidebar-logo">
+                <img src="assets/Wntrsolace.png" alt="WinterSolace Admin">
+            </div>
+            
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="admin-dashboard.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9,22 9,12 15,12 15,22"></polyline>
+                        </svg>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-products.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                        </svg>
+                        Products
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-orders.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 11V7a4 4 0 0 0-8 0v4"></path>
+                            <rect x="5" y="9" width="14" height="10" rx="2" ry="2"></rect>
+                        </svg>
+                        Orders
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-customers.html" class="active">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        Customers
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-analytics.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 20V10"></path>
+                            <path d="M12 20V4"></path>
+                            <path d="M6 20v-6"></path>
+                        </svg>
+                        Analytics
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-settings.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        </svg>
+                        Settings
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Header -->
+        <header class="admin-header">
+            <h1 class="header-title">Customer Management</h1>
+            <div class="header-actions">
+                <a href="collections.html" class="header-btn">View Site</a>
+                <a href="admin-logout.html" class="header-btn">Logout</a>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Customers Grid -->
+            <div class="customers-grid" id="customersGrid">
+                <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #c8e6ff; opacity: 0.6;">
+                    Loading customers...
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://pbbmrajuptceokpjnynz.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiYm1yYWp1cHRjZW9rcGpueW56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NzY1MzcsImV4cCI6MjA3NDA1MjUzN30.BYxGzM6G7MROTDTdj6KN3gCcrs6nxUaa_ylFZwMBT9o';
+        
+        let supabase;
+        let customers = [];
+
+        // Initialize Supabase
+        async function initSupabase() {
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('Supabase initialized successfully');
+                return true;
+            } catch (error) {
+                console.error('Error initializing Supabase:', error);
+                return false;
+            }
+        }
+
+        // Load customers from orders
+        async function loadCustomers() {
+            try {
+                const { data: ordersData, error } = await supabase
+                    .from('orders')
+                    .select('first_name, last_name, email, total, created_at')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error('Error loading customers:', error);
+                    showEmptyState();
+                    return;
+                }
+
+                // Group orders by customer email
+                const customerMap = new Map();
+                
+                ordersData.forEach(order => {
+                    const email = order.email;
+                    if (!customerMap.has(email)) {
+                        customerMap.set(email, {
+                            first_name: order.first_name,
+                            last_name: order.last_name,
+                            email: email,
+                            orders: [],
+                            total_spent: 0,
+                            first_order: order.created_at,
+                            last_order: order.created_at
+                        });
+                    }
+                    
+                    const customer = customerMap.get(email);
+                    customer.orders.push(order);
+                    customer.total_spent += order.total;
+                    
+                    if (new Date(order.created_at) < new Date(customer.first_order)) {
+                        customer.first_order = order.created_at;
+                    }
+                    if (new Date(order.created_at) > new Date(customer.last_order)) {
+                        customer.last_order = order.created_at;
+                    }
+                });
+
+                customers = Array.from(customerMap.values());
+                renderCustomers();
+            } catch (error) {
+                console.error('Error loading customers:', error);
+                showEmptyState();
+            }
+        }
+
+        // Render customers
+        function renderCustomers() {
+            const grid = document.getElementById('customersGrid');
+            
+            if (!customers || customers.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            grid.innerHTML = customers.map(customer => `
+                <div class="customer-card">
+                    <div class="customer-header">
+                        <div class="customer-avatar">
+                            ${customer.first_name.charAt(0)}${customer.last_name.charAt(0)}
+                        </div>
+                        <div class="customer-info">
+                            <h3>${customer.first_name} ${customer.last_name}</h3>
+                            <div class="customer-email">${customer.email}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="customer-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">${customer.orders.length}</div>
+                            <div class="stat-label">Orders</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">£${customer.total_spent.toFixed(2)}</div>
+                            <div class="stat-label">Total Spent</div>
+                        </div>
+                    </div>
+                    
+                    <div class="customer-actions">
+                        <button class="action-btn view-btn" onclick="viewCustomerDetails('${customer.email}')">View Details</button>
+                        <button class="action-btn" onclick="viewCustomerOrders('${customer.email}')">View Orders</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Show empty state
+        function showEmptyState() {
+            const grid = document.getElementById('customersGrid');
+            grid.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <div class="empty-icon">👥</div>
+                    <h3 class="empty-title">No Customers Yet</h3>
+                    <p class="empty-subtitle">Customers will appear here once they place orders.</p>
+                </div>
+            `;
+        }
+
+        // View customer details
+        function viewCustomerDetails(email) {
+            const customer = customers.find(c => c.email === email);
+            if (customer) {
+                alert(`Customer Details:\n\nName: ${customer.first_name} ${customer.last_name}\nEmail: ${customer.email}\nOrders: ${customer.orders.length}\nTotal Spent: £${customer.total_spent.toFixed(2)}\nFirst Order: ${new Date(customer.first_order).toLocaleDateString()}\nLast Order: ${new Date(customer.last_order).toLocaleDateString()}\n\nThis feature will be expanded in the next update.`);
+            }
+        }
+
+        // View customer orders
+        function viewCustomerOrders(email) {
+            const customer = customers.find(c => c.email === email);
+            if (customer) {
+                const ordersList = customer.orders.map(order => 
+                    `• Order on ${new Date(order.created_at).toLocaleDateString()} - £${order.total.toFixed(2)}`
+                ).join('\n');
+                
+                alert(`Orders for ${customer.first_name} ${customer.last_name}:\n\n${ordersList}\n\nThis feature will be expanded in the next update.`);
+            }
+        }
+
+        // Initialize admin customers page
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Admin Customers - Starting initialization...');
+            
+            // Initialize Supabase
+            const supabaseReady = await initSupabase();
+            
+            if (supabaseReady) {
+                // Load customers
+                await loadCustomers();
+            }
+            
+            console.log('Admin Customers initialization complete!');
+        });
+    </script>
+</body>
+</html>
+
+

@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Messages - Admin Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="background-animation"></div>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="admin-dashboard.html">
+                        <h1>❄️ Winter Solace Admin</h1>
+                    </a>
+                </div>
+                <nav class="nav">
+                    <a href="admin-dashboard.html" class="nav-link">Dashboard</a>
+                    <a href="admin-orders.html" class="nav-link">Orders</a>
+                    <a href="admin-contact.html" class="nav-link active">Contact Messages</a>
+                    <a href="admin-products.html" class="nav-link">Products</a>
+                </nav>
+                <div class="header-actions">
+                    <div class="user-name" id="userName">Admin</div>
+                    <button class="logout-button" onclick="logout()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                            <polyline points="16,17 21,12 16,7"/>
+                            <line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1>📞 Contact Messages</h1>
+                <p>Manage customer inquiries and support requests</p>
+            </div>
+
+            <!-- Filters and Stats -->
+            <div class="admin-controls">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Messages</h3>
+                        <div class="stat-number" id="totalMessages">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>New Messages</h3>
+                        <div class="stat-number" id="newMessages">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>In Progress</h3>
+                        <div class="stat-number" id="inProgressMessages">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Resolved</h3>
+                        <div class="stat-number" id="resolvedMessages">-</div>
+                    </div>
+                </div>
+
+                <div class="filters">
+                    <select id="statusFilter" class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="new">New</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="resolved">Resolved</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                    
+                    <select id="subjectFilter" class="filter-select">
+                        <option value="">All Subjects</option>
+                        <option value="order_inquiry">Order Inquiry</option>
+                        <option value="shipping_question">Shipping Question</option>
+                        <option value="product_question">Product Question</option>
+                        <option value="return_refund">Return & Refund</option>
+                        <option value="technical_support">Technical Support</option>
+                        <option value="feedback">Feedback</option>
+                        <option value="complaint">Complaint</option>
+                        <option value="other">Other</option>
+                    </select>
+                    
+                    <input type="date" id="dateFilter" class="filter-input" placeholder="Filter by date">
+                    
+                    <button class="btn-primary" onclick="refreshMessages()">Refresh</button>
+                </div>
+            </div>
+
+            <!-- Messages Table -->
+            <div class="messages-table-container">
+                <div class="table-header">
+                    <h2>Contact Messages</h2>
+                    <div class="table-actions">
+                        <button class="btn-secondary" onclick="exportMessages()">Export CSV</button>
+                    </div>
+                </div>
+                
+                <div class="table-wrapper">
+                    <table class="admin-table" id="messagesTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Subject</th>
+                                <th>Order #</th>
+                                <th>Status</th>
+                                <th>Priority</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="messagesTableBody">
+                            <tr>
+                                <td colspan="8" class="loading-cell">Loading messages...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Message Detail Modal -->
+    <div id="messageModal" class="modal" style="display: none;">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h2>Contact Message Details</h2>
+                <button class="close-btn" onclick="closeMessageModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="message-details" id="messageDetails">
+                    <!-- Message details will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeMessageModal()">Close</button>
+                <button class="btn-primary" onclick="updateMessageStatus()">Update Status</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Update Modal -->
+    <div id="statusModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Update Message Status</h2>
+                <button class="close-btn" onclick="closeStatusModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="newStatus">Status</label>
+                    <select id="newStatus" class="form-input">
+                        <option value="new">New</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="resolved">Resolved</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="newPriority">Priority</label>
+                    <select id="newPriority" class="form-input">
+                        <option value="low">Low</option>
+                        <option value="normal">Normal</option>
+                        <option value="high">High</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="adminNotes">Admin Notes</label>
+                    <textarea id="adminNotes" class="form-input" rows="4" placeholder="Add internal notes..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="responseMessage">Response Message</label>
+                    <textarea id="responseMessage" class="form-input" rows="4" placeholder="Response to send to customer..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeStatusModal()">Cancel</button>
+                <button class="btn-primary" onclick="saveStatusUpdate()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://your-project.supabase.co';
+        const SUPABASE_ANON_KEY = 'your-anon-key';
+        
+        let supabase;
+        let currentMessageId = null;
+        let allMessages = [];
+
+        // Initialize Supabase
+        async function initSupabase() {
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('Supabase initialized successfully');
+                return true;
+            } catch (error) {
+                console.error('Error initializing Supabase:', error);
+                return false;
+            }
+        }
+
+        // Load contact messages
+        async function loadContactMessages() {
+            try {
+                const { data, error } = await supabase
+                    .from('contact_messages')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    throw error;
+                }
+
+                allMessages = data || [];
+                updateStats();
+                renderMessagesTable();
+                
+            } catch (error) {
+                console.error('Error loading contact messages:', error);
+                document.getElementById('messagesTableBody').innerHTML = 
+                    '<tr><td colspan="8" class="error-cell">Error loading messages</td></tr>';
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            const total = allMessages.length;
+            const newCount = allMessages.filter(m => m.status === 'new').length;
+            const inProgressCount = allMessages.filter(m => m.status === 'in_progress').length;
+            const resolvedCount = allMessages.filter(m => m.status === 'resolved').length;
+
+            document.getElementById('totalMessages').textContent = total;
+            document.getElementById('newMessages').textContent = newCount;
+            document.getElementById('inProgressMessages').textContent = inProgressCount;
+            document.getElementById('resolvedMessages').textContent = resolvedCount;
+        }
+
+        // Render messages table
+        function renderMessagesTable() {
+            const tbody = document.getElementById('messagesTableBody');
+            const statusFilter = document.getElementById('statusFilter').value;
+            const subjectFilter = document.getElementById('subjectFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+
+            let filteredMessages = allMessages;
+
+            // Apply filters
+            if (statusFilter) {
+                filteredMessages = filteredMessages.filter(m => m.status === statusFilter);
+            }
+            if (subjectFilter) {
+                filteredMessages = filteredMessages.filter(m => m.subject === subjectFilter);
+            }
+            if (dateFilter) {
+                const filterDate = new Date(dateFilter);
+                filteredMessages = filteredMessages.filter(m => {
+                    const messageDate = new Date(m.created_at);
+                    return messageDate.toDateString() === filterDate.toDateString();
+                });
+            }
+
+            if (filteredMessages.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-cell">No messages found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filteredMessages.map(message => `
+                <tr>
+                    <td>${new Date(message.created_at).toLocaleDateString()}</td>
+                    <td>${message.name}</td>
+                    <td>${message.email}</td>
+                    <td>${formatSubject(message.subject)}</td>
+                    <td>${message.order_number || '-'}</td>
+                    <td><span class="status-badge status-${message.status}">${message.status}</span></td>
+                    <td><span class="priority-badge priority-${message.priority}">${message.priority}</span></td>
+                    <td>
+                        <button class="btn-small" onclick="viewMessage('${message.id}')">View</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Format subject for display
+        function formatSubject(subject) {
+            const subjectMap = {
+                'order_inquiry': 'Order Inquiry',
+                'shipping_question': 'Shipping Question',
+                'product_question': 'Product Question',
+                'return_refund': 'Return & Refund',
+                'technical_support': 'Technical Support',
+                'feedback': 'Feedback',
+                'complaint': 'Complaint',
+                'other': 'Other'
+            };
+            return subjectMap[subject] || subject;
+        }
+
+        // View message details
+        async function viewMessage(messageId) {
+            try {
+                const { data, error } = await supabase
+                    .from('contact_messages')
+                    .select('*')
+                    .eq('id', messageId)
+                    .single();
+
+                if (error) {
+                    throw error;
+                }
+
+                currentMessageId = messageId;
+                displayMessageDetails(data);
+                document.getElementById('messageModal').style.display = 'flex';
+                
+            } catch (error) {
+                console.error('Error loading message details:', error);
+                alert('Error loading message details');
+            }
+        }
+
+        // Display message details
+        function displayMessageDetails(message) {
+            const detailsContainer = document.getElementById('messageDetails');
+            
+            detailsContainer.innerHTML = `
+                <div class="message-info">
+                    <div class="info-row">
+                        <strong>Name:</strong> ${message.name}
+                    </div>
+                    <div class="info-row">
+                        <strong>Email:</strong> <a href="mailto:${message.email}">${message.email}</a>
+                    </div>
+                    <div class="info-row">
+                        <strong>Subject:</strong> ${formatSubject(message.subject)}
+                    </div>
+                    <div class="info-row">
+                        <strong>Order Number:</strong> ${message.order_number || 'N/A'}
+                    </div>
+                    <div class="info-row">
+                        <strong>Status:</strong> <span class="status-badge status-${message.status}">${message.status}</span>
+                    </div>
+                    <div class="info-row">
+                        <strong>Priority:</strong> <span class="priority-badge priority-${message.priority}">${message.priority}</span>
+                    </div>
+                    <div class="info-row">
+                        <strong>Newsletter:</strong> ${message.newsletter_subscription ? 'Yes' : 'No'}
+                    </div>
+                    <div class="info-row">
+                        <strong>Date:</strong> ${new Date(message.created_at).toLocaleString()}
+                    </div>
+                </div>
+                
+                <div class="message-content">
+                    <h3>Message:</h3>
+                    <div class="message-text">${message.message}</div>
+                </div>
+                
+                ${message.admin_notes ? `
+                    <div class="admin-notes">
+                        <h3>Admin Notes:</h3>
+                        <div class="notes-text">${message.admin_notes}</div>
+                    </div>
+                ` : ''}
+                
+                ${message.response_message ? `
+                    <div class="response-message">
+                        <h3>Response Sent:</h3>
+                        <div class="response-text">${message.response_message}</div>
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        // Update message status
+        function updateMessageStatus() {
+            document.getElementById('statusModal').style.display = 'flex';
+        }
+
+        // Save status update
+        async function saveStatusUpdate() {
+            try {
+                const status = document.getElementById('newStatus').value;
+                const priority = document.getElementById('newPriority').value;
+                const adminNotes = document.getElementById('adminNotes').value;
+                const responseMessage = document.getElementById('responseMessage').value;
+
+                const updateData = {
+                    status,
+                    priority,
+                    admin_notes: adminNotes,
+                    updated_at: new Date().toISOString()
+                };
+
+                if (responseMessage) {
+                    updateData.response_message = responseMessage;
+                    updateData.response_sent = true;
+                }
+
+                const { error } = await supabase
+                    .from('contact_messages')
+                    .update(updateData)
+                    .eq('id', currentMessageId);
+
+                if (error) {
+                    throw error;
+                }
+
+                alert('Message status updated successfully!');
+                closeStatusModal();
+                closeMessageModal();
+                loadContactMessages();
+                
+            } catch (error) {
+                console.error('Error updating message status:', error);
+                alert('Error updating message status');
+            }
+        }
+
+        // Close modals
+        function closeMessageModal() {
+            document.getElementById('messageModal').style.display = 'none';
+        }
+
+        function closeStatusModal() {
+            document.getElementById('statusModal').style.display = 'none';
+        }
+
+        // Refresh messages
+        function refreshMessages() {
+            loadContactMessages();
+        }
+
+        // Export messages to CSV
+        function exportMessages() {
+            const csvContent = generateCSV(allMessages);
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `contact-messages-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Generate CSV content
+        function generateCSV(messages) {
+            const headers = ['Date', 'Name', 'Email', 'Subject', 'Order Number', 'Status', 'Priority', 'Message'];
+            const rows = messages.map(msg => [
+                new Date(msg.created_at).toLocaleDateString(),
+                msg.name,
+                msg.email,
+                formatSubject(msg.subject),
+                msg.order_number || '',
+                msg.status,
+                msg.priority,
+                msg.message.replace(/\n/g, ' ')
+            ]);
+            
+            return [headers, ...rows].map(row => 
+                row.map(field => `"${field}"`).join(',')
+            ).join('\n');
+        }
+
+        // Logout function
+        async function logout() {
+            try {
+                await supabase.auth.signOut();
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Error logging out:', error);
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Admin Contact page - Starting initialization...');
+            
+            const supabaseInitialized = await initSupabase();
+            if (!supabaseInitialized) {
+                console.error('Failed to initialize Supabase');
+                return;
+            }
+
+            // Load contact messages
+            await loadContactMessages();
+            
+            // Set up filter event listeners
+            document.getElementById('statusFilter').addEventListener('change', renderMessagesTable);
+            document.getElementById('subjectFilter').addEventListener('change', renderMessagesTable);
+            document.getElementById('dateFilter').addEventListener('change', renderMessagesTable);
+            
+            console.log('Admin Contact page initialized successfully');
+        });
+    </script>
+</body>
+</html>
+

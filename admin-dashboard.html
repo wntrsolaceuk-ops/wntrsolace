@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - WinterSolace</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Heavy Fog overlay effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 120%;
+            height: 120%;
+            background: 
+                radial-gradient(ellipse 800px 400px at 20% 10%, rgba(255, 255, 255, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse 600px 300px at 80% 30%, rgba(200, 230, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 700px 350px at 10% 80%, rgba(220, 240, 255, 0.18) 0%, transparent 55%),
+                radial-gradient(ellipse 900px 450px at 90% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 65%);
+            pointer-events: none;
+            z-index: 1;
+            animation: heavyFogDrift 20s ease-in-out infinite;
+        }
+
+        @keyframes heavyFogDrift {
+            0% { 
+                transform: translateX(-50px) translateY(0) scale(1);
+                opacity: 0.8;
+            }
+            25% { 
+                transform: translateX(-20px) translateY(-30px) scale(1.1);
+                opacity: 1;
+            }
+            50% { 
+                transform: translateX(30px) translateY(20px) scale(0.9);
+                opacity: 0.7;
+            }
+            75% { 
+                transform: translateX(-10px) translateY(-15px) scale(1.05);
+                opacity: 0.9;
+            }
+            100% { 
+                transform: translateX(-50px) translateY(0) scale(1);
+                opacity: 0.8;
+            }
+        }
+
+        /* Ice crystals overlay */
+        .ice-crystals {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .ice-crystal {
+            position: absolute;
+            color: rgba(200, 230, 255, 0.6);
+            font-size: 20px;
+            animation: crystalFloat 8s linear infinite;
+        }
+
+        @keyframes crystalFloat {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .ice-crystal:nth-child(1) { left: 10%; animation-delay: 0s; font-size: 16px; }
+        .ice-crystal:nth-child(2) { left: 20%; animation-delay: 2s; font-size: 24px; }
+        .ice-crystal:nth-child(3) { left: 30%; animation-delay: 4s; font-size: 18px; }
+        .ice-crystal:nth-child(4) { left: 40%; animation-delay: 1s; font-size: 22px; }
+        .ice-crystal:nth-child(5) { left: 50%; animation-delay: 3s; font-size: 20px; }
+        .ice-crystal:nth-child(6) { left: 60%; animation-delay: 5s; font-size: 16px; }
+        .ice-crystal:nth-child(7) { left: 70%; animation-delay: 2.5s; font-size: 26px; }
+        .ice-crystal:nth-child(8) { left: 80%; animation-delay: 4.5s; font-size: 19px; }
+        .ice-crystal:nth-child(9) { left: 90%; animation-delay: 1.5s; font-size: 21px; }
+
+        /* Admin Layout */
+        .admin-container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            grid-template-rows: 60px 1fr;
+            grid-template-areas: 
+                "sidebar header"
+                "sidebar main";
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            grid-area: sidebar;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(200, 230, 255, 0.1);
+            padding: 2rem 0;
+        }
+
+        .sidebar-logo {
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid rgba(200, 230, 255, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-logo img {
+            height: 40px;
+            filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.1));
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 1rem 2rem;
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: rgba(200, 230, 255, 0.1);
+            border-left-color: #c8e6ff;
+            color: #c8e6ff;
+        }
+
+        .sidebar-nav svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 1rem;
+        }
+
+        /* Header */
+        .admin-header {
+            grid-area: header;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(200, 230, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+        }
+
+        .header-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #c8e6ff;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(200, 230, 255, 0.1);
+            border: 1px solid rgba(200, 230, 255, 0.2);
+            border-radius: 8px;
+            color: #c8e6ff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .header-btn:hover {
+            background: rgba(200, 230, 255, 0.2);
+            box-shadow: 0 0 15px rgba(200, 230, 255, 0.3);
+        }
+
+        /* Main Content */
+        .admin-main {
+            grid-area: main;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .dashboard-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(200, 230, 255, 0.5), transparent);
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(200, 230, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 0.9rem;
+            color: #c8e6ff;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-icon {
+            width: 24px;
+            height: 24px;
+            color: #c8e6ff;
+            opacity: 0.6;
+        }
+
+        .card-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-change {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .card-change.positive {
+            color: #28a745;
+        }
+
+        .card-change.negative {
+            color: #dc3545;
+        }
+
+        .card-change.neutral {
+            color: #c8e6ff;
+            opacity: 0.7;
+        }
+
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .chart-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+        }
+
+        .chart-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-placeholder {
+            height: 300px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #c8e6ff;
+            opacity: 0.6;
+            font-size: 0.9rem;
+            padding: 1rem;
+        }
+
+        .quick-action-btn {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            border-radius: 10px;
+            color: #ffffff;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .quick-action-btn:hover {
+            background: rgba(200, 230, 255, 0.1);
+            border-color: rgba(200, 230, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .quick-action-btn strong {
+            display: block;
+            color: #c8e6ff;
+            margin-bottom: 0.25rem;
+        }
+
+        .quick-action-btn small {
+            color: rgba(200, 230, 255, 0.6);
+            font-size: 0.8rem;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .status-item strong {
+            display: block;
+            color: #ffffff;
+            font-size: 0.9rem;
+        }
+
+        .status-item small {
+            color: rgba(200, 230, 255, 0.6);
+            font-size: 0.8rem;
+        }
+
+        /* Recent Orders Table */
+        .recent-orders {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+        }
+
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .orders-table th,
+        .orders-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .orders-table th {
+            font-weight: 600;
+            color: #c8e6ff;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .orders-table td {
+            color: #ffffff;
+        }
+
+        .order-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .status-confirmed {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .status-shipped {
+            background: rgba(0, 123, 255, 0.1);
+            color: #007bff;
+            border: 1px solid rgba(0, 123, 255, 0.3);
+        }
+
+        .status-delivered {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .view-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(200, 230, 255, 0.1);
+            border: 1px solid rgba(200, 230, 255, 0.2);
+            border-radius: 8px;
+            color: #c8e6ff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .view-btn:hover {
+            background: rgba(200, 230, 255, 0.2);
+            box-shadow: 0 0 15px rgba(200, 230, 255, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .admin-container {
+                grid-template-columns: 1fr;
+                grid-template-areas: 
+                    "header"
+                    "main";
+            }
+
+            .admin-sidebar {
+                display: none;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-main {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Ice crystals overlay -->
+    <div class="ice-crystals">
+        <div class="ice-crystal">✦</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">✦</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">✦</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">✦</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">✦</div>
+    </div>
+
+    <!-- Admin Layout -->
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <nav class="admin-sidebar">
+            <div class="sidebar-logo">
+                <img src="assets/Wntrsolace.png" alt="WinterSolace Admin">
+            </div>
+            
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="admin-dashboard.html" class="active">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9,22 9,12 15,12 15,22"></polyline>
+                        </svg>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-products.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                        </svg>
+                        Products
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-orders.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 11V7a4 4 0 0 0-8 0v4"></path>
+                            <rect x="5" y="9" width="14" height="10" rx="2" ry="2"></rect>
+                        </svg>
+                        Orders
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-contact.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        Contact Messages
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-cancellations.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="15" y1="9" x2="9" y2="15"></line>
+                            <line x1="9" y1="9" x2="15" y2="15"></line>
+                        </svg>
+                        Cancellations & Returns
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-customers.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        Customers
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-analytics.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 20V10"></path>
+                            <path d="M12 20V4"></path>
+                            <path d="M6 20v-6"></path>
+                        </svg>
+                        Analytics
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-settings.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        </svg>
+                        Settings
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Header -->
+        <header class="admin-header">
+            <h1 class="header-title">Dashboard Overview</h1>
+            <div class="header-actions">
+                <a href="collections.html" class="header-btn">View Site</a>
+                <a href="#" class="header-btn" onclick="logoutAdmin()">Logout</a>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Dashboard Cards -->
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <span class="card-title">Total Orders</span>
+                        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 11V7a4 4 0 0 0-8 0v4"></path>
+                            <rect x="5" y="9" width="14" height="10" rx="2" ry="2"></rect>
+                        </svg>
+                    </div>
+                    <div class="card-value" id="totalOrders">0</div>
+                    <div class="card-change positive">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="23,6 13.5,15.5 8.5,10.5 1,18"></polyline>
+                            <polyline points="17,6 23,6 23,12"></polyline>
+                        </svg>
+                        +12% from last month
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <span class="card-title">Total Revenue</span>
+                        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                    </div>
+                    <div class="card-value" id="totalRevenue">£0</div>
+                    <div class="card-change positive">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="23,6 13.5,15.5 8.5,10.5 1,18"></polyline>
+                            <polyline points="17,6 23,6 23,12"></polyline>
+                        </svg>
+                        +8% from last month
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <span class="card-title">Active Products</span>
+                        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                        </svg>
+                    </div>
+                    <div class="card-value" id="activeProducts">0</div>
+                    <div class="card-change neutral">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                        No change
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <span class="card-title">Pending Orders</span>
+                        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12,6 12,12 16,14"></polyline>
+                        </svg>
+                    </div>
+                    <div class="card-value" id="pendingOrders">0</div>
+                    <div class="card-change negative">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="22,17 13.5,8.5 8.5,13.5 2,7"></polyline>
+                            <polyline points="16,17 22,17 22,11"></polyline>
+                        </svg>
+                        -3 from yesterday
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions & System Status -->
+            <div class="charts-section">
+                <div class="chart-card">
+                    <h3 class="chart-title">Quick Actions</h3>
+                    <div class="chart-placeholder">
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <button onclick="window.location.href='admin-products.html'" class="quick-action-btn">
+                                <span style="font-size: 1.5rem;">➕</span>
+                                <div>
+                                    <strong>Add New Product</strong>
+                                    <small>Create new product listing</small>
+                                </div>
+                            </button>
+                            <button onclick="window.location.href='admin-orders.html'" class="quick-action-btn">
+                                <span style="font-size: 1.5rem;">📦</span>
+                                <div>
+                                    <strong>Manage Orders</strong>
+                                    <small>Update order status</small>
+                                </div>
+                            </button>
+                            <button onclick="window.location.href='admin-customers.html'" class="quick-action-btn">
+                                <span style="font-size: 1.5rem;">👥</span>
+                                <div>
+                                    <strong>View Customers</strong>
+                                    <small>Customer management</small>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <h3 class="chart-title">System Status</h3>
+                    <div class="chart-placeholder">
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div class="status-item">
+                                <div class="status-indicator" style="background: #10b981;"></div>
+                                <div>
+                                    <strong>Payment System</strong>
+                                    <small>Stripe Connected</small>
+                                </div>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-indicator" style="background: #10b981;"></div>
+                                <div>
+                                    <strong>Database</strong>
+                                    <small>Supabase Online</small>
+                                </div>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-indicator" style="background: #10b981;"></div>
+                                <div>
+                                    <strong>Image Storage</strong>
+                                    <small>Cloudinary Active</small>
+                                </div>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-indicator" style="background: #f59e0b;"></div>
+                                <div>
+                                    <strong>SSL Certificate</strong>
+                                    <small>Needs Renewal</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Orders -->
+            <div class="recent-orders">
+                <h3 class="section-title">Recent Orders</h3>
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Total</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentOrdersTable">
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 2rem; color: #c8e6ff; opacity: 0.6;">
+                                Loading recent orders...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://pbbmrajuptceokpjnynz.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiYm1yYWp1cHRjZW9rcGpueW56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NzY1MzcsImV4cCI6MjA3NDA1MjUzN30.BYxGzM6G7MROTDTdj6KN3gCcrs6nxUaa_ylFZwMBT9o';
+        
+        let supabase;
+
+        // Initialize Supabase
+        async function initSupabase() {
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('Supabase initialized successfully');
+                return true;
+            } catch (error) {
+                console.error('Error initializing Supabase:', error);
+                return false;
+            }
+        }
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                console.log('Loading dashboard data...');
+                
+                // Load orders data
+                const { data: orders, error: ordersError } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                console.log('Orders query result:', { orders, ordersError });
+
+                if (ordersError) {
+                    console.error('Error loading orders:', ordersError);
+                    return;
+                }
+
+                // Load products data
+                const { data: products, error: productsError } = await supabase
+                    .from('products')
+                    .select('id, is_preorder')
+                    .eq('is_preorder', false);
+
+                console.log('Products query result:', { products, productsError });
+
+                if (productsError) {
+                    console.error('Error loading products:', productsError);
+                }
+
+                // Update dashboard cards with real data
+                updateDashboardCards(orders, products);
+
+                // Load recent orders
+                loadRecentOrders(orders.slice(0, 5));
+
+                // Update charts with real data
+                // Charts replaced with Quick Actions and System Status
+
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        // Update dashboard cards
+        function updateDashboardCards(orders, products) {
+            console.log('Updating dashboard cards with:', { orders: orders?.length, products: products?.length });
+            
+            // Total Orders
+            document.getElementById('totalOrders').textContent = orders.length;
+
+            // Total Revenue
+            const totalRevenue = orders.reduce((sum, order) => sum + (order.total || 0), 0);
+            document.getElementById('totalRevenue').textContent = `£${totalRevenue.toFixed(2)}`;
+
+            // Pending Orders
+            const pendingOrders = orders.filter(order => order.status === 'pending').length;
+            document.getElementById('pendingOrders').textContent = pendingOrders;
+
+            // Active Products (real data)
+            const activeProductsCount = products ? products.length : 0;
+            document.getElementById('activeProducts').textContent = activeProductsCount;
+            
+            console.log('Dashboard cards updated:', {
+                totalOrders: orders.length,
+                totalRevenue: totalRevenue,
+                pendingOrders: pendingOrders,
+                activeProducts: activeProductsCount
+            });
+        }
+
+        // Load recent orders table
+        function loadRecentOrders(orders) {
+            const tbody = document.getElementById('recentOrdersTable');
+            
+            if (!orders || orders.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 2rem; color: #c8e6ff; opacity: 0.6;">
+                            No orders found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = orders.map(order => `
+                <tr>
+                    <td>${order.order_number}</td>
+                    <td>${order.first_name} ${order.last_name}</td>
+                    <td>${new Date(order.created_at).toLocaleDateString('en-GB')}</td>
+                    <td><span class="order-status status-${order.status}">${order.status}</span></td>
+                    <td>£${order.total.toFixed(2)}</td>
+                    <td><a href="admin-orders.html?id=${order.id}" class="view-btn">View</a></td>
+                </tr>
+            `).join('');
+        }
+
+        // No longer using charts - replaced with Quick Actions and System Status
+
+        // Calculate monthly revenue
+        function calculateMonthlyRevenue(orders) {
+            const monthlyRevenue = {};
+            
+            orders.forEach(order => {
+                const date = new Date(order.created_at);
+                const monthKey = date.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+                
+                if (!monthlyRevenue[monthKey]) {
+                    monthlyRevenue[monthKey] = 0;
+                }
+                
+                monthlyRevenue[monthKey] += order.total || 0;
+            });
+            
+            return monthlyRevenue;
+        }
+
+        // Logout function
+        function logoutAdmin() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Clear admin session
+                localStorage.removeItem('adminLoggedIn');
+                localStorage.removeItem('adminLoginTime');
+                localStorage.removeItem('adminEmail');
+                
+                // Also clear any regular user session
+                localStorage.removeItem('userLoggedIn');
+                localStorage.removeItem('username');
+                
+                // Redirect to login page
+                window.location.href = 'auth.html';
+            }
+        }
+
+        // Initialize admin dashboard
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Admin Dashboard - Starting initialization...');
+            
+            // Check if admin is logged in
+            const adminLoggedIn = localStorage.getItem('adminLoggedIn');
+            const adminLoginTime = localStorage.getItem('adminLoginTime');
+            
+            if (adminLoggedIn !== 'true' || !adminLoginTime) {
+                console.log('No admin session found, redirecting to login');
+                window.location.href = 'auth.html';
+                return;
+            }
+            
+            // Check if admin session is still valid (24 hours)
+            const loginDate = new Date(adminLoginTime);
+            const now = new Date();
+            const hoursDiff = (now - loginDate) / (1000 * 60 * 60);
+            
+            if (hoursDiff >= 24) {
+                console.log('Admin session expired, redirecting to login');
+                localStorage.removeItem('adminLoggedIn');
+                localStorage.removeItem('adminLoginTime');
+                localStorage.removeItem('adminEmail');
+                window.location.href = 'auth.html';
+                return;
+            }
+            
+            // Initialize Supabase
+            const supabaseReady = await initSupabase();
+            
+            if (supabaseReady) {
+                // Load dashboard data
+                await loadDashboardData();
+            }
+            
+            console.log('Admin Dashboard initialization complete!');
+        });
+    </script>
+</body>
+</html>

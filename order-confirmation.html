@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WinterSolace - Order Confirmation</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            align-items: center;
+            width: 100%;
+        }
+
+        .logo {
+            height: 60px;
+            filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.1));
+            transition: all 0.3s ease;
+        }
+
+        .logo:hover {
+            filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.2));
+            transform: scale(1.05);
+        }
+
+        .nav-menu {
+            display: contents;
+            list-style: none;
+        }
+
+        .nav-menu li {
+            justify-self: center;
+            list-style: none;
+        }
+
+        .nav-menu a {
+            color: #cccccc;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-menu a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-menu a:hover::before {
+            opacity: 1;
+        }
+
+        .nav-menu a:hover {
+            color: #ffffff;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            justify-self: end;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .user-profile:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .user-profile svg {
+            width: 20px;
+            height: 20px;
+            stroke: #cccccc;
+            transition: all 0.3s ease;
+        }
+
+        .user-profile:hover svg {
+            stroke: #ffffff;
+        }
+
+        .user-name {
+            color: #ffffff;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem 0;
+            min-height: calc(100vh - 200px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .confirmation-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            backdrop-filter: blur(10px);
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            animation: successPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes successPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .success-icon svg {
+            width: 40px;
+            height: 40px;
+            stroke: #ffffff;
+            stroke-width: 3;
+        }
+
+        .page-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ffffff 0%, #87ceeb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .order-number {
+            font-size: 1.2rem;
+            color: #87ceeb;
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
+
+        .confirmation-message {
+            font-size: 1.1rem;
+            color: #cccccc;
+            margin-bottom: 3rem;
+            line-height: 1.6;
+        }
+
+        .order-details {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .detail-label {
+            color: #888;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #87ceeb 0%, #4682b4 100%);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(135, 206, 235, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #87ceeb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .confirmation-card {
+                padding: 2rem;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <img src="assets/Wntrsolace.png" alt="WinterSolace Logo" class="logo">
+            <ul class="nav-menu">
+                <li><a href="layout-winter-frost.html">Home</a></li>
+                <li><a href="collections.html">Collection</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="nav-right">
+                <div class="user-profile" onclick="handlePersonClick()" id="userProfile" style="display: none;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span class="user-name" id="userName">User Name</span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Loading order details...</p>
+            </div>
+
+            <div class="confirmation-card" id="confirmationCard" style="display: none;">
+                <div class="success-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 6L9 17l-5-5"/>
+                    </svg>
+                </div>
+
+                <h1 class="page-title">Order Confirmed!</h1>
+                <div class="order-number" id="orderNumber">Order #WS123456</div>
+                
+                <p class="confirmation-message">
+                    Thank you for your order! We've received your order and will begin processing it shortly. 
+                    You'll receive a confirmation email with your order details and tracking information.
+                </p>
+
+                <div class="order-details" id="orderDetails">
+                    <!-- Order details will be populated here -->
+                </div>
+
+                <div class="action-buttons">
+                    <a href="collections.html" class="btn btn-primary">Continue Shopping</a>
+                    <a href="profile.html" class="btn btn-secondary">View Orders</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://pbbmrajuptceokpjnynz.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiYm1yYWp1cHRjZW9rcGpueW56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NzY1MzcsImV4cCI6MjA3NDA1MjUzN30.BYxGzM6G7MROTDTdj6KN3gCcrs6nxUaa_ylFZwMBT9o';
+        const CLOUDINARY_CLOUD_NAME = 'dlfsfybx3';
+
+        let supabase;
+
+        // Initialize Supabase
+        async function initSupabase() {
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('Supabase initialized successfully');
+                return true;
+            } catch (error) {
+                console.error('Error initializing Supabase:', error);
+                return false;
+            }
+        }
+
+        // Get Cloudinary URL
+        function getCloudinaryUrl(publicId, width = 800, height = 800) {
+            return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/w_${width},h_${height},c_fill/${publicId}`;
+        }
+
+        // Load order details
+        async function loadOrderDetails() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderNumber = urlParams.get('order');
+
+            if (!orderNumber) {
+                window.location.href = 'collections.html';
+                return;
+            }
+
+            try {
+                alert('Loading order: ' + orderNumber);
+                console.log('Loading order details for:', orderNumber);
+                console.log('Supabase initialized:', !!supabase);
+                
+                // Get order details (no products join needed)
+                const { data: order, error: orderError } = await supabase
+                    .from('orders')
+                    .select(`
+                        *,
+                        order_items (*)
+                    `)
+                    .eq('order_number', orderNumber)
+                    .single();
+
+                alert('Query result - Order: ' + (order ? 'Found' : 'Not found') + ', Error: ' + (orderError ? orderError.message : 'None'));
+                console.log('Order query result:', { order, orderError });
+
+                if (orderError) {
+                    console.error('Order query error:', orderError);
+                    throw new Error('Order not found: ' + orderError.message);
+                }
+
+                if (!order) {
+                    console.error('No order data returned for order number:', orderNumber);
+                    throw new Error('Order not found in database');
+                }
+
+                console.log('Order data found:', order);
+
+                // Display order information
+                document.getElementById('orderNumber').textContent = `Order #${order.order_number}`;
+                
+                // Populate order details
+                const orderDetails = document.getElementById('orderDetails');
+                const shippingAddress = order.shipping_address;
+                
+                orderDetails.innerHTML = `
+                    <div class="detail-row">
+                        <span class="detail-label">Order Date:</span>
+                        <span class="detail-value">${new Date(order.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Status:</span>
+                        <span class="detail-value">${order.status.charAt(0).toUpperCase() + order.status.slice(1)}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Total Amount:</span>
+                        <span class="detail-value">£${(order.total || 0).toFixed(2)}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Payment Method:</span>
+                        <span class="detail-value">${(order.payment_method || 'card').replace('_', ' ').toUpperCase()}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Shipping Address:</span>
+                        <span class="detail-value">
+                            ${order.first_name} ${order.last_name}<br>
+                            ${order.address}<br>
+                            ${order.city}, ${order.state} ${order.zip_code}<br>
+                            ${order.country}
+                        </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Items Ordered:</span>
+                        <span class="detail-value">
+                            ${order.order_items.map(item => 
+                                `${item.quantity}x ${item.product_name} (${item.size})`
+                            ).join('<br>')}
+                        </span>
+                    </div>
+                `;
+
+                // Show confirmation card
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('confirmationCard').style.display = 'block';
+
+            } catch (error) {
+                console.error('Error loading order details:', error);
+                console.error('Error details:', {
+                    message: error.message,
+                    stack: error.stack,
+                    orderNumber: orderNumber
+                });
+                alert('Error loading order details. Please try again.');
+                window.location.href = 'collections.html';
+            }
+        }
+
+        // Handle person click
+        function handlePersonClick() {
+            const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+            if (isLoggedIn) {
+                window.location.href = 'profile.html';
+            } else {
+                window.location.href = 'auth.html';
+            }
+        }
+
+        // Update user profile
+        async function updateUserProfile() {
+            const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+            const userProfile = document.getElementById('userProfile');
+            
+            if (isLoggedIn) {
+                try {
+                    const { data: { user }, error } = await supabase.auth.getUser();
+                    
+                    if (error) {
+                        console.error('Error getting user:', error);
+                        const username = localStorage.getItem('username') || 'User';
+                        document.getElementById('userName').textContent = username;
+                    } else if (user) {
+                        const username = user.user_metadata?.full_name || user.email.split('@')[0];
+                        document.getElementById('userName').textContent = username;
+                        localStorage.setItem('username', username);
+                    }
+                    
+                    userProfile.style.display = 'flex';
+                } catch (error) {
+                    console.error('Error updating user profile:', error);
+                    const username = localStorage.getItem('username') || 'User';
+                    document.getElementById('userName').textContent = username;
+                    userProfile.style.display = 'flex';
+                }
+            } else {
+                userProfile.style.display = 'none';
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            const supabaseInitialized = await initSupabase();
+            if (supabaseInitialized) {
+                await loadOrderDetails();
+                await updateUserProfile();
+            } else {
+                alert('Error initializing system. Please try again.');
+                window.location.href = 'collections.html';
+            }
+        });
+    </script>
+</body>
+</html>

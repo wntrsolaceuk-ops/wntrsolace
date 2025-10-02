@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WinterSolace - Email Confirmed</title>
+    <!-- Supabase JavaScript Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Snow effect */
+        .ice-crystals {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .ice-crystal {
+            position: absolute;
+            color: rgba(200, 230, 255, 0.6);
+            font-size: 20px;
+            animation: crystalFloat 8s linear infinite;
+        }
+
+        @keyframes crystalFloat {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .ice-crystal:nth-child(1) { left: 10%; animation-delay: 0s; font-size: 16px; }
+        .ice-crystal:nth-child(2) { left: 30%; animation-delay: 2s; font-size: 24px; }
+        .ice-crystal:nth-child(3) { left: 50%; animation-delay: 4s; font-size: 18px; }
+        .ice-crystal:nth-child(4) { left: 70%; animation-delay: 6s; font-size: 22px; }
+        .ice-crystal:nth-child(5) { left: 90%; animation-delay: 8s; font-size: 20px; }
+
+        .confirm-container {
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 4rem;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo {
+            height: 80px;
+            margin-bottom: 2rem;
+            filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.2));
+        }
+
+        .confirm-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .confirm-message {
+            font-size: 1.2rem;
+            color: #aaaaaa;
+            margin-bottom: 3rem;
+            line-height: 1.6;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: #4ade80;
+            margin-bottom: 2rem;
+            animation: successPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes successPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .continue-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 1rem 2rem;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .continue-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .error-message {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .loading {
+            color: #aaaaaa;
+            font-size: 1.1rem;
+        }
+
+        .spinner {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 2px solid #ffffff;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Ice Crystals Animation -->
+    <div class="ice-crystals">
+        <div class="ice-crystal">❅</div>
+        <div class="ice-crystal">❆</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">❅</div>
+        <div class="ice-crystal">❆</div>
+    </div>
+
+    <div class="confirm-container">
+        <img src="assets/Wntrsolace.png" alt="WinterSolace Logo" class="logo">
+        
+        <div id="loadingState">
+            <div class="spinner"></div>
+            <p class="loading">Confirming your email...</p>
+        </div>
+
+        <div id="successState" style="display: none;">
+            <div class="success-icon">✓</div>
+            <h1 class="confirm-title">Welcome!</h1>
+            <p class="confirm-message">
+                Your email has been confirmed successfully. 
+                You can now access your WinterSolace account.
+            </p>
+            <a href="layout-winter-frost.html" class="continue-btn">Continue to Site</a>
+        </div>
+
+        <div id="errorState" style="display: none;">
+            <h1 class="confirm-title">Oops!</h1>
+            <div class="error-message" id="errorMessage">
+                There was an issue confirming your email.
+            </div>
+            <a href="auth.html" class="continue-btn">Back to Sign In</a>
+        </div>
+    </div>
+
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://pbbmrajuptceokpjnynz.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiYm1yYWp1cHRjZW9rcGpueW56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NzY1MzcsImV4cCI6MjA3NDA1MjUzN30.BYxGzM6G7MROTDTdj6KN3gCcrs6nxUaa_ylFZwMBT9o'
+        
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+        // Handle email confirmation
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Confirmation page loaded')
+            
+            try {
+                // Get the URL hash parameters
+                const hashParams = new URLSearchParams(window.location.hash.substring(1))
+                const accessToken = hashParams.get('access_token')
+                const refreshToken = hashParams.get('refresh_token')
+                const type = hashParams.get('type')
+                
+                console.log('URL params:', { accessToken: !!accessToken, refreshToken: !!refreshToken, type })
+                
+                if (type === 'signup' && accessToken) {
+                    // Set the session with the tokens
+                    const { data, error } = await supabase.auth.setSession({
+                        access_token: accessToken,
+                        refresh_token: refreshToken
+                    })
+                    
+                    if (error) {
+                        console.error('Session error:', error)
+                        showError('Failed to confirm email: ' + error.message)
+                        return
+                    }
+                    
+                    console.log('Email confirmed successfully:', data.user)
+                    showSuccess()
+                    
+                } else if (type === 'recovery') {
+                    // Handle password reset confirmation
+                    showSuccess('Password reset confirmed. You can now set a new password.')
+                    
+                } else {
+                    // Check if user is already authenticated
+                    const { data: { user } } = await supabase.auth.getUser()
+                    if (user) {
+                        console.log('User already authenticated:', user)
+                        showSuccess()
+                    } else {
+                        console.log('No confirmation tokens found')
+                        showError('Invalid confirmation link or link has expired.')
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Confirmation error:', error)
+                showError('An error occurred during confirmation: ' + error.message)
+            }
+        })
+
+        function showSuccess(customMessage) {
+            document.getElementById('loadingState').style.display = 'none'
+            document.getElementById('errorState').style.display = 'none'
+            document.getElementById('successState').style.display = 'block'
+            
+            if (customMessage) {
+                document.querySelector('.confirm-message').textContent = customMessage
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('loadingState').style.display = 'none'
+            document.getElementById('successState').style.display = 'none'
+            document.getElementById('errorState').style.display = 'block'
+            document.getElementById('errorMessage').textContent = message
+        }
+    </script>
+</body>
+</html>
+
+
+

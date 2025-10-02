@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Cancellations & Returns - WinterSolace Admin</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Heavy Fog overlay effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 120%;
+            height: 120%;
+            background: 
+                radial-gradient(ellipse 800px 400px at 20% 10%, rgba(255, 255, 255, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse 600px 300px at 80% 30%, rgba(200, 230, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 700px 350px at 10% 80%, rgba(220, 240, 255, 0.18) 0%, transparent 55%),
+                radial-gradient(ellipse 900px 450px at 90% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 65%);
+            pointer-events: none;
+            z-index: 1;
+            animation: heavyFogDrift 20s ease-in-out infinite;
+        }
+
+        @keyframes heavyFogDrift {
+            0% { 
+                transform: translateX(-50px) translateY(0) scale(1);
+                opacity: 0.8;
+            }
+            25% { 
+                transform: translateX(-20px) translateY(-30px) scale(1.1);
+                opacity: 1;
+            }
+            50% { 
+                transform: translateX(30px) translateY(-20px) scale(0.9);
+                opacity: 0.9;
+            }
+            75% { 
+                transform: translateX(10px) translateY(40px) scale(1.05);
+                opacity: 1;
+            }
+            100% { 
+                transform: translateX(-50px) translateY(0) scale(1);
+                opacity: 0.8;
+            }
+        }
+
+        /* Ice crystals overlay */
+        .ice-crystals {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0.1;
+        }
+
+        .ice-crystal {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #c8e6ff;
+            border-radius: 50%;
+            animation: crystalFloat 15s linear infinite;
+        }
+
+        @keyframes crystalFloat {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Admin Layout */
+        .admin-container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            grid-template-rows: 60px 1fr;
+            grid-template-areas: 
+                "sidebar header"
+                "sidebar main";
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            grid-area: sidebar;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(200, 230, 255, 0.1);
+            padding: 2rem 0;
+        }
+
+        .sidebar-logo {
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid rgba(200, 230, 255, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-logo img {
+            height: 40px;
+            filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.1));
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 1rem 2rem;
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: rgba(200, 230, 255, 0.1);
+            border-left-color: #c8e6ff;
+            color: #c8e6ff;
+        }
+
+        .sidebar-nav svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 1rem;
+        }
+
+        /* Header */
+        .admin-header {
+            grid-area: header;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(200, 230, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+        }
+
+        .header-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .admin-main {
+            grid-area: main;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        /* Page Title */
+        .page-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        /* Filters */
+        .filters-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(20px);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-label {
+            font-size: 0.9rem;
+            color: #c8e6ff;
+            margin-bottom: 0.5rem;
+        }
+
+        .filter-input,
+        .filter-select {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(200, 230, 255, 0.2);
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: #ffffff;
+            font-size: 0.9rem;
+        }
+
+        .filter-input:focus,
+        .filter-select:focus {
+            outline: none;
+            border-color: #c8e6ff;
+            box-shadow: 0 0 0 2px rgba(200, 230, 255, 0.1);
+        }
+
+        .filter-btn {
+            background: linear-gradient(135deg, #c8e6ff 0%, #a8d8ff 100%);
+            color: #000000;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(200, 230, 255, 0.3);
+        }
+
+        /* Orders Table */
+        .orders-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+        }
+
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .orders-table th,
+        .orders-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(200, 230, 255, 0.1);
+        }
+
+        .orders-table th {
+            font-weight: 600;
+            color: #c8e6ff;
+            background: rgba(200, 230, 255, 0.05);
+        }
+
+        .orders-table td {
+            color: #ffffff;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .status-cancelled {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+
+        .status-returned {
+            background: rgba(108, 117, 125, 0.2);
+            color: #6c757d;
+            border: 1px solid rgba(108, 117, 125, 0.3);
+        }
+
+        .status-refunded {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .action-btn {
+            background: rgba(200, 230, 255, 0.1);
+            border: 1px solid rgba(200, 230, 255, 0.3);
+            color: #c8e6ff;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: rgba(200, 230, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .action-btn.danger {
+            background: rgba(220, 53, 69, 0.1);
+            border-color: rgba(220, 53, 69, 0.3);
+            color: #dc3545;
+        }
+
+        .action-btn.danger:hover {
+            background: rgba(220, 53, 69, 0.2);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(200, 230, 255, 0.2);
+            border-radius: 15px;
+            margin: 5% auto;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #c8e6ff;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            color: #c8e6ff;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(200, 230, 255, 0.2);
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: #ffffff;
+            font-size: 0.9rem;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #c8e6ff;
+            box-shadow: 0 0 0 2px rgba(200, 230, 255, 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #c8e6ff 0%, #a8d8ff 100%);
+            color: #000000;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 1px solid rgba(200, 230, 255, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .admin-container {
+                grid-template-columns: 1fr;
+                grid-template-areas: 
+                    "header"
+                    "main";
+            }
+
+            .admin-sidebar {
+                display: none;
+            }
+
+            .admin-main {
+                padding: 1rem;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .orders-table {
+                font-size: 0.8rem;
+            }
+
+            .orders-table th,
+            .orders-table td {
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Ice crystals overlay -->
+    <div class="ice-crystals">
+        <div class="ice-crystal" style="left: 10%; animation-delay: 0s;"></div>
+        <div class="ice-crystal" style="left: 20%; animation-delay: 2s;"></div>
+        <div class="ice-crystal" style="left: 30%; animation-delay: 4s;"></div>
+        <div class="ice-crystal" style="left: 40%; animation-delay: 6s;"></div>
+        <div class="ice-crystal" style="left: 50%; animation-delay: 8s;"></div>
+        <div class="ice-crystal" style="left: 60%; animation-delay: 10s;"></div>
+        <div class="ice-crystal" style="left: 70%; animation-delay: 12s;"></div>
+        <div class="ice-crystal" style="left: 80%; animation-delay: 14s;"></div>
+        <div class="ice-crystal" style="left: 90%; animation-delay: 16s;"></div>
+    </div>
+
+    <!-- Admin Layout -->
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <nav class="admin-sidebar">
+            <div class="sidebar-logo">
+                <img src="assets/Wntrsolace.png" alt="WinterSolace Admin">
+            </div>
+            
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="admin-dashboard.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9,22 9,12 15,12 15,22"></polyline>
+                        </svg>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-products.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                        </svg>
+                        Products
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-orders.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 11V7a4 4 0 0 0-8 0v4"></path>
+                            <rect x="5" y="9" width="14" height="10" rx="2" ry="2"></rect>
+                        </svg>
+                        Orders
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-contact.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        Contact Messages
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-cancellations.html" class="active">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="15" y1="9" x2="9" y2="15"></line>
+                            <line x1="9" y1="9" x2="15" y2="15"></line>
+                        </svg>
+                        Cancellations & Returns
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-customers.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        Customers
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Header -->
+        <header class="admin-header">
+            <h1 class="header-title">Order Cancellations & Returns</h1>
+            <div class="header-actions">
+                <span style="color: #c8e6ff;">Admin Panel</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <h2 class="page-title">Manage Order Cancellations & Returns</h2>
+
+            <!-- Filters -->
+            <div class="filters-section">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label class="filter-label">Search Order</label>
+                        <input type="text" class="filter-input" id="searchInput" placeholder="Order number, customer name...">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Status</label>
+                        <select class="filter-select" id="statusFilter">
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="cancelled">Cancelled</option>
+                            <option value="returned">Returned</option>
+                            <option value="refunded">Refunded</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Date Range</label>
+                        <input type="date" class="filter-input" id="dateFrom">
+                    </div>
+                    <div class="filter-group">
+                        <button class="filter-btn" onclick="applyFilters()">Apply Filters</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="orders-section">
+                <h3 class="section-title">Orders Requiring Action</h3>
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Amount</th>
+                            <th>Payment ID</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTable">
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 2rem; color: #c8e6ff; opacity: 0.6;">
+                                Loading orders...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Cancellation Modal -->
+    <div id="cancellationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Cancel Order</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="cancellationForm">
+                <div class="form-group">
+                    <label class="form-label">Order Number</label>
+                    <input type="text" class="form-input" id="modalOrderNumber" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Customer Email</label>
+                    <input type="email" class="form-input" id="modalCustomerEmail" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Refund Amount</label>
+                    <input type="number" class="form-input" id="modalRefundAmount" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Cancellation Reason</label>
+                    <select class="form-select" id="modalCancellationReason" required>
+                        <option value="">Select reason...</option>
+                        <option value="customer_request">Customer Request</option>
+                        <option value="out_of_stock">Out of Stock</option>
+                        <option value="payment_issue">Payment Issue</option>
+                        <option value="shipping_error">Shipping Error</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-textarea" id="modalNotes" placeholder="Additional notes..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" id="modalAutoRefund" checked>
+                        Automatically process Stripe refund
+                    </label>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Process Cancellation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Return Modal -->
+    <div id="returnModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Process Return</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="returnForm">
+                <div class="form-group">
+                    <label class="form-label">Order Number</label>
+                    <input type="text" class="form-input" id="returnOrderNumber" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Customer Email</label>
+                    <input type="email" class="form-input" id="returnCustomerEmail" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Return Reason</label>
+                    <select class="form-select" id="returnReason" required>
+                        <option value="">Select reason...</option>
+                        <option value="defective">Defective Item</option>
+                        <option value="wrong_size">Wrong Size</option>
+                        <option value="not_as_described">Not as Described</option>
+                        <option value="changed_mind">Changed Mind</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Return Tracking Number</label>
+                    <input type="text" class="form-input" id="returnTrackingNumber" placeholder="Enter tracking number...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-textarea" id="returnNotes" placeholder="Return processing notes..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Process Return</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://your-project.supabase.co';
+        const SUPABASE_ANON_KEY = 'your-anon-key';
+
+        let orders = [];
+        let filteredOrders = [];
+
+        // Load orders on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadOrders();
+        });
+
+        // Load orders from Supabase
+        async function loadOrders() {
+            try {
+                const { data: ordersData, error } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error('Error loading orders:', error);
+                    return;
+                }
+
+                orders = ordersData || [];
+                filteredOrders = orders;
+                displayOrders();
+            } catch (error) {
+                console.error('Error loading orders:', error);
+            }
+        }
+
+        // Display orders in table
+        function displayOrders() {
+            const tbody = document.getElementById('ordersTable');
+            
+            if (filteredOrders.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 2rem; color: #c8e6ff; opacity: 0.6;">
+                            No orders found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filteredOrders.map(order => `
+                <tr>
+                    <td>${order.order_number}</td>
+                    <td>${order.first_name && order.last_name ? `${order.first_name} ${order.last_name}` : 'N/A'}</td>
+                    <td>${new Date(order.created_at).toLocaleDateString()}</td>
+                    <td>
+                        <span class="status-badge status-${order.status || 'pending'}">
+                            ${(order.status || 'pending').toUpperCase()}
+                        </span>
+                    </td>
+                    <td>£${(order.total || 0).toFixed(2)}</td>
+                    <td>${order.stripe_payment_intent_id ? order.stripe_payment_intent_id.substring(0, 20) + '...' : 'N/A'}</td>
+                    <td>
+                        ${order.status === 'pending' || order.status === 'processing' ? `
+                            <button class="action-btn danger" onclick="openCancellationModal('${order.id}', '${order.order_number}', '${order.email}', ${order.total})">
+                                Cancel Order
+                            </button>
+                        ` : ''}
+                        ${order.status === 'delivered' ? `
+                            <button class="action-btn" onclick="openReturnModal('${order.id}', '${order.order_number}', '${order.email}')">
+                                Process Return
+                            </button>
+                        ` : ''}
+                        ${order.status === 'cancelled' && !order.stripe_refund_id ? `
+                            <button class="action-btn" onclick="processRefund('${order.id}', '${order.stripe_payment_intent_id}', ${order.total})">
+                                Process Refund
+                            </button>
+                        ` : ''}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const dateFrom = document.getElementById('dateFrom').value;
+
+            filteredOrders = orders.filter(order => {
+                const matchesSearch = !searchTerm || 
+                    order.order_number.toLowerCase().includes(searchTerm) ||
+                    (order.first_name && order.first_name.toLowerCase().includes(searchTerm)) ||
+                    (order.last_name && order.last_name.toLowerCase().includes(searchTerm)) ||
+                    (order.email && order.email.toLowerCase().includes(searchTerm));
+                
+                const matchesStatus = !statusFilter || order.status === statusFilter;
+                
+                const matchesDate = !dateFrom || new Date(order.created_at) >= new Date(dateFrom);
+                
+                return matchesSearch && matchesStatus && matchesDate;
+            });
+
+            displayOrders();
+        }
+
+        // Open cancellation modal
+        function openCancellationModal(orderId, orderNumber, customerEmail, amount) {
+            document.getElementById('modalOrderNumber').value = orderNumber;
+            document.getElementById('modalCustomerEmail').value = customerEmail;
+            document.getElementById('modalRefundAmount').value = amount.toFixed(2);
+            document.getElementById('cancellationModal').style.display = 'block';
+            
+            // Store order ID for form submission
+            document.getElementById('cancellationForm').dataset.orderId = orderId;
+        }
+
+        // Open return modal
+        function openReturnModal(orderId, orderNumber, customerEmail) {
+            document.getElementById('returnOrderNumber').value = orderNumber;
+            document.getElementById('returnCustomerEmail').value = customerEmail;
+            document.getElementById('returnModal').style.display = 'block';
+            
+            // Store order ID for form submission
+            document.getElementById('returnForm').dataset.orderId = orderId;
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('cancellationModal').style.display = 'none';
+            document.getElementById('returnModal').style.display = 'none';
+        }
+
+        // Handle cancellation form submission
+        document.getElementById('cancellationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const orderId = this.dataset.orderId;
+            const formData = new FormData(this);
+            
+            const cancellationData = {
+                order_id: orderId,
+                cancellation_reason: document.getElementById('modalCancellationReason').value,
+                cancellation_notes: document.getElementById('modalNotes').value,
+                refund_amount: parseFloat(document.getElementById('modalRefundAmount').value),
+                auto_refund: document.getElementById('modalAutoRefund').checked
+            };
+
+            try {
+                // Update order status in database
+                const { error: updateError } = await supabase
+                    .from('orders')
+                    .update({
+                        status: 'cancelled',
+                        cancellation_reason: cancellationData.cancellation_reason,
+                        cancellation_notes: cancellationData.cancellation_notes,
+                        cancellation_date: new Date().toISOString(),
+                        refund_amount: cancellationData.refund_amount
+                    })
+                    .eq('id', orderId);
+
+                if (updateError) {
+                    console.error('Error updating order:', updateError);
+                    alert('Error updating order status');
+                    return;
+                }
+
+                // Process Stripe refund if requested
+                if (cancellationData.auto_refund) {
+                    const order = orders.find(o => o.id === orderId);
+                    if (order && order.stripe_payment_intent_id) {
+                        await processStripeRefund(order.stripe_payment_intent_id, cancellationData.refund_amount);
+                    }
+                }
+
+                // Send cancellation email to customer
+                await sendCancellationEmail(cancellationData);
+
+                alert('Order cancelled successfully!');
+                closeModal();
+                loadOrders(); // Refresh the orders list
+                
+            } catch (error) {
+                console.error('Error processing cancellation:', error);
+                alert('Error processing cancellation');
+            }
+        });
+
+        // Handle return form submission
+        document.getElementById('returnForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const orderId = this.dataset.orderId;
+            
+            const returnData = {
+                order_id: orderId,
+                return_reason: document.getElementById('returnReason').value,
+                return_tracking_number: document.getElementById('returnTrackingNumber').value,
+                return_notes: document.getElementById('returnNotes').value
+            };
+
+            try {
+                // Update order status in database
+                const { error: updateError } = await supabase
+                    .from('orders')
+                    .update({
+                        status: 'returned',
+                        return_reason: returnData.return_reason,
+                        return_tracking_number: returnData.return_tracking_number,
+                        return_notes: returnData.return_notes,
+                        return_date: new Date().toISOString(),
+                        return_status: 'pending'
+                    })
+                    .eq('id', orderId);
+
+                if (updateError) {
+                    console.error('Error updating order:', updateError);
+                    alert('Error updating order status');
+                    return;
+                }
+
+                // Send return confirmation email to customer
+                await sendReturnEmail(returnData);
+
+                alert('Return processed successfully!');
+                closeModal();
+                loadOrders(); // Refresh the orders list
+                
+            } catch (error) {
+                console.error('Error processing return:', error);
+                alert('Error processing return');
+            }
+        });
+
+        // Process Stripe refund
+        async function processStripeRefund(paymentIntentId, amount) {
+            try {
+                const response = await fetch('http://localhost:3002/api/process-refund', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        payment_intent_id: paymentIntentId,
+                        amount: amount * 100 // Convert to cents
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Refund failed');
+                }
+
+                const result = await response.json();
+                console.log('Refund processed:', result);
+                
+                // Update order with refund ID
+                const { error } = await supabase
+                    .from('orders')
+                    .update({
+                        stripe_refund_id: result.refund_id,
+                        refund_date: new Date().toISOString(),
+                        refund_method: 'stripe',
+                        status: 'refunded'
+                    })
+                    .eq('stripe_payment_intent_id', paymentIntentId);
+
+                if (error) {
+                    console.error('Error updating refund info:', error);
+                }
+
+            } catch (error) {
+                console.error('Error processing refund:', error);
+                throw error;
+            }
+        }
+
+        // Send cancellation email
+        async function sendCancellationEmail(cancellationData) {
+            try {
+                const response = await fetch('http://localhost:3005/api/send-cancellation-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(cancellationData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to send cancellation email');
+                }
+
+                console.log('Cancellation email sent successfully');
+            } catch (error) {
+                console.error('Error sending cancellation email:', error);
+            }
+        }
+
+        // Send return email
+        async function sendReturnEmail(returnData) {
+            try {
+                const response = await fetch('http://localhost:3005/api/send-return-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(returnData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to send return email');
+                }
+
+                console.log('Return email sent successfully');
+            } catch (error) {
+                console.error('Error sending return email:', error);
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const cancellationModal = document.getElementById('cancellationModal');
+            const returnModal = document.getElementById('returnModal');
+            
+            if (event.target === cancellationModal) {
+                cancellationModal.style.display = 'none';
+            }
+            if (event.target === returnModal) {
+                returnModal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

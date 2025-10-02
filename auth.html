@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WinterSolace - Account</title>
+    <!-- Supabase JavaScript Client -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-top: 100px;
+        }
+
+        /* Heavy Fog overlay effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 120%;
+            height: 120%;
+            background: 
+                radial-gradient(ellipse 800px 400px at 20% 10%, rgba(255, 255, 255, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse 600px 300px at 80% 30%, rgba(200, 230, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 700px 350px at 10% 80%, rgba(220, 240, 255, 0.18) 0%, transparent 55%);
+            pointer-events: none;
+            z-index: 1;
+            animation: heavyFogDrift 20s ease-in-out infinite;
+        }
+
+        @keyframes heavyFogDrift {
+            0% { 
+                transform: translateX(-50px) translateY(0) scale(1);
+                opacity: 0.8;
+            }
+            50% { 
+                transform: translateX(30px) translateY(20px) scale(0.9);
+                opacity: 0.7;
+            }
+            100% { 
+                transform: translateX(-50px) translateY(0) scale(1);
+                opacity: 0.8;
+            }
+        }
+
+        /* Ice crystals overlay */
+        .ice-crystals {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .ice-crystal {
+            position: absolute;
+            color: rgba(200, 230, 255, 0.6);
+            font-size: 20px;
+            animation: crystalFloat 8s linear infinite;
+        }
+
+        @keyframes crystalFloat {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .ice-crystal:nth-child(1) { left: 10%; animation-delay: 0s; font-size: 16px; }
+        .ice-crystal:nth-child(2) { left: 20%; animation-delay: 1s; font-size: 24px; }
+        .ice-crystal:nth-child(3) { left: 30%; animation-delay: 2s; font-size: 18px; }
+        .ice-crystal:nth-child(4) { left: 40%; animation-delay: 3s; font-size: 22px; }
+        .ice-crystal:nth-child(5) { left: 50%; animation-delay: 4s; font-size: 20px; }
+        .ice-crystal:nth-child(6) { left: 60%; animation-delay: 5s; font-size: 26px; }
+        .ice-crystal:nth-child(7) { left: 70%; animation-delay: 6s; font-size: 16px; }
+        .ice-crystal:nth-child(8) { left: 80%; animation-delay: 7s; font-size: 28px; }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            height: 60px;
+            filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.1));
+        }
+
+        .back-link {
+            color: #cccccc;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Auth Container */
+        .auth-container {
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 3rem;
+            max-width: 650px;
+            width: 95%;
+            position: relative;
+            z-index: 3;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            margin: 0 auto;
+        }
+
+        .auth-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 4px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            color: #aaaaaa;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .auth-tab.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .auth-input {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 0.9rem 1.2rem;
+            color: #ffffff;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .auth-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        }
+
+        .auth-input::placeholder {
+            color: #aaaaaa;
+        }
+
+        .auth-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .auth-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: #aaaaaa;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .divider span {
+            padding: 0 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* Google SSO Button */
+        .google-btn {
+            background: #ffffff;
+            color: #333333;
+            border: none;
+            border-radius: 10px;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .google-btn:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .google-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .signup-form {
+            display: none;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .signup-form.active {
+            display: flex !important;
+        }
+
+        .signin-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .signin-form.active {
+            display: flex !important;
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .forgot-password a {
+            color: #aaaaaa;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .forgot-password a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .auth-container {
+                padding: 3rem 2rem;
+                margin: 1rem;
+            }
+            
+            .auth-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Ice Crystals Animation -->
+    <div class="ice-crystals">
+        <div class="ice-crystal">❅</div>
+        <div class="ice-crystal">❆</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">❅</div>
+        <div class="ice-crystal">❆</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">❅</div>
+        <div class="ice-crystal">❆</div>
+    </div>
+
+    <header class="header">
+        <nav class="nav">
+            <img src="assets/Wntrsolace.png" alt="WinterSolace Logo" class="logo">
+            <a href="layout-winter-frost.html" class="back-link">← Back to Home</a>
+        </nav>
+    </header>
+
+    <div class="auth-container">
+        <h1 class="auth-title">Welcome</h1>
+        
+        <!-- Auth Tabs -->
+        <div class="auth-tabs">
+            <button class="auth-tab active" id="signinTab">Sign In</button>
+            <button class="auth-tab" id="signupTab">Sign Up</button>
+        </div>
+
+        <!-- Google SSO -->
+        <button class="google-btn" onclick="signInWithGoogle()">
+            <svg class="google-icon" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Continue with Google
+        </button>
+
+        <div class="divider">
+            <span>or</span>
+        </div>
+
+        <!-- Sign In Form -->
+        <div class="signin-form active" id="signinForm">
+            <form class="auth-form" onsubmit="handleSignIn(event)">
+                <input type="email" class="auth-input" placeholder="Email" required>
+                <input type="password" class="auth-input" placeholder="Password" required>
+                <button type="submit" class="auth-button">Sign In</button>
+            </form>
+            <div class="forgot-password">
+                <a href="#" onclick="forgotPassword()">Forgot your password?</a>
+            </div>
+            <div class="admin-hint">
+                <small style="color: rgba(200, 230, 255, 0.6); font-size: 0.8rem;">
+                    Admin? Use admin2@wntrsolace.com
+                </small>
+            </div>
+        </div>
+
+        <!-- Sign Up Form -->
+        <div class="signup-form" id="signupForm">
+            <form class="auth-form" onsubmit="handleSignUp(event)">
+                <div style="display: flex; gap: 1.5rem;">
+                    <input type="text" class="auth-input" placeholder="First Name" required style="flex: 1; min-width: 0;">
+                    <input type="text" class="auth-input" placeholder="Last Name" required style="flex: 1; min-width: 0;">
+                </div>
+                <input type="email" class="auth-input" placeholder="Email" required>
+                <input type="password" class="auth-input" placeholder="Password" required>
+                <input type="password" class="auth-input" placeholder="Confirm Password" required>
+                <button type="submit" class="auth-button">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://pbbmrajuptceokpjnynz.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiYm1yYWp1cHRjZW9rcGpueW56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NzY1MzcsImV4cCI6MjA3NDA1MjUzN30.BYxGzM6G7MROTDTdj6KN3gCcrs6nxUaa_ylFZwMBT9o'
+        
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+        // Wait for DOM to be ready and set up event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, setting up event listeners');
+            
+            // Check if user is already logged in
+            checkAuthState();
+            
+            const signinTab = document.getElementById('signinTab');
+            const signupTab = document.getElementById('signupTab');
+            const signinForm = document.getElementById('signinForm');
+            const signupForm = document.getElementById('signupForm');
+
+            console.log('Found elements:', {signinTab, signupTab, signinForm, signupForm});
+
+            // Add click event listeners
+            signinTab.addEventListener('click', function() {
+                console.log('Sign In tab clicked');
+                switchToSignIn();
+            });
+
+            signupTab.addEventListener('click', function() {
+                console.log('Sign Up tab clicked');
+                switchToSignUp();
+            });
+
+            function switchToSignIn() {
+                signinTab.classList.add('active');
+                signupTab.classList.remove('active');
+                signinForm.style.display = 'block';
+                signupForm.style.display = 'none';
+                signinForm.classList.add('active');
+                signupForm.classList.remove('active');
+                console.log('Switched to Sign In');
+            }
+
+            function switchToSignUp() {
+                signupTab.classList.add('active');
+                signinTab.classList.remove('active');
+                signupForm.style.display = 'block';
+                signinForm.style.display = 'none';
+                signupForm.classList.add('active');
+                signinForm.classList.remove('active');
+                console.log('Switched to Sign Up');
+            }
+        });
+
+        // Supabase Authentication Functions
+        async function checkAuthState() {
+            try {
+                // Check Supabase session first
+                const { data: { user } } = await supabase.auth.getUser()
+                
+                if (user) {
+                    console.log('User found:', user.email)
+                    
+                    // Check if this is an admin user
+                    if (user.email === 'admin2@wntrsolace.com') {
+                        console.log('Admin user detected, redirecting to admin dashboard')
+                        window.location.href = 'admin-dashboard.html'
+                        return
+                    }
+                    
+                    // Regular user - redirect to main page
+                    console.log('Regular user detected, redirecting to main page')
+                    window.location.href = 'layout-winter-frost.html'
+                    return
+                }
+                
+                // No user session - check localStorage admin session as fallback
+                const adminLoggedIn = localStorage.getItem('adminLoggedIn')
+                const adminLoginTime = localStorage.getItem('adminLoginTime')
+                
+                if (adminLoggedIn === 'true' && adminLoginTime) {
+                    // Check if admin session is still valid (24 hours)
+                    const loginDate = new Date(adminLoginTime)
+                    const now = new Date()
+                    const hoursDiff = (now - loginDate) / (1000 * 60 * 60)
+                    
+                    if (hoursDiff < 24) {
+                        console.log('Admin session still valid, redirecting to admin dashboard')
+                        window.location.href = 'admin-dashboard.html'
+                        return
+                    } else {
+                        // Admin session expired, clear it
+                        localStorage.removeItem('adminLoggedIn')
+                        localStorage.removeItem('adminLoginTime')
+                        localStorage.removeItem('adminEmail')
+                    }
+                }
+                
+                if (!supabase) {
+                    console.log('Supabase not available, checking localStorage')
+                    if (localStorage.getItem('userLoggedIn') === 'true') {
+                        window.location.href = 'layout-winter-frost.html'
+                    }
+                    return
+                }
+            } catch (error) {
+                console.error('Auth check error:', error)
+            }
+        }
+
+        async function signInWithGoogle() {
+            try {
+                const { data, error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        redirectTo: window.location.origin + '/layout-winter-frost.html'
+                    }
+                })
+                
+                if (error) {
+                    console.error('Google sign in error:', error)
+                    alert('Google sign in failed: ' + error.message)
+                }
+            } catch (error) {
+                console.error('Google SSO error:', error)
+                alert('Google sign in error. Please try again.')
+            }
+        }
+
+        async function handleSignIn(event) {
+            event.preventDefault()
+            console.log('Sign in form submitted')
+            
+            const email = event.target.querySelector('input[type="email"]').value
+            const password = event.target.querySelector('input[type="password"]').value
+            
+            console.log('Attempting sign in with email:', email)
+            
+            // Check for admin credentials first
+            if (email === 'admin2@wntrsolace.com' && password === 'wintersolace2024') {
+                console.log('Admin login detected')
+                
+                // Sign in with Supabase to create proper session
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                })
+                
+                if (error) {
+                    console.error('Admin Supabase login error:', error)
+                    alert('Admin login failed: ' + error.message)
+                    return
+                }
+                
+                console.log('Admin Supabase login successful:', data)
+                
+                // Store admin session
+                localStorage.setItem('adminLoggedIn', 'true')
+                localStorage.setItem('adminLoginTime', new Date().toISOString())
+                localStorage.setItem('adminEmail', email)
+                
+                alert('Admin login successful! Redirecting to admin dashboard...')
+                window.location.href = 'admin-dashboard.html'
+                return
+            }
+            
+            // Show loading state
+            const submitBtn = event.target.querySelector('button[type="submit"]')
+            const originalText = submitBtn.textContent
+            submitBtn.textContent = 'Signing In...'
+            submitBtn.disabled = true
+            
+            try {
+                console.log('Calling Supabase signInWithPassword...')
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                })
+                
+                console.log('Supabase response:', { data, error })
+                
+                if (error) {
+                    console.error('Supabase sign in error:', error)
+                    alert('Sign in failed: ' + error.message)
+                    return
+                }
+                
+                if (data.user) {
+                    console.log('Sign in successful:', data.user)
+                    alert('Sign in successful! Redirecting...')
+                    window.location.href = 'layout-winter-frost.html'
+                } else {
+                    console.error('No user data returned')
+                    alert('Sign in failed: No user data returned')
+                }
+                
+            } catch (error) {
+                console.error('JavaScript error during sign in:', error)
+                alert('Sign in error: ' + error.message)
+            } finally {
+                // Reset button state
+                submitBtn.textContent = originalText
+                submitBtn.disabled = false
+            }
+        }
+
+        async function handleSignUp(event) {
+            event.preventDefault()
+            const inputs = event.target.querySelectorAll('.auth-input')
+            const firstName = inputs[0].value
+            const lastName = inputs[1].value
+            const email = inputs[2].value
+            const password = inputs[3].value
+            const confirmPassword = inputs[4].value
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!')
+                return
+            }
+            
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        emailRedirectTo: window.location.origin + '/confirm.html',
+                        data: {
+                            first_name: firstName,
+                            last_name: lastName,
+                            full_name: firstName + ' ' + lastName
+                        }
+                    }
+                })
+                
+                if (error) {
+                    alert('Sign up failed: ' + error.message)
+                    return
+                }
+                
+                if (data.user && !data.user.email_confirmed_at) {
+                    alert('Please check your email to confirm your account!')
+                } else {
+                    console.log('Sign up successful:', data.user)
+                    window.location.href = 'layout-winter-frost.html'
+                }
+                
+            } catch (error) {
+                console.error('Sign up error:', error)
+                alert('Sign up error. Please try again.')
+            }
+        }
+
+        function forgotPassword() {
+            alert('Password reset functionality coming soon!\n\nFor now, contact support at admin@wintersolace.com');
+        }
+
+        // Real Google SSO Implementation Guide
+        // To implement real Google SSO:
+        // 1. Add Google Sign-In script to head
+        // 2. Configure your Google OAuth client
+        // 3. Replace signInWithGoogle function with real implementation
+    </script>
+</body>
+</html>

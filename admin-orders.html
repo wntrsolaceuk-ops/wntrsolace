@@ -1,0 +1,2248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Management - WinterSolace Admin</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Heavy Fog overlay effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 120%;
+            height: 120%;
+            background: 
+                radial-gradient(ellipse 800px 400px at 20% 10%, rgba(255, 255, 255, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse 600px 300px at 80% 30%, rgba(200, 230, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 700px 350px at 10% 80%, rgba(220, 240, 255, 0.18) 0%, transparent 55%),
+                radial-gradient(ellipse 900px 450px at 90% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 65%);
+            pointer-events: none;
+            z-index: 1;
+            animation: heavyFogDrift 20s ease-in-out infinite;
+        }
+
+        @keyframes heavyFogDrift {
+            0% { 
+                transform: translateX(-50px) translateY(0) scale(1);
+                opacity: 0.8;
+            }
+            25% { 
+                transform: translateX(-20px) translateY(-30px) scale(1.1);
+                opacity: 1;
+            }
+            50% { 
+                transform: translateX(30px) translateY(20px) scale(0.9);
+                opacity: 0.7;
+            }
+            75% { 
+                transform: translateX(-10px) translateY(-15px) scale(1.05);
+                opacity: 0.9;
+            }
+            100% { 
+                transform: translateX(-50px) translateY(0) scale(1);
+                opacity: 0.8;
+            }
+        }
+
+        /* Ice crystals overlay */
+        .ice-crystals {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .ice-crystal {
+            position: absolute;
+            color: rgba(200, 230, 255, 0.6);
+            font-size: 20px;
+            animation: crystalFloat 8s linear infinite;
+        }
+
+        @keyframes crystalFloat {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .ice-crystal:nth-child(1) { left: 10%; animation-delay: 0s; font-size: 16px; }
+        .ice-crystal:nth-child(2) { left: 20%; animation-delay: 2s; font-size: 24px; }
+        .ice-crystal:nth-child(3) { left: 30%; animation-delay: 4s; font-size: 18px; }
+        .ice-crystal:nth-child(4) { left: 40%; animation-delay: 1s; font-size: 22px; }
+        .ice-crystal:nth-child(5) { left: 50%; animation-delay: 3s; font-size: 20px; }
+        .ice-crystal:nth-child(6) { left: 60%; animation-delay: 5s; font-size: 16px; }
+        .ice-crystal:nth-child(7) { left: 70%; animation-delay: 2.5s; font-size: 26px; }
+        .ice-crystal:nth-child(8) { left: 80%; animation-delay: 4.5s; font-size: 19px; }
+        .ice-crystal:nth-child(9) { left: 90%; animation-delay: 1.5s; font-size: 21px; }
+
+        /* Admin Layout */
+        .admin-container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            grid-template-rows: 60px 1fr;
+            grid-template-areas: 
+                "sidebar header"
+                "sidebar main";
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            grid-area: sidebar;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(200, 230, 255, 0.1);
+            padding: 2rem 0;
+        }
+
+        .sidebar-logo {
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid rgba(200, 230, 255, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-logo img {
+            height: 40px;
+            filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.1));
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 1rem 2rem;
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: rgba(200, 230, 255, 0.1);
+            border-left-color: #c8e6ff;
+            color: #c8e6ff;
+        }
+
+        .sidebar-nav svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 1rem;
+        }
+
+        /* Header */
+        .admin-header {
+            grid-area: header;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(200, 230, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+        }
+
+        .header-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #c8e6ff;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(200, 230, 255, 0.1);
+            border: 1px solid rgba(200, 230, 255, 0.2);
+            border-radius: 8px;
+            color: #c8e6ff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .header-btn:hover {
+            background: rgba(200, 230, 255, 0.2);
+            box-shadow: 0 0 15px rgba(200, 230, 255, 0.3);
+        }
+
+        /* Main Content */
+        .admin-main {
+            grid-area: main;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        /* Filters */
+        .filters-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            backdrop-filter: blur(20px);
+            margin-bottom: 2rem;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-label {
+            margin-bottom: 0.5rem;
+            color: #c8e6ff;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .filter-input {
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(200, 230, 255, 0.2);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 0.9rem;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #c8e6ff;
+            box-shadow: 0 0 15px rgba(200, 230, 255, 0.3);
+        }
+
+        .filter-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23c8e6ff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+
+        .filter-btn {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, rgba(200, 230, 255, 0.2), rgba(200, 230, 255, 0.1));
+            border: 1px solid rgba(200, 230, 255, 0.3);
+            border-radius: 8px;
+            color: #c8e6ff;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background: linear-gradient(135deg, rgba(200, 230, 255, 0.3), rgba(200, 230, 255, 0.2));
+            box-shadow: 0 0 20px rgba(200, 230, 255, 0.4);
+        }
+
+        /* Orders Table */
+        .orders-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .orders-count {
+            color: #c8e6ff;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+
+        .orders-table th,
+        .orders-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .orders-table th {
+            font-weight: 600;
+            color: #c8e6ff;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .orders-table td {
+            color: #ffffff;
+        }
+
+        .order-number {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            color: #c8e6ff;
+        }
+
+        .customer-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .customer-name {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .customer-email {
+            font-size: 0.85rem;
+            color: #c8e6ff;
+            opacity: 0.8;
+        }
+
+        .order-date {
+            font-size: 0.9rem;
+        }
+
+        .order-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .status-confirmed {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .status-shipped {
+            background: rgba(0, 123, 255, 0.1);
+            color: #007bff;
+            border: 1px solid rgba(0, 123, 255, 0.3);
+        }
+
+        .status-delivered {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .status-cancelled {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+
+        .order-total {
+            font-weight: 600;
+            color: #c8e6ff;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(200, 230, 255, 0.1);
+            border: 1px solid rgba(200, 230, 255, 0.2);
+            border-radius: 8px;
+            color: #c8e6ff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            background: rgba(200, 230, 255, 0.2);
+            box-shadow: 0 0 15px rgba(200, 230, 255, 0.3);
+        }
+
+        .view-btn {
+            background: rgba(40, 167, 69, 0.1);
+            border-color: rgba(40, 167, 69, 0.3);
+            color: #28a745;
+        }
+
+        .view-btn:hover {
+            background: rgba(40, 167, 69, 0.2);
+            box-shadow: 0 0 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .cancel-btn {
+            background: rgba(220, 53, 69, 0.1) !important;
+            border-color: rgba(220, 53, 69, 0.3) !important;
+            color: #dc3545 !important;
+        }
+
+        .cancel-btn:hover {
+            background: rgba(220, 53, 69, 0.2) !important;
+            box-shadow: 0 0 15px rgba(220, 53, 69, 0.3);
+        }
+
+        .status-btn {
+            background: rgba(0, 123, 255, 0.1);
+            border-color: rgba(0, 123, 255, 0.3);
+            color: #007bff;
+        }
+
+        .status-btn:hover {
+            background: rgba(0, 123, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 123, 255, 0.3);
+        }
+
+        /* Status Update Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid rgba(200, 230, 255, 0.3);
+            border-radius: 20px;
+            padding: 0;
+            backdrop-filter: blur(20px);
+            width: 90%;
+            max-width: 520px;
+            max-height: 90vh;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .modal-enhanced {
+            max-width: 600px;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .modal-title-section {
+            flex: 1;
+        }
+
+        .modal-subtitle {
+            color: rgba(200, 230, 255, 0.7);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+            font-weight: 400;
+        }
+
+        .modal-form {
+            padding: 2.5rem;
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(200, 230, 255, 0.3) transparent;
+        }
+
+        .modal-form::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-form::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .modal-form::-webkit-scrollbar-thumb {
+            background: rgba(200, 230, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .modal-form::-webkit-scrollbar-thumb:hover {
+            background: rgba(200, 230, 255, 0.5);
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section:last-of-type {
+            margin-bottom: 1rem;
+        }
+
+        .section-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(200, 230, 255, 0.1);
+        }
+
+        .section-title {
+            color: #c8e6ff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .section-description {
+            color: rgba(200, 230, 255, 0.6);
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .info-label {
+            color: rgba(200, 230, 255, 0.7);
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-badge {
+            text-transform: capitalize;
+            background: linear-gradient(135deg, rgba(200, 230, 255, 0.1) 0%, rgba(200, 230, 255, 0.15) 100%);
+            border-color: rgba(200, 230, 255, 0.2);
+            color: #c8e6ff;
+        }
+
+        .form-hint {
+            color: rgba(200, 230, 255, 0.6);
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            display: block;
+            line-height: 1.4;
+        }
+
+        .btn-icon {
+            margin-left: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-primary:hover .btn-icon {
+            transform: translateX(2px);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 2.5rem 1.5rem;
+            border-bottom: 1px solid rgba(200, 230, 255, 0.1);
+            flex-shrink: 0;
+        }
+
+        .modal-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #c8e6ff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(200, 230, 255, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.7rem;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(200, 230, 255, 0.25);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #c8e6ff;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 3px rgba(200, 230, 255, 0.1);
+        }
+
+        .form-input[readonly] {
+            background: rgba(200, 230, 255, 0.05);
+            color: rgba(255, 255, 255, 0.7);
+            cursor: not-allowed;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.5;
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23c8e6ff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 1rem center;
+            background-repeat: no-repeat;
+            background-size: 1.2em 1.2em;
+            padding-right: 3rem;
+            cursor: pointer;
+        }
+
+        .form-select:hover {
+            border-color: rgba(200, 230, 255, 0.4);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .form-select:focus {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: #c8e6ff;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 3px rgba(200, 230, 255, 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            padding: 1.5rem 2.5rem 2rem;
+            border-top: 1px solid rgba(200, 230, 255, 0.1);
+            flex-shrink: 0;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        /* Form Row Layout */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* Tracking Section */
+        .tracking-section {
+            background: rgba(200, 230, 255, 0.05);
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Custom Dropdown Styling */
+        .custom-dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .dropdown-trigger {
+            width: 100%;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.12) 100%);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                0 2px 4px -1px rgba(0, 0, 0, 0.06),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .dropdown-trigger:hover {
+            border-color: rgba(200, 230, 255, 0.4);
+            background: linear-gradient(135deg, rgba(200, 230, 255, 0.12) 0%, rgba(200, 230, 255, 0.16) 100%);
+            box-shadow: 
+                0 6px 20px -5px rgba(0, 0, 0, 0.15),
+                0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .dropdown-trigger.active {
+            border-color: #c8e6ff;
+            background: linear-gradient(135deg, rgba(200, 230, 255, 0.15) 0%, rgba(200, 230, 255, 0.2) 100%);
+            box-shadow: 
+                0 0 0 4px rgba(200, 230, 255, 0.2),
+                0 8px 25px -5px rgba(200, 230, 255, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .dropdown-text {
+            color: #ffffff;
+            font-size: 0.9rem;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .dropdown-arrow {
+            color: rgba(200, 230, 255, 0.8);
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .dropdown-trigger:hover .dropdown-arrow {
+            color: rgba(200, 230, 255, 1);
+            transform: scale(1.1);
+        }
+
+        .dropdown-trigger.active .dropdown-arrow {
+            color: #c8e6ff;
+            transform: rotate(180deg) scale(1.1);
+            text-shadow: 0 1px 2px rgba(200, 230, 255, 0.3);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(20, 20, 20, 0.9) 100%);
+            border: 2px solid rgba(200, 230, 255, 0.3);
+            border-radius: 8px;
+            box-shadow: 
+                0 20px 25px -5px rgba(0, 0, 0, 0.4),
+                0 10px 10px -5px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(200, 230, 255, 0.1);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            padding: 10px 16px;
+            color: #ffffff;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: linear-gradient(135deg, rgba(200, 230, 255, 0.1) 0%, rgba(200, 230, 255, 0.15) 100%);
+            color: #c8e6ff;
+            transform: translateX(4px);
+            border-left: 3px solid #c8e6ff;
+        }
+
+        .dropdown-item.selected {
+            background: linear-gradient(135deg, rgba(200, 230, 255, 0.2) 0%, rgba(200, 230, 255, 0.25) 100%);
+            color: #ffffff;
+            font-weight: 600;
+            border-left: 3px solid #c8e6ff;
+        }
+
+        .carrier-detected .dropdown-trigger {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.2) 100%);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .carrier-detected .dropdown-text {
+            color: #10b981;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            min-width: 140px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #c8e6ff 0%, #a8d8ff 100%);
+            color: #000000;
+            box-shadow: 0 4px 15px rgba(200, 230, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(200, 230, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(200, 230, 255, 0.3);
+            color: #ffffff;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-1px);
+        }
+
+        /* Custom Checkbox */
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: #ffffff;
+            margin-bottom: 0;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            display: none;
+        }
+
+        .checkbox-custom {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(200, 230, 255, 0.3);
+            border-radius: 6px;
+            margin-right: 0.75rem;
+            position: relative;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .checkbox-label input[type="checkbox"]:checked + .checkbox-custom {
+            background: #c8e6ff;
+            border-color: #c8e6ff;
+        }
+
+        .checkbox-label input[type="checkbox"]:checked + .checkbox-custom::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #000000;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .checkbox-text {
+            font-weight: 500;
+        }
+
+        /* Custom Dropdown Component */
+        .custom-dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .dropdown-trigger {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(200, 230, 255, 0.25);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .dropdown-trigger:hover {
+            border-color: rgba(200, 230, 255, 0.4);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .dropdown-trigger.active {
+            border-color: #c8e6ff;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 3px rgba(200, 230, 255, 0.1);
+        }
+
+        .dropdown-text {
+            flex: 1;
+            text-align: left;
+        }
+
+        .dropdown-arrow {
+            font-size: 1.2rem;
+            color: #c8e6ff;
+            transition: transform 0.3s ease;
+            margin-left: 0.5rem;
+        }
+
+        .dropdown-trigger.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid rgba(200, 230, 255, 0.3);
+            border-radius: 12px;
+            margin-top: 0.5rem;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            padding: 1rem;
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(200, 230, 255, 0.1);
+            font-size: 0.95rem;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(200, 230, 255, 0.1);
+            color: #c8e6ff;
+        }
+
+        .dropdown-item.selected {
+            background: rgba(200, 230, 255, 0.2);
+            color: #c8e6ff;
+            font-weight: 600;
+        }
+
+        .dropdown-menu::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .dropdown-menu::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .dropdown-menu::-webkit-scrollbar-thumb {
+            background: rgba(200, 230, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .dropdown-menu::-webkit-scrollbar-thumb:hover {
+            background: rgba(200, 230, 255, 0.5);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #c8e6ff;
+            opacity: 0.6;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #c8e6ff;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .admin-container {
+                grid-template-columns: 1fr;
+                grid-template-areas: 
+                    "header"
+                    "main";
+            }
+
+            .admin-sidebar {
+                display: none;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-main {
+                padding: 1rem;
+            }
+
+            .orders-table {
+                font-size: 0.8rem;
+            }
+
+            .orders-table th,
+            .orders-table td {
+                padding: 0.5rem;
+            }
+
+            .modal {
+                width: 95%;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Ice crystals overlay -->
+    <div class="ice-crystals">
+        <div class="ice-crystal">✦</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">✦</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">✦</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">✦</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">✦</div>
+    </div>
+
+    <!-- Admin Layout -->
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <nav class="admin-sidebar">
+            <div class="sidebar-logo">
+                <img src="assets/Wntrsolace.png" alt="WinterSolace Admin">
+            </div>
+            
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="admin-dashboard.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9,22 9,12 15,12 15,22"></polyline>
+                        </svg>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-products.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                        </svg>
+                        Products
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-orders.html" class="active">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 11V7a4 4 0 0 0-8 0v4"></path>
+                            <rect x="5" y="9" width="14" height="10" rx="2" ry="2"></rect>
+                        </svg>
+                        Orders
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-customers.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        Customers
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-analytics.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 20V10"></path>
+                            <path d="M12 20V4"></path>
+                            <path d="M6 20v-6"></path>
+                        </svg>
+                        Analytics
+                    </a>
+                </li>
+                <li>
+                    <a href="admin-settings.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        </svg>
+                        Settings
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Header -->
+        <header class="admin-header">
+            <h1 class="header-title">Order Management</h1>
+            <div class="header-actions">
+                <a href="collections.html" class="header-btn">View Site</a>
+                <a href="admin-logout.html" class="header-btn">Logout</a>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Filters -->
+            <div class="filters-section">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label class="filter-label">Search Orders</label>
+                        <input type="text" class="filter-input" id="searchInput" placeholder="Order number, customer name...">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Status</label>
+                        <select class="filter-input filter-select" id="statusFilter">
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Date Range</label>
+                        <input type="date" class="filter-input" id="dateFrom">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">To</label>
+                        <input type="date" class="filter-input" id="dateTo">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <button class="filter-btn" onclick="applyFilters()">Apply Filters</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="orders-section">
+                <div class="section-header">
+                    <h2 class="section-title">All Orders</h2>
+                    <span class="orders-count" id="ordersCount">0 orders</span>
+                </div>
+                
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Total</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody">
+                        <tr>
+                            <td colspan="6" class="empty-state">
+                                <div class="empty-icon">📦</div>
+                                <div class="empty-title">Loading orders...</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Cancellation Modal -->
+    <div class="modal-overlay" id="cancellationModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Cancel Order</h2>
+                <button class="close-btn" onclick="closeCancellationModal()">&times;</button>
+            </div>
+            <form id="cancellationForm" class="modal-form">
+                <div class="form-group">
+                    <label class="form-label">Order Number</label>
+                    <input type="text" class="form-input" id="cancelOrderNumber" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Customer Email</label>
+                    <input type="email" class="form-input" id="cancelCustomerEmail" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Refund Amount</label>
+                    <input type="number" class="form-input" id="cancelRefundAmount" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Cancellation Reason</label>
+                    <div class="custom-dropdown" id="reasonDropdown">
+                        <div class="dropdown-trigger" id="reasonTrigger">
+                            <span class="dropdown-text">Select reason...</span>
+                            <div class="dropdown-arrow">⌄</div>
+                        </div>
+                        <div class="dropdown-menu" id="reasonMenu">
+                            <div class="dropdown-item" data-value="">Select reason...</div>
+                            <div class="dropdown-item" data-value="customer_request">Customer Request</div>
+                            <div class="dropdown-item" data-value="out_of_stock">Out of Stock</div>
+                            <div class="dropdown-item" data-value="payment_issue">Payment Issue</div>
+                            <div class="dropdown-item" data-value="shipping_error">Shipping Error</div>
+                            <div class="dropdown-item" data-value="other">Other</div>
+                        </div>
+                        <input type="hidden" id="cancelReason" value="" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-textarea" id="cancelNotes" placeholder="Additional notes..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="cancelAutoRefund" checked>
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">Automatically process Stripe refund</span>
+                    </label>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeCancellationModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Process Cancellation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Status Update Modal -->
+    <div class="modal-overlay" id="statusModal">
+        <div class="modal modal-enhanced">
+            <div class="modal-header">
+                <div class="modal-title-section">
+                    <h2 class="modal-title">Order Status Update</h2>
+                    <p class="modal-subtitle">Manage order status and shipping information</p>
+                </div>
+                <button class="close-btn" onclick="closeStatusModal()">&times;</button>
+            </div>
+            
+            <form id="statusForm" class="modal-form">
+                <!-- Order Info Section -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <h3 class="section-title">Order Information</h3>
+                    </div>
+                    
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label class="info-label">Order Number</label>
+                            <div class="info-value" id="modalOrderNumber">-</div>
+                        </div>
+                        <div class="info-item">
+                            <label class="info-label">Current Status</label>
+                            <div class="info-value status-badge" id="modalCurrentStatus">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Update Section -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <h3 class="section-title">Update Status</h3>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">New Status</label>
+                        <div class="custom-dropdown" id="statusDropdown">
+                            <div class="dropdown-trigger" id="statusTrigger">
+                                <span class="dropdown-text">Pending</span>
+                                <div class="dropdown-arrow">⌄</div>
+                            </div>
+                            <div class="dropdown-menu" id="statusMenu">
+                                <div class="dropdown-item" data-value="pending">Pending</div>
+                                <div class="dropdown-item" data-value="confirmed">Confirmed</div>
+                                <div class="dropdown-item" data-value="shipped">Shipped</div>
+                                <div class="dropdown-item" data-value="delivered">Delivered</div>
+                                <div class="dropdown-item" data-value="cancelled">Cancelled</div>
+                            </div>
+                            <input type="hidden" id="modalNewStatus" value="pending" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Shipping Information Section -->
+                <div id="trackingSection" class="form-section tracking-section" style="display: none;">
+                    <div class="section-header">
+                        <h3 class="section-title">Shipping Information</h3>
+                        <p class="section-description">Add tracking details for shipped orders</p>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Tracking Number</label>
+                            <input type="text" class="form-input" id="trackingNumber" placeholder="Enter tracking number" oninput="detectCarrier()">
+                            <small class="form-hint">We'll automatically detect the carrier</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Shipping Carrier</label>
+                            <div class="custom-dropdown" id="carrierDropdown">
+                                <div class="dropdown-trigger" id="carrierTrigger">
+                                    <span class="dropdown-text">Auto-detect</span>
+                                    <div class="dropdown-arrow">⌄</div>
+                                </div>
+                                <div class="dropdown-menu" id="carrierMenu">
+                                    <div class="dropdown-item" data-value="">Auto-detect</div>
+                                    <div class="dropdown-item" data-value="ups">UPS</div>
+                                    <div class="dropdown-item" data-value="fedex">FedEx</div>
+                                    <div class="dropdown-item" data-value="dhl">DHL</div>
+                                    <div class="dropdown-item" data-value="royal-mail">Royal Mail</div>
+                                    <div class="dropdown-item" data-value="dpd">DPD</div>
+                                    <div class="dropdown-item" data-value="evri">Evri</div>
+                                    <div class="dropdown-item" data-value="yodel">Yodel</div>
+                                    <div class="dropdown-item" data-value="other">Other</div>
+                                </div>
+                                <input type="hidden" id="shippingCompany" value="">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Estimated Delivery</label>
+                        <input type="date" class="form-input" id="estimatedDelivery">
+                        <small class="form-hint">Optional: Set expected delivery date</small>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeStatusModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-text">Update Status</span>
+                        <span class="btn-icon">→</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://pbbmrajuptceokpjnynz.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiYm1yYWp1cHRjZW9rcGpueW56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NzY1MzcsImV4cCI6MjA3NDA1MjUzN30.BYxGzM6G7MROTDTdj6KN3gCcrs6nxUaa_ylFZwMBT9o';
+        
+        let supabase;
+        let orders = [];
+        let filteredOrders = [];
+        let currentOrderId = null;
+
+        // Initialize Supabase
+        async function initSupabase() {
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('Supabase initialized successfully');
+                
+                // Check current user and admin status
+                const { data: { user } } = await supabase.auth.getUser();
+                console.log('Current user:', user);
+                
+                if (user) {
+                    const { data: profile } = await supabase
+                        .from('user_profiles')
+                        .select('*')
+                        .eq('id', user.id)
+                        .single();
+                    console.log('User profile:', profile);
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('Error initializing Supabase:', error);
+                return false;
+            }
+        }
+
+        // Load orders from Supabase
+        async function loadOrders() {
+            try {
+                const { data: ordersData, error } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error('Error loading orders:', error);
+                    showEmptyState();
+                    return;
+                }
+
+                orders = ordersData || [];
+                filteredOrders = [...orders];
+                renderOrders();
+                updateOrdersCount();
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                showEmptyState();
+            }
+        }
+
+        // Render orders table
+        function renderOrders() {
+            const tbody = document.getElementById('ordersTableBody');
+            
+            if (!filteredOrders || filteredOrders.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            tbody.innerHTML = filteredOrders.map(order => `
+                <tr>
+                    <td class="order-number">${order.order_number}</td>
+                    <td>
+                        <div class="customer-info">
+                            <div class="customer-name">${order.first_name} ${order.last_name}</div>
+                            <div class="customer-email">${order.email}</div>
+                        </div>
+                    </td>
+                    <td class="order-date">${new Date(order.created_at).toLocaleDateString('en-GB')}</td>
+                    <td><span class="order-status status-${order.status}">${order.status}</span></td>
+                    <td class="order-total">£${order.total.toFixed(2)}</td>
+                    <td>
+                        <div class="order-actions">
+                            <button class="action-btn view-btn" onclick="viewOrder('${order.id}')">View</button>
+                            <button class="action-btn status-btn" onclick="openStatusModal('${order.id}')">Update</button>
+                            ${order.status === 'pending' || order.status === 'processing' ? `
+                                <button class="action-btn cancel-btn" onclick="openCancellationModal('${order.id}', '${order.order_number}', '${order.email}', ${order.total})">Cancel</button>
+                            ` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Show empty state
+        function showEmptyState() {
+            const tbody = document.getElementById('ordersTableBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="empty-state">
+                        <div class="empty-icon">📦</div>
+                        <div class="empty-title">No orders found</div>
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Update orders count
+        function updateOrdersCount() {
+            const count = filteredOrders.length;
+            document.getElementById('ordersCount').textContent = `${count} order${count !== 1 ? 's' : ''}`;
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
+
+            filteredOrders = orders.filter(order => {
+                // Search filter
+                const matchesSearch = !searchTerm || 
+                    order.order_number.toLowerCase().includes(searchTerm) ||
+                    `${order.first_name} ${order.last_name}`.toLowerCase().includes(searchTerm) ||
+                    order.email.toLowerCase().includes(searchTerm);
+
+                // Status filter
+                const matchesStatus = !statusFilter || order.status === statusFilter;
+
+                // Date filter
+                const orderDate = new Date(order.created_at).toISOString().split('T')[0];
+                const matchesDateFrom = !dateFrom || orderDate >= dateFrom;
+                const matchesDateTo = !dateTo || orderDate <= dateTo;
+
+                return matchesSearch && matchesStatus && matchesDateFrom && matchesDateTo;
+            });
+
+            renderOrders();
+            updateOrdersCount();
+        }
+
+        // View order details
+        function viewOrder(orderId) {
+            // For now, just show an alert - you can implement order details modal later
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                alert(`Order Details:\n\nOrder: ${order.order_number}\nCustomer: ${order.first_name} ${order.last_name}\nEmail: ${order.email}\nStatus: ${order.status}\nTotal: £${order.total.toFixed(2)}\n\nThis feature will be implemented in the next update.`);
+            }
+        }
+
+        // Open cancellation modal
+        function openCancellationModal(orderId, orderNumber, customerEmail, amount) {
+            document.getElementById('cancelOrderNumber').value = orderNumber;
+            document.getElementById('cancelCustomerEmail').value = customerEmail;
+            document.getElementById('cancelRefundAmount').value = amount.toFixed(2);
+            document.getElementById('cancellationModal').classList.add('active');
+            
+            // Store order ID for form submission
+            document.getElementById('cancellationForm').dataset.orderId = orderId;
+        }
+
+        // Close cancellation modal
+        function closeCancellationModal() {
+            document.getElementById('cancellationModal').classList.remove('active');
+            document.getElementById('cancellationForm').reset();
+            delete document.getElementById('cancellationForm').dataset.orderId;
+            
+            // Reset custom dropdown
+            const reasonTrigger = document.getElementById('reasonTrigger');
+            const reasonMenu = document.getElementById('reasonMenu');
+            const reasonText = reasonTrigger.querySelector('.dropdown-text');
+            const reasonHidden = document.getElementById('cancelReason');
+            
+            reasonTrigger.classList.remove('active');
+            reasonMenu.classList.remove('active');
+            reasonText.textContent = 'Select reason...';
+            reasonHidden.value = '';
+            
+            // Remove selected class from all items
+            reasonMenu.querySelectorAll('.dropdown-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+        }
+
+        // Initialize custom dropdown for cancellation reason
+        function initCancellationDropdown() {
+            const reasonTrigger = document.getElementById('reasonTrigger');
+            const reasonMenu = document.getElementById('reasonMenu');
+            const reasonItems = reasonMenu.querySelectorAll('.dropdown-item');
+            const reasonHidden = document.getElementById('cancelReason');
+
+            reasonTrigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                reasonTrigger.classList.toggle('active');
+                reasonMenu.classList.toggle('active');
+            });
+
+            reasonItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const value = this.dataset.value;
+                    const text = this.textContent;
+                    
+                    // Update trigger text
+                    reasonTrigger.querySelector('.dropdown-text').textContent = text;
+                    reasonHidden.value = value;
+                    
+                    // Update selected state
+                    reasonItems.forEach(i => i.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    // Close dropdown
+                    reasonTrigger.classList.remove('active');
+                    reasonMenu.classList.remove('active');
+                });
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!reasonTrigger.contains(e.target) && !reasonMenu.contains(e.target)) {
+                    reasonTrigger.classList.remove('active');
+                    reasonMenu.classList.remove('active');
+                }
+            });
+        }
+
+        // Open status update modal
+        function openStatusModal(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            currentOrderId = orderId;
+            document.getElementById('modalOrderNumber').textContent = order.order_number;
+            document.getElementById('modalCurrentStatus').textContent = order.status;
+            document.getElementById('modalNewStatus').value = order.status;
+            
+            // Update status dropdown display
+            const statusTrigger = document.getElementById('statusTrigger');
+            const statusText = document.querySelector(`#statusMenu .dropdown-item[data-value="${order.status}"]`);
+            if (statusText) {
+                statusTrigger.querySelector('.dropdown-text').textContent = statusText.textContent;
+            }
+            
+            document.getElementById('statusModal').classList.add('active');
+        }
+
+        // Close status modal
+        function closeStatusModal() {
+            document.getElementById('statusModal').classList.remove('active');
+            currentOrderId = null;
+            
+            // Reset info fields
+            document.getElementById('modalOrderNumber').textContent = '-';
+            document.getElementById('modalCurrentStatus').textContent = '-';
+            
+            // Reset tracking fields
+            document.getElementById('trackingSection').style.display = 'none';
+            document.getElementById('trackingNumber').value = '';
+            document.getElementById('shippingCompany').value = '';
+            document.getElementById('carrierTrigger').classList.remove('carrier-detected');
+            document.getElementById('carrierTrigger').querySelector('.dropdown-text').textContent = 'Auto-detect';
+            document.getElementById('estimatedDelivery').value = '';
+            
+            // Reset status dropdown
+            document.getElementById('modalNewStatus').value = 'pending';
+            document.getElementById('statusTrigger').querySelector('.dropdown-text').textContent = 'Pending';
+            document.querySelectorAll('#statusMenu .dropdown-item').forEach(item => item.classList.remove('selected'));
+            document.querySelector('#statusMenu .dropdown-item[data-value="pending"]').classList.add('selected');
+        }
+
+        // Toggle tracking fields based on status selection
+        function toggleTrackingFields() {
+            const newStatus = document.getElementById('modalNewStatus').value;
+            const trackingSection = document.getElementById('trackingSection');
+            
+            if (newStatus === 'shipped') {
+                trackingSection.style.display = 'block';
+            } else {
+                trackingSection.style.display = 'none';
+            }
+        }
+
+        // Custom Dropdown Functionality
+        function initCustomDropdowns() {
+            // Status dropdown
+            const statusTrigger = document.getElementById('statusTrigger');
+            const statusMenu = document.getElementById('statusMenu');
+            const statusItems = statusMenu.querySelectorAll('.dropdown-item');
+            const statusHidden = document.getElementById('modalNewStatus');
+
+            statusTrigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                statusTrigger.classList.toggle('active');
+                statusMenu.classList.toggle('show');
+            });
+
+            statusItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const value = this.getAttribute('data-value');
+                    const text = this.textContent;
+                    
+                    statusTrigger.querySelector('.dropdown-text').textContent = text;
+                    statusHidden.value = value;
+                    
+                    // Remove selected class from all items
+                    statusItems.forEach(i => i.classList.remove('selected'));
+                    // Add selected class to clicked item
+                    this.classList.add('selected');
+                    
+                    // Close dropdown
+                    statusTrigger.classList.remove('active');
+                    statusMenu.classList.remove('show');
+                    
+                    // Toggle tracking fields
+                    toggleTrackingFields();
+                });
+            });
+
+            // Carrier dropdown
+            const carrierTrigger = document.getElementById('carrierTrigger');
+            const carrierMenu = document.getElementById('carrierMenu');
+            const carrierItems = carrierMenu.querySelectorAll('.dropdown-item');
+            const carrierHidden = document.getElementById('shippingCompany');
+
+            carrierTrigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                carrierTrigger.classList.toggle('active');
+                carrierMenu.classList.toggle('show');
+            });
+
+            carrierItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const value = this.getAttribute('data-value');
+                    const text = this.textContent;
+                    
+                    carrierTrigger.querySelector('.dropdown-text').textContent = text;
+                    carrierHidden.value = value;
+                    
+                    // Remove selected class from all items
+                    carrierItems.forEach(i => i.classList.remove('selected'));
+                    // Add selected class to clicked item
+                    this.classList.add('selected');
+                    
+                    // Close dropdown
+                    carrierTrigger.classList.remove('active');
+                    carrierMenu.classList.remove('show');
+                });
+            });
+
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function() {
+                statusTrigger.classList.remove('active');
+                statusMenu.classList.remove('show');
+                carrierTrigger.classList.remove('active');
+                carrierMenu.classList.remove('show');
+            });
+        }
+
+        // Carrier detection patterns
+        const carrierPatterns = {
+            'ups': [
+                /^1Z[0-9A-Z]{16}$/i,  // UPS Ground
+                /^1Z[0-9A-Z]{6}[0-9]{10}$/i,  // UPS Air
+                /^T[0-9]{10}$/i  // UPS Mail Innovations
+            ],
+            'fedex': [
+                /^[0-9]{12}$/i,  // FedEx Ground
+                /^[0-9]{14}$/i,  // FedEx Express
+                /^[0-9]{15}$/i,  // FedEx SmartPost
+                /^[0-9]{20}$/i   // FedEx International
+            ],
+            'dhl': [
+                /^[0-9]{10}$/i,  // DHL Express
+                /^[0-9]{11}$/i,  // DHL Parcel
+                /^[A-Z]{2}[0-9]{9}[A-Z]{2}$/i  // DHL International
+            ],
+            'royal-mail': [
+                /^[A-Z]{2}[0-9]{9}GB$/i,  // Royal Mail International
+                /^[0-9]{13}$/i,  // Royal Mail Tracked
+                /^[A-Z]{2}[0-9]{9}$/i  // Royal Mail Signed For
+            ],
+            'dpd': [
+                /^[0-9]{14}$/i,  // DPD UK
+                /^[0-9]{12}$/i   // DPD International
+            ],
+            'evri': [
+                /^[A-Z][0-9]{2}[A-Z]{2}[0-9]{9}$/i,  // Evri UK (H00IAA1839338167)
+                /^[A-Z]{2}[0-9]{9}[A-Z]{2}$/i,  // Evri International
+                /^[0-9]{16}$/i  // Evri numeric format
+            ],
+            'yodel': [
+                /^[0-9]{12}$/i,  // Yodel UK
+                /^[A-Z]{2}[0-9]{9}$/i  // Yodel International
+            ]
+        };
+
+        // Carrier tracking URLs
+        const trackingUrls = {
+            'ups': 'https://www.ups.com/track?track=yes&trackNums=',
+            'fedex': 'https://www.fedex.com/fedextrack/?trknbr=',
+            'dhl': 'https://www.dhl.com/en/express/tracking.html?AWB=',
+            'royal-mail': 'https://www.royalmail.com/track-your-item#/tracking-results/',
+            'dpd': 'https://www.dpd.co.uk/apps/tracking/?reference=',
+            'evri': 'https://www.evri.com/track/parcel/',
+            'yodel': 'https://www.yodel.co.uk/track/parcel/'
+        };
+
+        // Detect carrier from tracking number
+        function detectCarrier() {
+            const trackingNumber = document.getElementById('trackingNumber').value.trim();
+            const carrierHidden = document.getElementById('shippingCompany');
+            const carrierTrigger = document.getElementById('carrierTrigger');
+            const carrierItems = document.querySelectorAll('#carrierMenu .dropdown-item');
+            
+            console.log('Detecting carrier for tracking number:', trackingNumber);
+            
+            if (!trackingNumber) {
+                carrierHidden.value = '';
+                carrierTrigger.classList.remove('carrier-detected');
+                carrierTrigger.querySelector('.dropdown-text').textContent = 'Auto-detect';
+                carrierItems.forEach(item => item.classList.remove('selected'));
+                return;
+            }
+
+            // Check each carrier's patterns
+            for (const [carrier, patterns] of Object.entries(carrierPatterns)) {
+                console.log(`Checking ${carrier} patterns:`, patterns);
+                for (const pattern of patterns) {
+                    const isMatch = pattern.test(trackingNumber);
+                    console.log(`Pattern ${pattern} matches ${trackingNumber}:`, isMatch);
+                    if (isMatch) {
+                        // Found a match!
+                        console.log(`✅ Detected carrier: ${carrier}`);
+                        carrierHidden.value = carrier;
+                        carrierTrigger.classList.add('carrier-detected');
+                        
+                        // Update dropdown text - convert NodeList to Array to use find()
+                        const carrierItemsArray = Array.from(carrierItems);
+                        const carrierText = carrierItemsArray.find(item => item.getAttribute('data-value') === carrier);
+                        if (carrierText) {
+                            carrierTrigger.querySelector('.dropdown-text').textContent = carrierText.textContent;
+                            carrierItems.forEach(item => item.classList.remove('selected'));
+                            carrierText.classList.add('selected');
+                        }
+                        
+                        // Show success message
+                        showCarrierDetectionMessage(`✅ Detected: ${carrier.toUpperCase()}`, 'success');
+                        return;
+                    }
+                }
+            }
+            
+            // No pattern matched
+            console.log('❌ No carrier pattern matched');
+            carrierHidden.value = '';
+            carrierTrigger.classList.remove('carrier-detected');
+            carrierTrigger.querySelector('.dropdown-text').textContent = 'Auto-detect';
+            carrierItems.forEach(item => item.classList.remove('selected'));
+            showCarrierDetectionMessage('❓ Unknown carrier - please select manually', 'warning');
+        }
+
+        // Show carrier detection message
+        function showCarrierDetectionMessage(message, type) {
+            // Remove existing message
+            const existingMessage = document.querySelector('.carrier-message');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+            
+            // Create new message
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `carrier-message ${type}`;
+            messageDiv.textContent = message;
+            messageDiv.style.cssText = `
+                margin-top: 0.5rem;
+                padding: 0.5rem;
+                border-radius: 5px;
+                font-size: 0.8rem;
+                ${type === 'success' ? 'background: rgba(16, 185, 129, 0.1); color: #10b981;' : 'background: rgba(245, 158, 11, 0.1); color: #f59e0b;'}
+            `;
+            
+            document.getElementById('trackingNumber').parentNode.appendChild(messageDiv);
+            
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.remove();
+                }
+            }, 3000);
+        }
+
+        // Update order status with tracking information
+        async function updateOrderStatus(orderId, newStatus, trackingData = null) {
+            try {
+                const updateData = { 
+                    status: newStatus, 
+                    updated_at: new Date().toISOString() 
+                };
+
+                // Add tracking information if provided
+                if (trackingData && newStatus === 'shipped') {
+                    updateData.tracking_number = trackingData.trackingNumber;
+                    updateData.shipping_company = trackingData.shippingCompany;
+                    updateData.estimated_delivery = trackingData.estimatedDelivery;
+                    updateData.tracking_link = trackingData.trackingLink;
+                }
+
+                console.log('Updating order with data:', updateData);
+                console.log('Order ID:', orderId);
+
+                const { data, error } = await supabase
+                    .from('orders')
+                    .update(updateData)
+                    .eq('id', orderId)
+                    .select();
+
+                console.log('Update result:', { data, error });
+
+                if (error) {
+                    console.error('Error updating order status:', error);
+                    alert('Error updating order status: ' + error.message);
+                    return;
+                }
+
+                console.log('Order status updated successfully');
+                
+                // Update local data
+                const orderIndex = orders.findIndex(o => o.id === orderId);
+                if (orderIndex !== -1) {
+                    orders[orderIndex].status = newStatus;
+                    orders[orderIndex].updated_at = new Date().toISOString();
+                    
+                    // Add tracking data to local order
+                    if (trackingData && newStatus === 'shipped') {
+                        orders[orderIndex].tracking_number = trackingData.trackingNumber;
+                        orders[orderIndex].shipping_company = trackingData.shippingCompany;
+                        orders[orderIndex].estimated_delivery = trackingData.estimatedDelivery;
+                        orders[orderIndex].tracking_link = trackingData.trackingLink;
+                    }
+                }
+
+                // Refresh display
+                applyFilters();
+                closeStatusModal();
+                alert('Order status updated successfully!');
+            } catch (error) {
+                console.error('Error updating order status:', error);
+                alert('Error updating order status: ' + error.message);
+            }
+        }
+
+        // Handle cancellation form submission
+        document.getElementById('cancellationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const orderId = this.dataset.orderId;
+            const formData = new FormData(this);
+            
+            const cancellationData = {
+                order_id: orderId,
+                order_number: document.getElementById('cancelOrderNumber').value,
+                customer_email: document.getElementById('cancelCustomerEmail').value,
+                cancellation_reason: document.getElementById('cancelReason').value,
+                cancellation_notes: document.getElementById('cancelNotes').value,
+                refund_amount: parseFloat(document.getElementById('cancelRefundAmount').value),
+                auto_refund: document.getElementById('cancelAutoRefund').checked
+            };
+
+            try {
+                // Update order status in database
+                const { error: updateError } = await supabase
+                    .from('orders')
+                    .update({
+                        status: 'cancelled',
+                        cancellation_reason: cancellationData.cancellation_reason,
+                        cancellation_notes: cancellationData.cancellation_notes,
+                        cancellation_date: new Date().toISOString(),
+                        refund_amount: cancellationData.refund_amount
+                    })
+                    .eq('id', orderId);
+
+                if (updateError) {
+                    console.error('Error updating order:', updateError);
+                    alert('Error updating order status');
+                    return;
+                }
+
+                // Process Stripe refund if requested
+                if (cancellationData.auto_refund) {
+                    const order = orders.find(o => o.id === orderId);
+                    const paymentIntentId = order?.payment_details?.stripe_payment_intent_id;
+                    if (order && paymentIntentId) {
+                        await processStripeRefund(orderId, paymentIntentId, cancellationData.refund_amount);
+                    }
+                }
+
+                // Send cancellation email to customer
+                await sendCancellationEmail(cancellationData);
+
+                alert('Order cancelled successfully!');
+                closeCancellationModal();
+                loadOrders(); // Refresh the orders list
+                
+            } catch (error) {
+                console.error('Error processing cancellation:', error);
+                alert('Error processing cancellation');
+            }
+        });
+
+        // Handle status form submission
+        document.getElementById('statusForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const newStatus = document.getElementById('modalNewStatus').value;
+            let trackingData = null;
+            
+            // Collect tracking data if status is "shipped"
+            if (newStatus === 'shipped') {
+                const trackingNumber = document.getElementById('trackingNumber').value.trim();
+                const shippingCompany = document.getElementById('shippingCompany').value;
+                const estimatedDelivery = document.getElementById('estimatedDelivery').value;
+                
+                console.log('Collected tracking data:', {
+                    trackingNumber,
+                    shippingCompany,
+                    estimatedDelivery
+                });
+                
+                // Validate required fields
+                if (!trackingNumber) {
+                    alert('Please enter a tracking number for shipped orders.');
+                    return;
+                }
+                
+                if (!shippingCompany) {
+                    alert('Please select a shipping company.');
+                    return;
+                }
+                
+                // Generate tracking link
+                const trackingLink = trackingUrls[shippingCompany] ? trackingUrls[shippingCompany] + trackingNumber : '';
+                
+                trackingData = {
+                    trackingNumber,
+                    shippingCompany,
+                    estimatedDelivery,
+                    trackingLink
+                };
+                
+                console.log('Final tracking data:', trackingData);
+            }
+            
+            await updateOrderStatus(currentOrderId, newStatus, trackingData);
+        });
+
+        // Add event listeners for real-time filtering
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+        document.getElementById('statusFilter').addEventListener('change', applyFilters);
+        document.getElementById('dateFrom').addEventListener('change', applyFilters);
+        document.getElementById('dateTo').addEventListener('change', applyFilters);
+
+        // Process Stripe refund
+        async function processStripeRefund(orderId, paymentIntentId, amount) {
+            try {
+                const response = await fetch('http://localhost:3002/api/process-refund', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        payment_intent_id: paymentIntentId,
+                        amount: Math.round(amount * 100) // Convert pounds to cents
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Refund failed');
+                }
+
+                const result = await response.json();
+                console.log('Refund processed:', result);
+                
+                // Update order with refund ID
+                const { error } = await supabase
+                    .from('orders')
+                    .update({
+                        stripe_refund_id: result.refund_id,
+                        refund_date: new Date().toISOString(),
+                        refund_method: 'stripe',
+                        status: 'refunded'
+                    })
+                    .eq('id', orderId);
+
+                if (error) {
+                    console.error('Error updating refund info:', error);
+                }
+
+            } catch (error) {
+                console.error('Error processing refund:', error);
+                throw error;
+            }
+        }
+
+        // Send cancellation email
+        async function sendCancellationEmail(cancellationData) {
+            try {
+                const response = await fetch('http://localhost:3005/api/send-cancellation-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(cancellationData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to send cancellation email');
+                }
+
+                console.log('Cancellation email sent successfully');
+            } catch (error) {
+                console.error('Error sending cancellation email:', error);
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                if (event.target.id === 'cancellationModal') {
+                    closeCancellationModal();
+                } else if (event.target.id === 'statusModal') {
+                    closeStatusModal();
+                }
+            }
+        }
+
+        // Initialize admin orders page
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Admin Orders - Starting initialization...');
+            
+            // Initialize Supabase
+            const supabaseReady = await initSupabase();
+            
+            if (supabaseReady) {
+                // Load orders
+                await loadOrders();
+            }
+            
+            // Initialize custom dropdowns
+            initCustomDropdowns();
+            initCancellationDropdown();
+            
+            console.log('Admin Orders initialization complete!');
+        });
+    </script>
+</body>
+</html>
