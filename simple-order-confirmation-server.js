@@ -111,8 +111,11 @@ WinterSolace Team
         if (customerEmailResponse.ok) {
             const result = await customerEmailResponse.json();
             console.log('Customer confirmation email sent successfully:', result.id);
+            console.log('Resend response:', JSON.stringify(result, null, 2));
         } else {
-            console.error('Failed to send customer email:', await customerEmailResponse.text());
+            const errorText = await customerEmailResponse.text();
+            console.error('Failed to send customer email:', errorText);
+            console.error('Response status:', customerEmailResponse.status);
         }
 
         // Send admin notification using Resend
@@ -155,8 +158,11 @@ WinterSolace System
         if (adminEmailResponse.ok) {
             const result = await adminEmailResponse.json();
             console.log('Admin notification sent successfully:', result.id);
+            console.log('Admin Resend response:', JSON.stringify(result, null, 2));
         } else {
-            console.error('Failed to send admin email:', await adminEmailResponse.text());
+            const errorText = await adminEmailResponse.text();
+            console.error('Failed to send admin email:', errorText);
+            console.error('Admin response status:', adminEmailResponse.status);
         }
         
         res.json({ 
