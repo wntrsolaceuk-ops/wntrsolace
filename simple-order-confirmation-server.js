@@ -80,30 +80,63 @@ WinterSolace Team
                 from: FROM_EMAIL,
                 to: [orderData.customer_email],
                 subject: `Order Confirmation #${orderData.order_id}`,
-                text: `
-WINTERSOLACE - Order Confirmation
-
-Hello ${orderData.customer_name},
-
-Thank you for your order! Here are your order details:
-
-Order ID: ${orderData.order_id}
-Date: ${new Date().toLocaleDateString()}
-
-Items Ordered:
-${orderSummary}
-
-Total Amount: £${totalAmount.toFixed(2)}
-
-Shipping Address:
-${orderData.shipping_address}
-
-Your order is being processed and will be shipped within 2-3 business days.
-
-Thank you for choosing WinterSolace!
-
-Best regards,
-WinterSolace Team
+                html: `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%); padding: 30px; text-align: center; }
+        .logo { max-width: 200px; height: auto; }
+        .content { padding: 30px; }
+        .order-details { background-color: #f8f9fa; padding: 20px; border-radius: 6px; margin: 20px 0; }
+        .item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .item:last-child { border-bottom: none; }
+        .total { font-size: 18px; font-weight: bold; color: #000; margin-top: 15px; padding-top: 15px; border-top: 2px solid #000; }
+        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://www.wntrsolace.uk/assets/Wntrsolace.png" alt="WinterSolace Logo" class="logo">
+        </div>
+        <div class="content">
+            <h2>Order Confirmation</h2>
+            <p>Hello <strong>${orderData.customer_name}</strong>,</p>
+            <p>Thank you for your order! Here are your order details:</p>
+            
+            <div class="order-details">
+                <h3>Order Information</h3>
+                <p><strong>Order ID:</strong> ${orderData.order_id}</p>
+                <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                <p><strong>Shipping Address:</strong><br>${orderData.shipping_address}</p>
+            </div>
+            
+            <div class="order-details">
+                <h3>Items Ordered</h3>
+                ${orderItems.map(item => `
+                    <div class="item">
+                        <span>${item.name} x ${item.quantity}</span>
+                        <span>£${(item.price * item.quantity).toFixed(2)}</span>
+                    </div>
+                `).join('')}
+                <div class="total">
+                    <span>Total Amount: £${totalAmount.toFixed(2)}</span>
+                </div>
+            </div>
+            
+            <p>Your order is being processed and will be shipped within 2-3 business days.</p>
+            <p>Thank you for choosing WinterSolace!</p>
+        </div>
+        <div class="footer">
+            <p>Best regards,<br>WinterSolace Team</p>
+        </div>
+    </div>
+</body>
+</html>
                 `
             })
         });
@@ -129,28 +162,66 @@ WinterSolace Team
                 from: FROM_EMAIL,
                 to: [FROM_EMAIL],
                 subject: `New Order Received - #${orderData.order_id}`,
-                text: `
-NEW ORDER NOTIFICATION
-
-A new order has been placed on WinterSolace:
-
-Order ID: ${orderData.order_id}
-Customer: ${orderData.customer_name}
-Email: ${orderData.customer_email}
-Date: ${new Date().toLocaleDateString()}
-
-Items Ordered:
-${orderSummary}
-
-Total Amount: £${totalAmount.toFixed(2)}
-
-Shipping Address:
-${orderData.shipping_address}
-
-Please process this order and prepare for shipment.
-
-Best regards,
-WinterSolace System
+                html: `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%); padding: 30px; text-align: center; }
+        .logo { max-width: 200px; height: auto; }
+        .content { padding: 30px; }
+        .order-details { background-color: #f8f9fa; padding: 20px; border-radius: 6px; margin: 20px 0; }
+        .item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .item:last-child { border-bottom: none; }
+        .total { font-size: 18px; font-weight: bold; color: #000; margin-top: 15px; padding-top: 15px; border-top: 2px solid #000; }
+        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #666; }
+        .alert { background-color: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 15px; border-radius: 6px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://www.wntrsolace.uk/assets/Wntrsolace.png" alt="WinterSolace Logo" class="logo">
+        </div>
+        <div class="content">
+            <div class="alert">
+                <h2>🚨 NEW ORDER NOTIFICATION</h2>
+                <p>A new order has been placed on WinterSolace!</p>
+            </div>
+            
+            <div class="order-details">
+                <h3>Customer Information</h3>
+                <p><strong>Order ID:</strong> ${orderData.order_id}</p>
+                <p><strong>Customer:</strong> ${orderData.customer_name}</p>
+                <p><strong>Email:</strong> ${orderData.customer_email}</p>
+                <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                <p><strong>Shipping Address:</strong><br>${orderData.shipping_address}</p>
+            </div>
+            
+            <div class="order-details">
+                <h3>Items Ordered</h3>
+                ${orderItems.map(item => `
+                    <div class="item">
+                        <span>${item.name} x ${item.quantity}</span>
+                        <span>£${(item.price * item.quantity).toFixed(2)}</span>
+                    </div>
+                `).join('')}
+                <div class="total">
+                    <span>Total Amount: £${totalAmount.toFixed(2)}</span>
+                </div>
+            </div>
+            
+            <p><strong>Action Required:</strong> Please process this order and prepare for shipment.</p>
+        </div>
+        <div class="footer">
+            <p>Best regards,<br>WinterSolace System</p>
+        </div>
+    </div>
+</body>
+</html>
                 `
             })
         });
