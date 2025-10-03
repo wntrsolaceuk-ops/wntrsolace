@@ -413,7 +413,6 @@
             }
 
             try {
-                alert('Loading order: ' + orderNumber);
                 console.log('Loading order details for:', orderNumber);
                 console.log('Supabase initialized:', !!supabase);
                 
@@ -427,7 +426,6 @@
                     .eq('order_number', orderNumber)
                     .single();
 
-                alert('Query result - Order: ' + (order ? 'Found' : 'Not found') + ', Error: ' + (orderError ? orderError.message : 'None'));
                 console.log('Order query result:', { order, orderError });
 
                 if (orderError) {
