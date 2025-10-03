@@ -56,23 +56,25 @@
         }
 
         .logo {
-            font-size: 4rem;
-            font-weight: bold;
             margin-bottom: 1rem;
-            background: linear-gradient(45deg, #00d4ff, #ffffff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo-image {
+            height: 120px;
+            width: auto;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
             animation: glow 2s ease-in-out infinite alternate;
         }
 
         @keyframes glow {
             from {
-                text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+                filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
             }
             to {
-                text-shadow: 0 0 30px rgba(0, 212, 255, 0.8), 0 0 40px rgba(0, 212, 255, 0.3);
+                filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.6)) drop-shadow(0 0 40px rgba(255, 255, 255, 0.2));
             }
         }
 
@@ -131,32 +133,6 @@
         }
 
 
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .social-link {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            color: white;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .social-link:hover {
-            background: rgba(0, 212, 255, 0.2);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
-        }
 
         .footer {
             margin-top: 3rem;
@@ -177,9 +153,8 @@
                 max-width: 100%;
             }
             
-            .logo {
-                font-size: 2.5rem;
-                margin-bottom: 0.5rem;
+            .logo-image {
+                height: 80px;
             }
             
             .coming-soon {
@@ -217,16 +192,6 @@
                 font-size: 0.8rem;
             }
             
-            .social-links {
-                gap: 0.5rem;
-                margin-top: 1.5rem;
-            }
-            
-            .social-link {
-                width: 40px;
-                height: 40px;
-                font-size: 1.2rem;
-            }
             
             .footer {
                 font-size: 0.8rem;
@@ -240,8 +205,8 @@
                 border-radius: 10px;
             }
             
-            .logo {
-                font-size: 2rem;
+            .logo-image {
+                height: 60px;
             }
             
             .coming-soon {
@@ -274,11 +239,6 @@
                 font-size: 0.7rem;
             }
             
-            .social-link {
-                width: 35px;
-                height: 35px;
-                font-size: 1rem;
-            }
         }
 
     </style>
@@ -288,7 +248,9 @@
     <div id="snowflakes"></div>
 
     <div class="container">
-        <div class="logo">WINTERSOLACE</div>
+        <div class="logo">
+            <img src="Wntrsolacewhite.png" alt="WinterSolace" class="logo-image">
+        </div>
         <div class="coming-soon">Coming Soon</div>
         <div class="subtitle">Premium Winter Apparel Collection</div>
         <div class="description">
@@ -315,12 +277,6 @@
         </div>
 
 
-        <div class="social-links">
-            <a href="#" class="social-link" title="Instagram">📷</a>
-            <a href="#" class="social-link" title="Facebook">📘</a>
-            <a href="#" class="social-link" title="Twitter">🐦</a>
-            <a href="#" class="social-link" title="Email">✉️</a>
-        </div>
 
         <div class="footer">
             © 2024 WinterSolace. All rights reserved.
@@ -369,7 +325,7 @@
                 document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
                 document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
             } else {
-                document.getElementById('countdown').innerHTML = '<div class="coming-soon">We\'re Live!</div>';
+                document.getElementById('countdown').innerHTML = '<div class="coming-soon">Coming Soon</div>';
             }
         }
 
