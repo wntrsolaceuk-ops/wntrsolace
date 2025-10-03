@@ -12,7 +12,7 @@ app.use(express.json());
 
 // Email configuration - Using Resend API (FREE: 3,000 emails/month)
 const RESEND_API_KEY = process.env.RESEND_API_KEY || 'your-resend-api-key';
-const FROM_EMAIL = process.env.FROM_EMAIL || 'wntrsolace.uk@gmail.com';
+const FROM_EMAIL = process.env.FROM_EMAIL || 'noreply@wntrsolace.uk';
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
