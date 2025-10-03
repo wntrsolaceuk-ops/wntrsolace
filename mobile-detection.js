@@ -156,22 +156,20 @@
 
     // Main mobile detection logic
     async function initMobileDetection() {
-        // Skip if user has explicitly chosen desktop
-        const userPreference = getUserPreference();
-        if (userPreference === 'false') {
-            return;
-        }
-
         // Check if mobile device
         if (!isMobileDevice()) {
+            console.log('Not a mobile device, skipping redirect');
             return;
         }
 
         // Get mobile page URL
         const mobileUrl = getMobilePageUrl();
         if (!mobileUrl) {
+            console.log('No mobile page URL found for current page');
             return;
         }
+
+        console.log('Mobile device detected, redirecting to:', mobileUrl);
 
         // Check if mobile page exists
         const mobilePageExists = await checkMobilePageExists(mobileUrl);
@@ -180,16 +178,8 @@
             return;
         }
 
-        // If user prefers mobile, redirect immediately
-        if (userPreference === 'true') {
-            window.location.href = mobileUrl;
-            return;
-        }
-
-        // Show notification for first-time mobile users
-        setTimeout(() => {
-            showMobileNotification();
-        }, 1000);
+        // Auto-redirect to mobile version for mobile devices
+        window.location.href = mobileUrl;
     }
 
     // Make functions globally available
@@ -208,10 +198,7 @@
     window.addEventListener('resize', function() {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
-            // Only re-check if user hasn't set a preference
-            if (!getUserPreference()) {
-                initMobileDetection();
-            }
+            initMobileDetection();
         }, 500);
     });
 
