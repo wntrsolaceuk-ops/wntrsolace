@@ -280,8 +280,8 @@
 
         /* Main Content */
         .main-content {
-            margin-top: 80px;
-            padding: 1rem 0;
+            margin-top: 70px;
+            padding: 0.5rem 0;
             position: relative;
             z-index: 3;
         }
@@ -294,19 +294,19 @@
 
         .page-header {
             text-align: center;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
         }
 
         .page-title {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 700;
             color: #ffffff;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.2rem;
         }
 
         .page-subtitle {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: #aaaaaa;
             font-weight: 400;
         }
@@ -853,7 +853,9 @@
 
     <header class="header">
         <nav class="nav">
-            <a href="layout-winter-frost.html" class="logo">Wntrsolace</a>
+            <a href="layout-winter-frost.html" class="logo">
+                <img src="assets/Wntrsolace.png" alt="WinterSolace Logo" style="height: 40px;">
+            </a>
             
             <div class="nav-center">
                 <ul class="nav-links">
@@ -1171,6 +1173,11 @@
                 window.location.href = 'auth.html';
             }
         }
+
+        // Initialize Supabase
+        const supabaseUrl = 'https://qjqjqjqjqjqjqjqjqjq.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqcWpxanFqcWpxanFqcWpxanFqcWoiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTczNDU2NzIwMCwiZXhwIjoyMDUwMTQzMjAwfQ.placeholder';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
         // Update user profile
         async function updateUserProfile() {
