@@ -1189,7 +1189,7 @@
             const navMenu = document.getElementById('navMenu');
             const mobileToggle = document.querySelector('.mobile-menu-toggle');
             
-            if (!navMenu.contains(event.target) && !mobileToggle.contains(event.target)) {
+            if (navMenu && mobileToggle && !navMenu.contains(event.target) && !mobileToggle.contains(event.target)) {
                 navMenu.classList.remove('active');
             }
         });
@@ -1223,7 +1223,7 @@
             const profile = document.getElementById('userProfile')
             const dropdown = document.getElementById('profileDropdown')
             
-            if (!profile.contains(event.target)) {
+            if (profile && dropdown && !profile.contains(event.target)) {
                 dropdown.classList.remove('active')
             }
         })
@@ -1268,11 +1268,11 @@
         }
 
         function updateUIForLoggedInUser(username) {
-            // Hide account button
-            document.getElementById('auth-button').style.display = 'none'
-            // Show user profile
-            document.getElementById('userProfile').classList.add('active')
-            document.getElementById('username').textContent = username
+            // Update the user text in the new header design
+            const userText = document.getElementById('userText');
+            if (userText) {
+                userText.textContent = username;
+            }
         }
 
         function closeAuthModal() {
@@ -1320,12 +1320,11 @@
         }
 
         function updateUIForLoggedInUser(username, isAdmin) {
-            // Hide account button
-            document.getElementById('auth-button').style.display = 'none';
-            
-            // Show user profile button
-            document.getElementById('userProfile').classList.add('active');
-            document.getElementById('username').textContent = username;
+            // Update the user text in the new header design
+            const userText = document.getElementById('userText');
+            if (userText) {
+                userText.textContent = username;
+            }
         }
 
         function logout() {
