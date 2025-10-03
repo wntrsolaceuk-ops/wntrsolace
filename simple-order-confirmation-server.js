@@ -109,23 +109,29 @@ WinterSolace Team
             <p>Thank you for your order! Here are your order details:</p>
             
             <div class="order-details">
-                <h3>Order Information</h3>
-                <p><strong>Order ID:</strong> ${orderData.order_id}</p>
-                <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-                <p><strong>Shipping Address:</strong><br>${orderData.shipping_address}</p>
-            </div>
-            
-            <div class="order-details">
                 <h3>Items Ordered</h3>
                 ${orderItems.map(item => `
                     <div class="item">
-                        <span>${item.name} x ${item.quantity}</span>
-                        <span>£${(item.price * item.quantity).toFixed(2)}</span>
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <img src="${item.image || 'https://www.wntrsolace.uk/assets/Wntrsolace.png'}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;">
+                            <div>
+                                <div style="font-weight: bold;">${item.name}</div>
+                                <div style="color: #666; font-size: 14px;">Quantity: ${item.quantity}</div>
+                            </div>
+                        </div>
+                        <span style="font-weight: bold;">£${(item.price * item.quantity).toFixed(2)}</span>
                     </div>
                 `).join('')}
                 <div class="total">
                     <span>Total Amount: £${totalAmount.toFixed(2)}</span>
                 </div>
+            </div>
+            
+            <div class="order-details">
+                <h3>Order Information</h3>
+                <p><strong>Order ID:</strong> ${orderData.order_id}</p>
+                <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                <p><strong>Shipping Address:</strong><br>${orderData.shipping_address}</p>
             </div>
             
             <p>Your order is being processed and will be shipped within 2-3 business days.</p>
@@ -193,25 +199,31 @@ WinterSolace Team
             </div>
             
             <div class="order-details">
+                <h3>Items Ordered</h3>
+                ${orderItems.map(item => `
+                    <div class="item">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <img src="${item.image || 'https://www.wntrsolace.uk/assets/Wntrsolace.png'}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;">
+                            <div>
+                                <div style="font-weight: bold;">${item.name}</div>
+                                <div style="color: #666; font-size: 14px;">Quantity: ${item.quantity}</div>
+                            </div>
+                        </div>
+                        <span style="font-weight: bold;">£${(item.price * item.quantity).toFixed(2)}</span>
+                    </div>
+                `).join('')}
+                <div class="total">
+                    <span>Total Amount: £${totalAmount.toFixed(2)}</span>
+                </div>
+            </div>
+            
+            <div class="order-details">
                 <h3>Customer Information</h3>
                 <p><strong>Order ID:</strong> ${orderData.order_id}</p>
                 <p><strong>Customer:</strong> ${orderData.customer_name}</p>
                 <p><strong>Email:</strong> ${orderData.customer_email}</p>
                 <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
                 <p><strong>Shipping Address:</strong><br>${orderData.shipping_address}</p>
-            </div>
-            
-            <div class="order-details">
-                <h3>Items Ordered</h3>
-                ${orderItems.map(item => `
-                    <div class="item">
-                        <span>${item.name} x ${item.quantity}</span>
-                        <span>£${(item.price * item.quantity).toFixed(2)}</span>
-                    </div>
-                `).join('')}
-                <div class="total">
-                    <span>Total Amount: £${totalAmount.toFixed(2)}</span>
-                </div>
             </div>
             
             <p><strong>Action Required:</strong> Please process this order and prepare for shipment.</p>
