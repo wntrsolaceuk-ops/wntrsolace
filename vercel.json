@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/coming-soon.html"
+      "destination": "/layout-winter-frost.html"
     }
   ],
   "headers": [
