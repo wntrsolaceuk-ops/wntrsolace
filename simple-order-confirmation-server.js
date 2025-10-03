@@ -1,6 +1,7 @@
 const express = require('express');
 const nodemailer = require('nodemailer');
 const cors = require('cors');
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 const app = express();
 const PORT = process.env.PORT || 3005;
@@ -9,25 +10,9 @@ const PORT = process.env.PORT || 3005;
 app.use(cors());
 app.use(express.json());
 
-// Email configuration
-const EMAIL_CONFIG = {
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // true for 465, false for other ports
-    auth: {
-        user: process.env.EMAIL_USER || 'wntrsolace.uk@gmail.com',
-        pass: process.env.EMAIL_PASS || 'afrq uoya outa tpcr'
-    },
-    tls: {
-        rejectUnauthorized: false
-    },
-    connectionTimeout: 60000, // 60 seconds
-    greetingTimeout: 30000,   // 30 seconds
-    socketTimeout: 60000      // 60 seconds
-};
-
-// Create transporter
-const transporter = nodemailer.createTransport(EMAIL_CONFIG);
+// Email configuration - Using Resend API (FREE: 3,000 emails/month)
+const RESEND_API_KEY = process.env.RESEND_API_KEY || 'your-resend-api-key';
+const FROM_EMAIL = process.env.FROM_EMAIL || 'wntrsolace.uk@gmail.com';
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -84,14 +69,62 @@ WinterSolace Team
             `
         };
 
-        const result = await transporter.sendMail(mailOptions);
-        console.log('Simple order confirmation sent successfully:', result.messageId);
-        
-        // Send admin notification email
-        try {
-            const adminMailOptions = {
-                from: 'wntrsolace.uk@gmail.com',
-                to: 'wntrsolace.uk@gmail.com',
+        // Send customer email using Resend
+        const customerEmailResponse = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${RESEND_API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                from: FROM_EMAIL,
+                to: [orderData.customer_email],
+                subject: `Order Confirmation #${orderData.order_id}`,
+                text: `
+WINTERSOLACE - Order Confirmation
+
+Hello ${orderData.customer_name},
+
+Thank you for your order! Here are your order details:
+
+Order ID: ${orderData.order_id}
+Date: ${new Date().toLocaleDateString()}
+
+Items Ordered:
+${orderSummary}
+
+Total Amount: £${totalAmount.toFixed(2)}
+
+Shipping Address:
+${orderData.shipping_address}
+
+Your order is being processed and will be shipped within 2-3 business days.
+
+Thank you for choosing WinterSolace!
+
+Best regards,
+WinterSolace Team
+                `
+            })
+        });
+
+        if (customerEmailResponse.ok) {
+            const result = await customerEmailResponse.json();
+            console.log('Customer confirmation email sent successfully:', result.id);
+        } else {
+            console.error('Failed to send customer email:', await customerEmailResponse.text());
+        }
+
+        // Send admin notification using Resend
+        const adminEmailResponse = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${RESEND_API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                from: FROM_EMAIL,
+                to: [FROM_EMAIL],
                 subject: `New Order Received - #${orderData.order_id}`,
                 text: `
 NEW ORDER NOTIFICATION
@@ -116,18 +149,19 @@ Please process this order and prepare for shipment.
 Best regards,
 WinterSolace System
                 `
-            };
+            })
+        });
 
-            const adminResult = await transporter.sendMail(adminMailOptions);
-            console.log('Admin notification sent successfully:', adminResult.messageId);
-        } catch (adminError) {
-            console.error('Error sending admin notification:', adminError);
+        if (adminEmailResponse.ok) {
+            const result = await adminEmailResponse.json();
+            console.log('Admin notification sent successfully:', result.id);
+        } else {
+            console.error('Failed to send admin email:', await adminEmailResponse.text());
         }
         
         res.json({ 
             success: true, 
-            message: 'Order confirmation sent successfully',
-            messageId: result.messageId
+            message: 'Order confirmation sent successfully via Resend'
         });
 
     } catch (error) {
