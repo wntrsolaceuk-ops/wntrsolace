@@ -85,7 +85,7 @@ app.post('/api/complete-order', async (req, res) => {
             
             console.log('Email payload:', JSON.stringify(emailPayload, null, 2));
             
-            const emailResponse = await fetch('http://localhost:3005/api/send-simple-confirmation', {
+            const emailResponse = await fetch('https://wntrsolace-email.onrender.com/api/send-simple-confirmation', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
