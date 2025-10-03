@@ -2036,8 +2036,8 @@
                 // Check if user is logged in
                 const { data: { user } } = await supabase.auth.getUser();
                 if (!user) {
-                    // Redirect immediately to auth page
-                    window.location.href = 'auth.html';
+                    // Redirect to auth page with checkout redirect parameter
+                    window.location.href = 'auth.html?redirect=checkout';
                     return;
                 }
                 

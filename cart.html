@@ -462,12 +462,18 @@
             
             .nav-menu {
                 display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0, 0, 0, 0.98);
+                backdrop-filter: blur(10px);
                 flex-direction: column;
-                width: 100%;
-                background: rgba(0, 0, 0, 0.9);
-                padding: 1rem;
-                margin-top: 1rem;
-                border-radius: 8px;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+                padding: 2rem;
             }
             
             .nav-menu.active {
@@ -475,8 +481,22 @@
             }
             
             .nav-menu li {
-                margin: 0.5rem 0;
+                margin: 1.5rem 0;
                 text-align: center;
+            }
+            
+            .nav-menu li a {
+                font-size: 1.5rem;
+                font-weight: 600;
+                padding: 1rem 2rem;
+                display: block;
+                border-radius: 8px;
+                transition: all 0.3s ease;
+            }
+            
+            .nav-menu li a:hover {
+                background: rgba(255, 255, 255, 0.1);
+                transform: scale(1.05);
             }
             
             .nav-right {
@@ -691,8 +711,25 @@
             <ul class="nav-menu" id="navMenu">
                 <li><a href="layout-winter-frost.html">Home</a></li>
                 <li><a href="collections.html">Collection</a></li>
-                <li><a href="#about">About</a></li>
                 <li><a href="contact.html">Contact</a></li>
+                <li id="mobileUserProfile" style="display: none;">
+                    <a href="#" onclick="handlePersonClick()">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <span id="mobileUserName">User Name</span>
+                    </a>
+                </li>
+                <li id="mobileAuthButton" style="display: none;">
+                    <a href="#" onclick="handlePersonClick()">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        Sign In
+                    </a>
+                </li>
             </ul>
             <div class="person-icon" onclick="handlePersonClick()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">

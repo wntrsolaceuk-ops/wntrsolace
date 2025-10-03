@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>WinterSolace - Account</title>
     <!-- Supabase JavaScript Client -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
@@ -331,14 +331,98 @@
             text-decoration: underline;
         }
 
+        /* Mobile Responsive */
         @media (max-width: 768px) {
             .auth-container {
-                padding: 3rem 2rem;
-                margin: 1rem;
+                padding: 2rem 1rem;
+                margin: 0.5rem;
+                max-width: 100%;
+                width: calc(100% - 1rem);
             }
             
             .auth-title {
                 font-size: 2rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .auth-subtitle {
+                font-size: 1rem;
+                margin-bottom: 2rem;
+            }
+            
+            .auth-tabs {
+                margin-bottom: 2rem;
+            }
+            
+            .auth-tab {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.9rem;
+            }
+            
+            .auth-form {
+                gap: 1.5rem;
+            }
+            
+            .form-group {
+                margin-bottom: 1.5rem;
+            }
+            
+            .form-group label {
+                font-size: 0.9rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .form-group input {
+                padding: 0.8rem;
+                font-size: 1rem;
+                border-radius: 8px;
+            }
+            
+            .auth-btn {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+            
+            .forgot-password {
+                margin-top: 1rem;
+            }
+            
+            .forgot-password a {
+                font-size: 0.9rem;
+            }
+            
+            .ice-crystals {
+                display: none; /* Hide animations on mobile for performance */
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .auth-container {
+                padding: 1.5rem 0.8rem;
+                margin: 0.25rem;
+            }
+            
+            .auth-title {
+                font-size: 1.8rem;
+            }
+            
+            .auth-subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .auth-tab {
+                padding: 0.7rem 1.2rem;
+                font-size: 0.8rem;
+            }
+            
+            .form-group input {
+                padding: 0.7rem;
+                font-size: 0.9rem;
+            }
+            
+            .auth-btn {
+                padding: 0.7rem 1.2rem;
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -428,6 +512,86 @@
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
         // Wait for DOM to be ready and set up event listeners
+        // Notification system
+        function showNotification(message, type = 'info') {
+            // Remove existing notifications
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notification => notification.remove());
+            
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <span class="notification-message">${message}</span>
+                    <button class="notification-close">&times;</button>
+                </div>
+            `;
+            
+            // Add styles
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'error' ? '#ff4757' : type === 'success' ? '#2ed573' : '#3742fa'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                max-width: 400px;
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            // Add animation styles
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+                .notification-content {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                }
+                .notification-close {
+                    background: none;
+                    border: none;
+                    color: white;
+                    font-size: 18px;
+                    cursor: pointer;
+                    margin-left: 10px;
+                    opacity: 0.8;
+                }
+                .notification-close:hover {
+                    opacity: 1;
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Add to page
+            document.body.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.animation = 'slideOut 0.3s ease-in';
+                    setTimeout(() => notification.remove(), 300);
+                }
+            }, 5000);
+            
+            // Close button functionality
+            notification.querySelector('.notification-close').addEventListener('click', () => {
+                notification.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => notification.remove(), 300);
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, setting up event listeners');
             
@@ -540,11 +704,11 @@
                 
                 if (error) {
                     console.error('Google sign in error:', error)
-                    alert('Google sign in failed: ' + error.message)
+                    showNotification('Google sign in failed: ' + error.message, 'error')
                 }
             } catch (error) {
                 console.error('Google SSO error:', error)
-                alert('Google sign in error. Please try again.')
+                showNotification('Google sign in error. Please try again.', 'error')
             }
         }
 
@@ -569,7 +733,7 @@
                 
                 if (error) {
                     console.error('Admin Supabase login error:', error)
-                    alert('Admin login failed: ' + error.message)
+                    showNotification('Admin login failed: ' + error.message, 'error')
                     return
                 }
                 
@@ -580,7 +744,7 @@
                 localStorage.setItem('adminLoginTime', new Date().toISOString())
                 localStorage.setItem('adminEmail', email)
                 
-                alert('Admin login successful! Redirecting to admin dashboard...')
+                showNotification('Admin login successful! Redirecting to admin dashboard...', 'success')
                 window.location.href = 'admin-dashboard.html'
                 return
             }
@@ -602,22 +766,35 @@
                 
                 if (error) {
                     console.error('Supabase sign in error:', error)
-                    alert('Sign in failed: ' + error.message)
+                    showNotification('Sign in failed: ' + error.message, 'error')
                     return
                 }
                 
                 if (data.user) {
                     console.log('Sign in successful:', data.user)
-                    alert('Sign in successful! Redirecting...')
-                    window.location.href = 'layout-winter-frost.html'
+                    showNotification('Sign in successful! Redirecting...', 'success')
+                    
+                    // Check if user came from checkout page
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const redirectTo = urlParams.get('redirect');
+                    
+                    if (redirectTo === 'checkout') {
+                        setTimeout(() => {
+                            window.location.href = 'checkout.html';
+                        }, 1500);
+                    } else {
+                        setTimeout(() => {
+                            window.location.href = 'layout-winter-frost.html';
+                        }, 1500);
+                    }
                 } else {
                     console.error('No user data returned')
-                    alert('Sign in failed: No user data returned')
+                    showNotification('Sign in failed: No user data returned', 'error')
                 }
                 
             } catch (error) {
                 console.error('JavaScript error during sign in:', error)
-                alert('Sign in error: ' + error.message)
+                showNotification('Sign in error: ' + error.message, 'error')
             } finally {
                 // Reset button state
                 submitBtn.textContent = originalText
@@ -635,7 +812,7 @@
             const confirmPassword = inputs[4].value
             
             if (password !== confirmPassword) {
-                alert('Passwords do not match!')
+                showNotification('Passwords do not match!', 'error')
                 return
             }
             
@@ -654,12 +831,12 @@
                 })
                 
                 if (error) {
-                    alert('Sign up failed: ' + error.message)
+                    showNotification('Sign up failed: ' + error.message, 'error')
                     return
                 }
                 
                 if (data.user && !data.user.email_confirmed_at) {
-                    alert('Please check your email to confirm your account!')
+                    showNotification('Please check your email to confirm your account!', 'success')
                 } else {
                     console.log('Sign up successful:', data.user)
                     window.location.href = 'layout-winter-frost.html'
@@ -667,12 +844,12 @@
                 
             } catch (error) {
                 console.error('Sign up error:', error)
-                alert('Sign up error. Please try again.')
+                showNotification('Sign up error. Please try again.', 'error')
             }
         }
 
         function forgotPassword() {
-            alert('Password reset functionality coming soon!\n\nFor now, contact support at admin@wintersolace.com');
+            showNotification('Password reset functionality coming soon! For now, contact support at admin@wintersolace.com', 'info');
         }
 
         // Real Google SSO Implementation Guide
