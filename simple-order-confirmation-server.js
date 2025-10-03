@@ -118,21 +118,32 @@ WinterSolace Team
             
             <div class="order-details">
                 <h3>Items Ordered</h3>
-                ${orderItems.map(item => `
-                    <div class="item" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee;">
-                        <div style="display: flex; align-items: center; gap: 15px; flex: 1;">
-                            <img src="${item.image_public_id ? getCloudinaryUrl(item.image_public_id, 120, 120) : (item.image || 'https://www.wntrsolace.uk/assets/Wntrsolace.png')}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #eee;">
-                            <div>
-                                <div style="font-weight: bold;">${item.name}</div>
-                                <div style="color: #666; font-size: 14px;">Quantity: ${item.quantity}</div>
-                            </div>
-                        </div>
-                        <div style="font-weight: bold; font-size: 16px; color: #000;">£${(item.price * item.quantity).toFixed(2)}</div>
-                    </div>
-                `).join('')}
-                <div class="total">
-                    <span>Total Amount: £${totalAmount.toFixed(2)}</span>
-                </div>
+                <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                    <thead>
+                        <tr style="background-color: #f8f9fa; border-bottom: 2px solid #000;">
+                            <th style="padding: 12px; text-align: left; font-weight: bold;">Item</th>
+                            <th style="padding: 12px; text-align: center; font-weight: bold;">Qty</th>
+                            <th style="padding: 12px; text-align: right; font-weight: bold;">Price</th>
+                            <th style="padding: 12px; text-align: right; font-weight: bold;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${orderItems.map(item => `
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 12px; font-weight: bold;">${item.name}</td>
+                                <td style="padding: 12px; text-align: center;">${item.quantity}</td>
+                                <td style="padding: 12px; text-align: right;">£${item.price.toFixed(2)}</td>
+                                <td style="padding: 12px; text-align: right; font-weight: bold;">£${(item.price * item.quantity).toFixed(2)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                    <tfoot>
+                        <tr style="background-color: #000; color: white;">
+                            <td colspan="3" style="padding: 15px; text-align: right; font-weight: bold; font-size: 18px;">TOTAL:</td>
+                            <td style="padding: 15px; text-align: right; font-weight: bold; font-size: 18px;">£${totalAmount.toFixed(2)}</td>
+                        </tr>
+                    </tfoot>
+                </table>
             </div>
             
             <div class="order-details">
@@ -208,21 +219,32 @@ WinterSolace Team
             
             <div class="order-details">
                 <h3>Items Ordered</h3>
-                ${orderItems.map(item => `
-                    <div class="item" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee;">
-                        <div style="display: flex; align-items: center; gap: 15px; flex: 1;">
-                            <img src="${item.image_public_id ? getCloudinaryUrl(item.image_public_id, 120, 120) : (item.image || 'https://www.wntrsolace.uk/assets/Wntrsolace.png')}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #eee;">
-                            <div>
-                                <div style="font-weight: bold;">${item.name}</div>
-                                <div style="color: #666; font-size: 14px;">Quantity: ${item.quantity}</div>
-                            </div>
-                        </div>
-                        <div style="font-weight: bold; font-size: 16px; color: #000;">£${(item.price * item.quantity).toFixed(2)}</div>
-                    </div>
-                `).join('')}
-                <div class="total">
-                    <span>Total Amount: £${totalAmount.toFixed(2)}</span>
-                </div>
+                <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                    <thead>
+                        <tr style="background-color: #f8f9fa; border-bottom: 2px solid #000;">
+                            <th style="padding: 12px; text-align: left; font-weight: bold;">Item</th>
+                            <th style="padding: 12px; text-align: center; font-weight: bold;">Qty</th>
+                            <th style="padding: 12px; text-align: right; font-weight: bold;">Price</th>
+                            <th style="padding: 12px; text-align: right; font-weight: bold;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${orderItems.map(item => `
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 12px; font-weight: bold;">${item.name}</td>
+                                <td style="padding: 12px; text-align: center;">${item.quantity}</td>
+                                <td style="padding: 12px; text-align: right;">£${item.price.toFixed(2)}</td>
+                                <td style="padding: 12px; text-align: right; font-weight: bold;">£${(item.price * item.quantity).toFixed(2)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                    <tfoot>
+                        <tr style="background-color: #000; color: white;">
+                            <td colspan="3" style="padding: 15px; text-align: right; font-weight: bold; font-size: 18px;">TOTAL:</td>
+                            <td style="padding: 15px; text-align: right; font-weight: bold; font-size: 18px;">£${totalAmount.toFixed(2)}</td>
+                        </tr>
+                    </tfoot>
+                </table>
             </div>
             
             <div class="order-details">
