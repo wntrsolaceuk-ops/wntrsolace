@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>WinterSolace - Shopping Cart</title>
+    <!-- Supabase JavaScript Client -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap');
 
@@ -1175,9 +1177,26 @@
         }
 
         // Initialize Supabase
-        const supabaseUrl = 'https://qjqjqjqjqjqjqjqjqjq.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqcWpxanFqcWpxanFqcWpxanFqcWoiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTczNDU2NzIwMCwiZXhwIjoyMDUwMTQzMjAwfQ.placeholder';
-        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+        const SUPABASE_URL = 'https://pbbmrajuptceokpjnynz.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiYm1yYWp1cHRjZW9rcGpueW56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NzY1MzcsImV4cCI6MjA3NDA1MjUzN30.BYxGzM6G7MROTDTdj6KN3gCcrs6nxUaa_ylFZwMBT9o';
+        
+        let supabaseClient = null;
+        
+        function initializeSupabase() {
+            try {
+                if (window.supabase && window.supabase.createClient) {
+                    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                    console.log('Supabase initialized successfully');
+                    return true;
+                } else {
+                    console.log('Supabase library not yet available, retrying...');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error initializing Supabase:', error);
+                return false;
+            }
+        }
 
         // Update user profile
         async function updateUserProfile() {
@@ -1225,9 +1244,19 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Cart page - DOM loaded, initializing...');
             console.log('Cart page - cart from localStorage:', cart);
-            updateCartCount();
-            renderCart();
-            updateUserProfile();
+            
+            // Initialize Supabase with retry logic
+            const initSupabase = () => {
+                if (initializeSupabase()) {
+                    updateCartCount();
+                    renderCart();
+                    updateUserProfile();
+                } else {
+                    setTimeout(initSupabase, 100);
+                }
+            };
+            
+            initSupabase();
         });
     </script>
 </body>
