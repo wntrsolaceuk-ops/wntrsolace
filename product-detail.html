@@ -142,7 +142,7 @@
         .user-icon {
             width: 20px;
             height: 20px;
-            stroke: #ffffff;
+            color: #ffffff;
         }
 
         .user-text {
@@ -152,27 +152,43 @@
         }
 
         .cart-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            color: #ffffff;
+            text-decoration: none;
+            transition: opacity 0.3s ease;
         }
 
         .cart-icon:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.3);
+            opacity: 0.7;
         }
 
-        .cart-icon svg {
-            width: 20px;
-            height: 20px;
+        .mobile-menu-toggle {
+            display: none;
+        }
+
+        /* Person Icon Styling */
+        .person-icon {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            padding: 8px !important;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .person-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .person-icon svg {
+            transition: all 0.3s ease;
+        }
+
+        .person-icon:hover svg {
             stroke: #ffffff;
-            fill: none;
         }
 
         .person-icon svg {
