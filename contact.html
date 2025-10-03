@@ -141,7 +141,7 @@
             font-weight: 400;
             color: #ffffff;
             text-decoration: none;
-            margin-top: 15px;
+            margin-top: 25px;
         }
 
         .nav-links {
@@ -1011,6 +1011,12 @@
             const mobileUserProfile = document.getElementById('mobileUserProfile');
             const mobileUserName = document.getElementById('mobileUserName');
             const mobileAuthButton = document.getElementById('mobileAuthButton');
+            
+            // Check if mobile elements exist before using them
+            if (!mobileUserProfile || !mobileAuthButton) {
+                console.log('Mobile elements not found, skipping mobile updates');
+                return;
+            }
             
             if (isLoggedIn) {
                 // Show desktop user profile
