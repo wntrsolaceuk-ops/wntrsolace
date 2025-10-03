@@ -1004,6 +1004,18 @@
             }
         }
 
+        // Handle user section click
+        function handleUserClick() {
+            const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+            if (isLoggedIn) {
+                // User is logged in, redirect to profile
+                window.location.href = 'profile.html';
+            } else {
+                // User is not logged in, redirect to auth page
+                window.location.href = 'auth.html';
+            }
+        }
+
         // Update user profile for mobile menu
         async function updateUserProfile() {
             const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
