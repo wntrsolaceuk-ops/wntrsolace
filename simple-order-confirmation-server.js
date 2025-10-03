@@ -14,6 +14,14 @@ app.use(express.json());
 const RESEND_API_KEY = process.env.RESEND_API_KEY || 'your-resend-api-key';
 const FROM_EMAIL = process.env.FROM_EMAIL || 'noreply@wntrsolace.uk';
 
+// Cloudinary configuration
+const CLOUDINARY_CLOUD_NAME = 'dlfsfybx3';
+
+// Function to generate Cloudinary URLs
+function getCloudinaryUrl(publicId, width = 200, height = 200, quality = 'auto') {
+    return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/w_${width},h_${height},c_fill,q_${quality},f_auto/${publicId}`;
+}
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
     res.json({ status: 'OK', message: 'Simple order confirmation server running' });
@@ -113,7 +121,7 @@ WinterSolace Team
                 ${orderItems.map(item => `
                     <div class="item" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee;">
                         <div style="display: flex; align-items: center; gap: 15px; flex: 1;">
-                            <img src="${item.image || 'https://www.wntrsolace.uk/assets/Wntrsolace.png'}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #eee;">
+                            <img src="${item.image_public_id ? getCloudinaryUrl(item.image_public_id, 120, 120) : (item.image || 'https://www.wntrsolace.uk/assets/Wntrsolace.png')}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #eee;">
                             <div>
                                 <div style="font-weight: bold;">${item.name}</div>
                                 <div style="color: #666; font-size: 14px;">Quantity: ${item.quantity}</div>
@@ -203,7 +211,7 @@ WinterSolace Team
                 ${orderItems.map(item => `
                     <div class="item" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee;">
                         <div style="display: flex; align-items: center; gap: 15px; flex: 1;">
-                            <img src="${item.image || 'https://www.wntrsolace.uk/assets/Wntrsolace.png'}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #eee;">
+                            <img src="${item.image_public_id ? getCloudinaryUrl(item.image_public_id, 120, 120) : (item.image || 'https://www.wntrsolace.uk/assets/Wntrsolace.png')}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #eee;">
                             <div>
                                 <div style="font-weight: bold;">${item.name}</div>
                                 <div style="color: #666; font-size: 14px;">Quantity: ${item.quantity}</div>
