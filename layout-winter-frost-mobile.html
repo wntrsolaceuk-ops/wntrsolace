@@ -549,11 +549,46 @@
             const mobileUserTextElement = document.getElementById('mobileUserText');
             
             if (isLoggedIn) {
-                const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-                const displayName = userData.full_name || userData.first_name || userData.email || 'User';
-                
-                if (userTextElement) userTextElement.textContent = displayName;
-                if (mobileUserTextElement) mobileUserTextElement.textContent = displayName;
+                try {
+                    // First try to get user data from localStorage
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    let displayName = 'User';
+                    
+                    if (userData.full_name) {
+                        displayName = userData.full_name;
+                    } else if (userData.first_name) {
+                        displayName = userData.first_name;
+                    } else if (userData.email) {
+                        displayName = userData.email.split('@')[0];
+                    } else if (localStorage.getItem('username')) {
+                        displayName = localStorage.getItem('username');
+                    }
+                    
+                    if (userTextElement) userTextElement.textContent = displayName;
+                    if (mobileUserTextElement) mobileUserTextElement.textContent = displayName;
+                    
+                    // Also try to get fresh data from Supabase if available
+                    if (supabase) {
+                        const { data: { user }, error } = await supabase.auth.getUser();
+                        if (!error && user) {
+                            const freshName = user.user_metadata?.full_name || user.user_metadata?.first_name || user.email.split('@')[0];
+                            if (userTextElement) userTextElement.textContent = freshName;
+                            if (mobileUserTextElement) mobileUserTextElement.textContent = freshName;
+                            // Update localStorage with fresh data
+                            localStorage.setItem('userData', JSON.stringify({
+                                full_name: user.user_metadata?.full_name,
+                                first_name: user.user_metadata?.first_name,
+                                email: user.email
+                            }));
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error updating user profile:', error);
+                    // Fallback to localStorage
+                    const username = localStorage.getItem('username') || 'User';
+                    if (userTextElement) userTextElement.textContent = username;
+                    if (mobileUserTextElement) mobileUserTextElement.textContent = username;
+                }
             } else {
                 if (userTextElement) userTextElement.textContent = 'Sign In';
                 if (mobileUserTextElement) mobileUserTextElement.textContent = 'Sign In';
