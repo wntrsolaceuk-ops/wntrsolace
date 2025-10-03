@@ -3,7 +3,7 @@ const nodemailer = require('nodemailer');
 const cors = require('cors');
 
 const app = express();
-const PORT = 3005;
+const PORT = process.env.PORT || 3005;
 
 // Middleware
 app.use(cors());
@@ -13,8 +13,8 @@ app.use(express.json());
 const EMAIL_CONFIG = {
     service: 'gmail',
     auth: {
-        user: 'wntrsolace.uk@gmail.com',
-        pass: 'afrq uoya outa tpcr'
+        user: process.env.EMAIL_USER || 'wntrsolace.uk@gmail.com',
+        pass: process.env.EMAIL_PASS || 'afrq uoya outa tpcr'
     }
 };
 
