@@ -1714,7 +1714,7 @@
             const navMenu = document.getElementById('navMenu');
             const mobileToggle = document.querySelector('.mobile-menu-toggle');
             
-            if (!navMenu.contains(event.target) && !mobileToggle.contains(event.target)) {
+            if (navMenu && mobileToggle && !navMenu.contains(event.target) && !mobileToggle.contains(event.target)) {
                 navMenu.classList.remove('active');
             }
         });
