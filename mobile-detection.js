@@ -31,6 +31,17 @@
         // Check if user is already on a mobile page
         const isAlreadyOnMobile = window.location.pathname.includes('-mobile.html');
 
+        // Debug logging
+        console.log('Mobile Detection Debug:', {
+            userAgent: userAgent,
+            isMobileUA: isMobileUA,
+            screenWidth: window.innerWidth,
+            isMobileScreen: isMobileScreen,
+            isTouchDevice: isTouchDevice,
+            isAlreadyOnMobile: isAlreadyOnMobile,
+            finalResult: (isMobileUA || (isMobileScreen && isTouchDevice)) && !isAlreadyOnMobile
+        });
+
         // Return true if it's a mobile device and not already on mobile page
         return (isMobileUA || (isMobileScreen && isTouchDevice)) && !isAlreadyOnMobile;
     }
@@ -74,18 +85,25 @@
     function checkMobilePageExists(mobileUrl) {
         return new Promise((resolve) => {
             if (!mobileUrl) {
+                console.log('No mobile URL provided');
                 resolve(false);
                 return;
             }
 
+            console.log('Checking if mobile page exists:', mobileUrl);
             const xhr = new XMLHttpRequest();
             xhr.open('HEAD', mobileUrl, true);
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {
-                    resolve(xhr.status === 200);
+                    const exists = xhr.status === 200;
+                    console.log('Mobile page check result:', exists, 'Status:', xhr.status);
+                    resolve(exists);
                 }
             };
-            xhr.onerror = () => resolve(false);
+            xhr.onerror = () => {
+                console.log('Error checking mobile page');
+                resolve(false);
+            };
             xhr.send();
         });
     }
