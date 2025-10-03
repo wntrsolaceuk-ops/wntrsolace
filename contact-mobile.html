@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Contact Us - WinterSolace</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;600;700&family=Dancing+Script:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Mobile-optimized fog effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse 400px 200px at 20% 10%, rgba(255, 255, 255, 0.1) 0%, transparent 60%),
+                radial-gradient(ellipse 300px 150px at 80% 30%, rgba(200, 230, 255, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+            animation: mobileFogDrift 15s ease-in-out infinite;
+        }
+
+        @keyframes mobileFogDrift {
+            0%, 100% { opacity: 0.6; transform: translateX(-20px); }
+            50% { opacity: 1; transform: translateX(20px); }
+        }
+
+        /* Mobile ice crystals */
+        .ice-crystals {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .ice-crystal {
+            position: absolute;
+            color: rgba(200, 230, 255, 0.4);
+            font-size: 14px;
+            animation: mobileCrystalFloat 6s linear infinite;
+        }
+
+        @keyframes mobileCrystalFloat {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10%, 90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .ice-crystal:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .ice-crystal:nth-child(2) { left: 30%; animation-delay: 1s; }
+        .ice-crystal:nth-child(3) { left: 50%; animation-delay: 2s; }
+        .ice-crystal:nth-child(4) { left: 70%; animation-delay: 3s; }
+        .ice-crystal:nth-child(5) { left: 90%; animation-delay: 4s; }
+
+        /* Mobile Header */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: #000000;
+            z-index: 1000;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+        }
+
+        .nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Dancing Script', cursive;
+            font-size: 20px;
+            font-weight: 400;
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .logo img {
+            height: 35px;
+        }
+
+        .mobile-menu-toggle {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .user-section:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .user-icon {
+            width: 20px;
+            height: 20px;
+            color: #ffffff;
+        }
+
+        .user-text {
+            font-size: 14px;
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .cart-icon {
+            width: 20px;
+            height: 20px;
+            color: #ffffff;
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+            position: relative;
+        }
+
+        .cart-icon:hover {
+            opacity: 0.7;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Mobile Menu Overlay */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 30px;
+            cursor: pointer;
+        }
+
+        .mobile-nav-links {
+            list-style: none;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .mobile-nav-links li {
+            margin: 1.5rem 0;
+        }
+
+        .mobile-nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 24px;
+            font-weight: 500;
+            transition: opacity 0.3s ease;
+        }
+
+        .mobile-nav-links a:hover {
+            opacity: 0.7;
+        }
+
+        .mobile-user-section {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .mobile-user-section .user-section {
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 60px;
+            min-height: calc(100vh - 60px);
+            position: relative;
+            z-index: 10;
+            padding: 2rem 1rem;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+        }
+
+        .page-title p {
+            color: rgba(200, 230, 255, 0.8);
+            font-size: 1rem;
+        }
+
+        /* Contact Form Card */
+        .contact-form-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #c8e6ff;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(200, 230, 255, 0.2);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #c8e6ff;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(200, 230, 255, 0.6);
+        }
+
+        .form-group textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            font-size: 0.9rem;
+            color: rgba(200, 230, 255, 0.8);
+            line-height: 1.4;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #c8e6ff, #007bff);
+            border: none;
+            border-radius: 8px;
+            padding: 14px 20px;
+            color: #000000;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(200, 230, 255, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Contact Info Card */
+        .contact-info-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #c8e6ff;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .contact-method {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .method-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #c8e6ff, #007bff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000000;
+            flex-shrink: 0;
+        }
+
+        .method-content h3 {
+            color: #c8e6ff;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .method-content p {
+            color: #ffffff;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .method-content small {
+            color: rgba(200, 230, 255, 0.7);
+            font-size: 0.8rem;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            margin-top: 2rem;
+        }
+
+        .faq-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #c8e6ff;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .faq-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .faq-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(200, 230, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            border-color: rgba(200, 230, 255, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .faq-item h3 {
+            color: #c8e6ff;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .faq-item p {
+            color: rgba(200, 230, 255, 0.8);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Success Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(200, 230, 255, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            max-width: 90%;
+            width: 400px;
+            backdrop-filter: blur(20px);
+            text-align: center;
+        }
+
+        .modal-content h2 {
+            color: #c8e6ff;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .modal-content p {
+            color: rgba(200, 230, 255, 0.8);
+            margin-bottom: 1rem;
+            line-height: 1.5;
+            font-size: 0.9rem;
+        }
+
+        .modal-btn {
+            background: linear-gradient(135deg, #c8e6ff, #007bff);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            color: #000000;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(200, 230, 255, 0.3);
+        }
+
+        /* Touch optimizations */
+        .submit-btn, .modal-btn, .user-section, .cart-icon, .mobile-menu-toggle {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <!-- Ice Crystals Animation -->
+    <div class="ice-crystals">
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">❅</div>
+        <div class="ice-crystal">❆</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">❅</div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="layout-winter-frost-mobile.html" class="logo">
+                <img src="assets/Wntrsolace.png" alt="WinterSolace Logo">
+            </a>
+            
+            <div class="nav-right">
+                <div class="user-section" id="userSection" onclick="handleUserClick()">
+                    <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span class="user-text" id="userText">Sign In</span>
+                </div>
+                
+                <a href="cart-mobile.html" class="cart-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                    <span class="cart-count" id="cartCount">0</span>
+                </a>
+                
+                <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                    ☰
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="mobile-menu-close" onclick="toggleMobileMenu()">×</button>
+        
+        <ul class="mobile-nav-links">
+            <li><a href="layout-winter-frost-mobile.html" onclick="toggleMobileMenu()">Home</a></li>
+            <li><a href="collections-mobile.html" onclick="toggleMobileMenu()">Collection</a></li>
+            <li><a href="contact-mobile.html" onclick="toggleMobileMenu()">Contact</a></li>
+        </ul>
+        
+        <div class="mobile-user-section">
+            <div class="user-section" id="mobileUserSection" onclick="handleUserClick(); toggleMobileMenu();">
+                <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span class="user-text" id="mobileUserText">Sign In</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-title">
+            <h1>Get in Touch</h1>
+            <p>We're here to help with any questions or concerns you may have</p>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="contact-form-card">
+            <h2 class="form-title">Send us a Message</h2>
+            <form id="contactForm" class="contact-form">
+                <div class="form-group">
+                    <label for="name">Full Name *</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="subject">Subject *</label>
+                    <select id="subject" name="subject" required>
+                        <option value="">Select a subject</option>
+                        <option value="order_inquiry">Order Inquiry</option>
+                        <option value="shipping_question">Shipping Question</option>
+                        <option value="product_question">Product Question</option>
+                        <option value="return_refund">Return & Refund</option>
+                        <option value="technical_support">Technical Support</option>
+                        <option value="feedback">Feedback</option>
+                        <option value="complaint">Complaint</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="orderNumber">Order Number (if applicable)</label>
+                    <input type="text" id="orderNumber" name="orderNumber" placeholder="e.g., WS-2024-001">
+                </div>
+                
+                <div class="form-group">
+                    <label for="message">Message *</label>
+                    <textarea id="message" name="message" rows="6" required placeholder="Please describe your inquiry in detail..."></textarea>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="newsletter" name="newsletter">
+                    <label for="newsletter">Subscribe to our newsletter for updates and special offers</label>
+                </div>
+                
+                <button type="submit" class="submit-btn">
+                    Send Message
+                </button>
+            </form>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="contact-info-card">
+            <h2 class="info-title">Contact Information</h2>
+            <div class="contact-methods">
+                <div class="contact-method">
+                    <div class="method-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                            <polyline points="22,6 12,13 2,6"/>
+                        </svg>
+                    </div>
+                    <div class="method-content">
+                        <h3>Email</h3>
+                        <p>support@wintersolace.com</p>
+                        <small>We'll respond within 24 hours</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="faq-section">
+            <h2 class="faq-title">Frequently Asked Questions</h2>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <h3>How long does shipping take?</h3>
+                    <p>Standard shipping takes 3-5 business days, while express shipping takes 1-2 business days.</p>
+                </div>
+                
+                <div class="faq-item">
+                    <h3>Can I track my order?</h3>
+                    <p>Yes! You can track your order in real-time using the tracking number provided in your order confirmation email.</p>
+                </div>
+                
+                <div class="faq-item">
+                    <h3>What's your return policy?</h3>
+                    <p>We offer a 30-day return policy for unused items in original packaging. Contact us to initiate a return.</p>
+                </div>
+                
+                <div class="faq-item">
+                    <h3>Do you ship internationally?</h3>
+                    <p>Currently, we only ship within the United States. International shipping will be available soon.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <h2>✅ Message Sent Successfully!</h2>
+            <p>Thank you for contacting us! We've received your message and will get back to you within 24 hours.</p>
+            <p>You should receive a confirmation email shortly.</p>
+            <button class="modal-btn" onclick="closeSuccessModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://pbbmrajuptceokpjnynz.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiYm1yYWp1cHRjZW9rcGpueW56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NzY1MzcsImV4cCI6MjA3NDA1MjUzN30.BYxGzM6G7MROTDTdj6KN3gCcrs6nxUaa_ylFZwMBT9o';
+        
+        let supabase;
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        // Initialize Supabase
+        async function initSupabase() {
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('Supabase initialized successfully');
+                return true;
+            } catch (error) {
+                console.error('Error initializing Supabase:', error);
+                return false;
+            }
+        }
+
+        // Update cart count
+        function updateCartCount() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const cartCountElement = document.getElementById('cartCount');
+            if (cartCountElement) {
+                cartCountElement.textContent = totalItems;
+            }
+        }
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('active');
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            
+            if (mobileMenu && mobileToggle && !mobileMenu.contains(event.target) && !mobileToggle.contains(event.target)) {
+                mobileMenu.classList.remove('active');
+            }
+        });
+
+        // Handle user click
+        function handleUserClick() {
+            const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+            if (isLoggedIn) {
+                window.location.href = 'profile-mobile.html';
+            } else {
+                window.location.href = 'auth-mobile.html';
+            }
+        }
+
+        // Update user profile
+        async function updateUserProfile() {
+            const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+            const userTextElement = document.getElementById('userText');
+            const mobileUserTextElement = document.getElementById('mobileUserText');
+            
+            if (isLoggedIn) {
+                const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                const displayName = userData.full_name || userData.first_name || userData.email || 'User';
+                
+                if (userTextElement) userTextElement.textContent = displayName;
+                if (mobileUserTextElement) mobileUserTextElement.textContent = displayName;
+            } else {
+                if (userTextElement) userTextElement.textContent = 'Sign In';
+                if (mobileUserTextElement) mobileUserTextElement.textContent = 'Sign In';
+            }
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+                color: white;
+                padding: 12px 24px;
+                border-radius: 25px;
+                font-size: 14px;
+                font-weight: 500;
+                z-index: 10000;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                animation: slideDown 0.3s ease;
+            `;
+            notification.textContent = message;
+            
+            // Add animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideDown {
+                    from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+                    to { transform: translateX(-50%) translateY(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideUp 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Handle form submission
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            const submitBtn = document.querySelector('.submit-btn');
+            const originalText = submitBtn.textContent;
+            
+            // Disable button and show loading
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+            
+            try {
+                const formData = new FormData(event.target);
+                const contactData = {
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    subject: formData.get('subject'),
+                    order_number: formData.get('orderNumber') || null,
+                    message: formData.get('message'),
+                    newsletter_subscription: formData.get('newsletter') === 'on',
+                    created_at: new Date().toISOString()
+                };
+
+                console.log('Submitting contact form:', contactData);
+
+                // Insert into Supabase
+                const { data, error } = await supabase
+                    .from('contact_messages')
+                    .insert([contactData]);
+
+                if (error) {
+                    throw error;
+                }
+
+                console.log('Contact message saved:', data);
+                
+                // Show success modal
+                showSuccessModal();
+                
+                // Reset form
+                event.target.reset();
+                
+            } catch (error) {
+                console.error('Error submitting contact form:', error);
+                showNotification('Failed to send message. Please try again.', 'error');
+            } finally {
+                // Re-enable button
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        }
+
+        // Show success modal
+        function showSuccessModal() {
+            const modal = document.getElementById('successModal');
+            modal.style.display = 'flex';
+        }
+
+        // Close success modal
+        function closeSuccessModal() {
+            const modal = document.getElementById('successModal');
+            modal.style.display = 'none';
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            updateUserProfile();
+            updateCartCount();
+            
+            // Initialize Supabase
+            const supabaseInitialized = await initSupabase();
+            if (!supabaseInitialized) {
+                console.error('Failed to initialize Supabase');
+                showNotification('Unable to connect to server. Please try again later.', 'error');
+            }
+            
+            // Add form event listener
+            const contactForm = document.getElementById('contactForm');
+            if (contactForm) {
+                contactForm.addEventListener('submit', handleFormSubmit);
+            }
+        });
+
+        // Listen for cart updates
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'cart') {
+                cart = JSON.parse(e.newValue || '[]');
+                updateCartCount();
+            }
+        });
+    </script>
+</body>
+</html>

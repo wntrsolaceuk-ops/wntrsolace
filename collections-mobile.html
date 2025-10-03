@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WinterSolace - Collections</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;600;700&family=Dancing+Script:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Mobile-optimized fog effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse 400px 200px at 20% 10%, rgba(255, 255, 255, 0.1) 0%, transparent 60%),
+                radial-gradient(ellipse 300px 150px at 80% 30%, rgba(200, 230, 255, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+            animation: mobileFogDrift 15s ease-in-out infinite;
+        }
+
+        @keyframes mobileFogDrift {
+            0%, 100% { opacity: 0.6; transform: translateX(-20px); }
+            50% { opacity: 1; transform: translateX(20px); }
+        }
+
+        /* Mobile ice crystals */
+        .ice-crystals {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .ice-crystal {
+            position: absolute;
+            color: rgba(200, 230, 255, 0.4);
+            font-size: 14px;
+            animation: mobileCrystalFloat 6s linear infinite;
+        }
+
+        @keyframes mobileCrystalFloat {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10%, 90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .ice-crystal:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .ice-crystal:nth-child(2) { left: 30%; animation-delay: 1s; }
+        .ice-crystal:nth-child(3) { left: 50%; animation-delay: 2s; }
+        .ice-crystal:nth-child(4) { left: 70%; animation-delay: 3s; }
+        .ice-crystal:nth-child(5) { left: 90%; animation-delay: 4s; }
+
+        /* Mobile Header */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: #000000;
+            z-index: 1000;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+        }
+
+        .nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Dancing Script', cursive;
+            font-size: 20px;
+            font-weight: 400;
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .logo img {
+            height: 35px;
+        }
+
+        .mobile-menu-toggle {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .user-section:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .user-icon {
+            width: 20px;
+            height: 20px;
+            color: #ffffff;
+        }
+
+        .user-text {
+            font-size: 14px;
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .cart-icon {
+            width: 20px;
+            height: 20px;
+            color: #ffffff;
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+            position: relative;
+        }
+
+        .cart-icon:hover {
+            opacity: 0.7;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Mobile Menu Overlay */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 30px;
+            cursor: pointer;
+        }
+
+        .mobile-nav-links {
+            list-style: none;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .mobile-nav-links li {
+            margin: 1.5rem 0;
+        }
+
+        .mobile-nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 24px;
+            font-weight: 500;
+            transition: opacity 0.3s ease;
+        }
+
+        .mobile-nav-links a:hover {
+            opacity: 0.7;
+        }
+
+        .mobile-user-section {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .mobile-user-section .user-section {
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 60px;
+            min-height: calc(100vh - 60px);
+            position: relative;
+            z-index: 10;
+            padding: 2rem 1rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Mobile Products Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            max-width: 100%;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+        }
+
+        .product-card.preorder {
+            border: 2px solid rgba(200, 230, 255, 0.3);
+        }
+
+        .product-image {
+            height: 250px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-image.frozen-effect {
+            position: relative;
+        }
+
+        .product-image.frozen-effect::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(200, 230, 255, 0.1) 50%, transparent 70%);
+            animation: frostShimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes frostShimmer {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        .ice-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 20%, rgba(200, 230, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .preorder-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #c8e6ff 0%, #ffffff 100%);
+            color: #000000;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 10px rgba(200, 230, 255, 0.3);
+        }
+
+        .product-info {
+            padding: 1.5rem;
+        }
+
+        .product-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+        }
+
+        .product-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .product-price {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 1rem;
+        }
+
+        .add-to-cart {
+            width: 100%;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+            color: #000000;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .add-to-cart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+        }
+
+        .add-to-cart.preorder-btn {
+            background: linear-gradient(135deg, #c8e6ff 0%, #ffffff 100%);
+            color: #000000;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            opacity: 0.7;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 2rem 1rem;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            height: 40px;
+            margin-bottom: 1rem;
+        }
+
+        .footer-text {
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        /* Touch optimizations */
+        .product-card, .add-to-cart, .user-section, .cart-icon, .mobile-menu-toggle {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body>
+    <!-- Ice Crystals -->
+    <div class="ice-crystals">
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">❅</div>
+        <div class="ice-crystal">❆</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">❅</div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="layout-winter-frost-mobile.html" class="logo">
+                <img src="assets/Wntrsolace.png" alt="WinterSolace Logo">
+            </a>
+            
+            <div class="nav-right">
+                <div class="user-section" id="userSection" onclick="handleUserClick()">
+                    <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span class="user-text" id="userText">Sign In</span>
+                </div>
+                
+                <a href="cart-mobile.html" class="cart-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                    <span class="cart-count" id="cartCount">0</span>
+                </a>
+                
+                <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                    ☰
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="mobile-menu-close" onclick="toggleMobileMenu()">×</button>
+        
+        <ul class="mobile-nav-links">
+            <li><a href="layout-winter-frost-mobile.html" onclick="toggleMobileMenu()">Home</a></li>
+            <li><a href="collections-mobile.html" onclick="toggleMobileMenu()">Collection</a></li>
+            <li><a href="contact-mobile.html" onclick="toggleMobileMenu()">Contact</a></li>
+        </ul>
+        
+        <div class="mobile-user-section">
+            <div class="user-section" id="mobileUserSection" onclick="handleUserClick(); toggleMobileMenu();">
+                <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span class="user-text" id="mobileUserText">Sign In</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Our Collections</h1>
+        </div>
+
+        <div class="products-grid" id="productsGrid">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading products...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <img src="assets/Wntrsolace.png" alt="WinterSolace Logo" class="footer-logo">
+            <p class="footer-text">&copy; 2024 WinterSolace. Crafted for the coldest moments.</p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://pbbmrajuptceokpjnynz.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiYm1yYWp1cHRjZW9rcGpueW56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NzY1MzcsImV4cCI6MjA3NDA1MjUzN30.BYxGzM6G7MROTDTdj6KN3gCcrs6nxUaa_ylFZwMBT9o';
+        
+        let supabase;
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let products = [];
+
+        // Initialize Supabase
+        async function initSupabase() {
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('Supabase initialized successfully');
+                return true;
+            } catch (error) {
+                console.error('Error initializing Supabase:', error);
+                return false;
+            }
+        }
+
+        // Cloudinary configuration
+        const CLOUDINARY_CLOUD_NAME = 'dlfsfybx3';
+        
+        // Function to generate Cloudinary URLs
+        function getCloudinaryUrl(publicId, width = 800, height = 800, quality = 'auto') {
+            return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/w_${width},h_${height},c_fill,q_${quality},f_auto/${publicId}`;
+        }
+
+        // Load products from Supabase
+        async function loadProducts() {
+            try {
+                console.log('Loading products from Supabase...');
+                const { data, error } = await supabase
+                    .from('products')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+                
+                console.log('Products loaded:', data);
+                products = data;
+                renderProducts(data);
+            } catch (error) {
+                console.error('Error loading products:', error);
+                // Fallback to hardcoded products if Supabase fails
+                loadFallbackProducts();
+            }
+        }
+
+        // Fallback products if Supabase fails
+        function loadFallbackProducts() {
+            console.log('Loading fallback products...');
+            const fallbackProducts = [
+                {
+                    id: 'wntr-solace-hoodie',
+                    name: 'Wntr Solace Hoodie',
+                    description: 'Premium winter hoodie crafted with the finest materials for ultimate comfort and style.',
+                    price: 125,
+                    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+                    stock_quantity: 25,
+                    main_image_public_id: 'front_g9w8zc',
+                    image_variants: [
+                        {"type": "front", "public_id": "front_g9w8zc"},
+                        {"type": "back", "public_id": "Back_qlvac0"},
+                        {"type": "pants", "public_id": "pants_bphqzq"},
+                        {"type": "sample1", "public_id": "Sample1-min_o1wn8v"},
+                        {"type": "sample2", "public_id": "Sample2-min_fx7bqh"},
+                        {"type": "sample3", "public_id": "Sample3-min_ywsavk"}
+                    ],
+                    is_preorder: true
+                }
+            ];
+            products = fallbackProducts;
+            renderProducts(fallbackProducts);
+        }
+
+        // Render products
+        function renderProducts(productsData) {
+            const productsGrid = document.getElementById('productsGrid');
+            if (!productsGrid) return;
+
+            const productsHTML = productsData.map(product => {
+                const mainImageUrl = getCloudinaryUrl(product.main_image_public_id, 400, 400);
+                const isPreorder = product.is_preorder;
+                
+                return `
+                    <div class="product-card ${isPreorder ? 'preorder' : ''}" onclick="goToProductDetail('${product.id}')">
+                        <div class="product-image ${isPreorder ? 'frozen-effect' : ''}" style="background-image: url('${mainImageUrl}');">
+                            ${isPreorder ? '<div class="ice-overlay"></div>' : ''}
+                            ${isPreorder ? '<div class="preorder-badge">Pre-Order</div>' : ''}
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title">${product.name}</h3>
+                            <p class="product-description">${product.description}</p>
+                            <p class="product-price">$${product.price}</p>
+                            <button class="add-to-cart ${isPreorder ? 'preorder-btn' : ''}" 
+                                    onclick="event.stopPropagation(); ${isPreorder ? 'goToProductDetail(\'' + product.id + '\')' : 'addToCart(\'' + product.id + '\')'}">
+                                ${isPreorder ? 'Pre-Order Now' : 'Add to Cart'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            productsGrid.innerHTML = productsHTML;
+        }
+
+        // Update cart count
+        function updateCartCount() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const cartCountElement = document.getElementById('cartCount');
+            if (cartCountElement) {
+                cartCountElement.textContent = totalItems;
+            }
+        }
+
+        // Navigation functions
+        function goToProductDetail(productId = 'frozen-collection') {
+            // Store the product ID in localStorage for the detail page
+            localStorage.setItem('selectedProduct', productId);
+            window.location.href = 'product-detail-mobile.html';
+        }
+
+        function addToCart(productId) {
+            console.log('Adding to cart:', productId);
+            
+            // Find product in the loaded products array
+            const product = products.find(p => p.id === productId);
+            console.log('Product found:', product);
+            
+            if (product) {
+                const cartItem = {
+                    id: productId,
+                    name: product.name,
+                    price: product.price,
+                    size: 'L',
+                    quantity: 1,
+                    image: getCloudinaryUrl(product.main_image_public_id, 200, 200),
+                    isPreorder: product.is_preorder
+                };
+
+                // Check if item already exists in cart
+                const existingItemIndex = cart.findIndex(item => item.id === productId && item.size === 'L');
+                
+                if (existingItemIndex > -1) {
+                    // Update quantity
+                    cart[existingItemIndex].quantity += 1;
+                } else {
+                    // Add new item
+                    cart.push(cartItem);
+                }
+
+                // Save to localStorage
+                localStorage.setItem('cart', JSON.stringify(cart));
+                
+                // Update cart count
+                updateCartCount();
+                
+                // Show success message
+                showNotification('Added to cart!', 'success');
+                
+                console.log('Cart updated:', cart);
+            } else {
+                console.error('Product not found:', productId);
+                showNotification('Product not found', 'error');
+            }
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+                color: white;
+                padding: 12px 24px;
+                border-radius: 25px;
+                font-size: 14px;
+                font-weight: 500;
+                z-index: 10000;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                animation: slideDown 0.3s ease;
+            `;
+            notification.textContent = message;
+            
+            // Add animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideDown {
+                    from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+                    to { transform: translateX(-50%) translateY(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideUp 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('active');
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            
+            if (mobileMenu && mobileToggle && !mobileMenu.contains(event.target) && !mobileToggle.contains(event.target)) {
+                mobileMenu.classList.remove('active');
+            }
+        });
+
+        // Handle user click
+        function handleUserClick() {
+            const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+            if (isLoggedIn) {
+                window.location.href = 'profile-mobile.html';
+            } else {
+                window.location.href = 'auth-mobile.html';
+            }
+        }
+
+        // Update user profile
+        async function updateUserProfile() {
+            const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+            const userTextElement = document.getElementById('userText');
+            const mobileUserTextElement = document.getElementById('mobileUserText');
+            
+            if (isLoggedIn) {
+                const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                const displayName = userData.full_name || userData.first_name || userData.email || 'User';
+                
+                if (userTextElement) userTextElement.textContent = displayName;
+                if (mobileUserTextElement) mobileUserTextElement.textContent = displayName;
+            } else {
+                if (userTextElement) userTextElement.textContent = 'Sign In';
+                if (mobileUserTextElement) mobileUserTextElement.textContent = 'Sign In';
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            updateUserProfile();
+            updateCartCount();
+            
+            // Initialize Supabase and load products
+            const supabaseInitialized = await initSupabase();
+            if (supabaseInitialized) {
+                await loadProducts();
+            } else {
+                console.error('Failed to initialize Supabase');
+                loadFallbackProducts();
+            }
+        });
+
+        // Listen for cart updates
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'cart') {
+                cart = JSON.parse(e.newValue || '[]');
+                updateCartCount();
+            }
+        });
+    </script>
+</body>
+</html>

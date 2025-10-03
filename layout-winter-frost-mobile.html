@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WinterSolace - Frost Collection</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;600;700&family=Dancing+Script:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Mobile-optimized fog effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse 400px 200px at 20% 10%, rgba(255, 255, 255, 0.1) 0%, transparent 60%),
+                radial-gradient(ellipse 300px 150px at 80% 30%, rgba(200, 230, 255, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+            animation: mobileFogDrift 15s ease-in-out infinite;
+        }
+
+        @keyframes mobileFogDrift {
+            0%, 100% { opacity: 0.6; transform: translateX(-20px); }
+            50% { opacity: 1; transform: translateX(20px); }
+        }
+
+        /* Mobile ice crystals */
+        .ice-crystals {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .ice-crystal {
+            position: absolute;
+            color: rgba(200, 230, 255, 0.4);
+            font-size: 14px;
+            animation: mobileCrystalFloat 6s linear infinite;
+        }
+
+        @keyframes mobileCrystalFloat {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10%, 90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .ice-crystal:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .ice-crystal:nth-child(2) { left: 30%; animation-delay: 1s; }
+        .ice-crystal:nth-child(3) { left: 50%; animation-delay: 2s; }
+        .ice-crystal:nth-child(4) { left: 70%; animation-delay: 3s; }
+        .ice-crystal:nth-child(5) { left: 90%; animation-delay: 4s; }
+
+        /* Mobile Header */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: #000000;
+            z-index: 1000;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+        }
+
+        .nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Dancing Script', cursive;
+            font-size: 20px;
+            font-weight: 400;
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .logo img {
+            height: 35px;
+        }
+
+        .mobile-menu-toggle {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .user-section:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .user-icon {
+            width: 20px;
+            height: 20px;
+            color: #ffffff;
+        }
+
+        .user-text {
+            font-size: 14px;
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .cart-icon {
+            width: 20px;
+            height: 20px;
+            color: #ffffff;
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+            position: relative;
+        }
+
+        .cart-icon:hover {
+            opacity: 0.7;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Mobile Menu Overlay */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 30px;
+            cursor: pointer;
+        }
+
+        .mobile-nav-links {
+            list-style: none;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .mobile-nav-links li {
+            margin: 1.5rem 0;
+        }
+
+        .mobile-nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 24px;
+            font-weight: 500;
+            transition: opacity 0.3s ease;
+        }
+
+        .mobile-nav-links a:hover {
+            opacity: 0.7;
+        }
+
+        .mobile-user-section {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .mobile-user-section .user-section {
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 60px;
+            min-height: calc(100vh - 60px);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem 1rem;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 100%;
+            z-index: 10;
+        }
+
+        .hero h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ffffff 0%, #c8e6ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+            color: #000000;
+            padding: 1rem 2rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 4rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 3rem;
+            font-weight: 600;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .feature-card p {
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 2rem 1rem;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            height: 40px;
+            margin-bottom: 1rem;
+        }
+
+        .footer-text {
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        /* Mobile-specific optimizations */
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .features h2 {
+                font-size: 1.5rem;
+            }
+            
+            .feature-card {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Touch optimizations */
+        .cta-button, .user-section, .cart-icon, .mobile-menu-toggle {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body>
+    <!-- Ice Crystals -->
+    <div class="ice-crystals">
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">❅</div>
+        <div class="ice-crystal">❆</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">❅</div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="layout-winter-frost-mobile.html" class="logo">
+                <img src="assets/Wntrsolace.png" alt="WinterSolace Logo">
+            </a>
+            
+            <div class="nav-right">
+                <div class="user-section" id="userSection" onclick="handleUserClick()">
+                    <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span class="user-text" id="userText">Sign In</span>
+                </div>
+                
+                <a href="cart-mobile.html" class="cart-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                    <span class="cart-count" id="cartCount">0</span>
+                </a>
+                
+                <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                    ☰
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="mobile-menu-close" onclick="toggleMobileMenu()">×</button>
+        
+        <ul class="mobile-nav-links">
+            <li><a href="layout-winter-frost-mobile.html" onclick="toggleMobileMenu()">Home</a></li>
+            <li><a href="collections-mobile.html" onclick="toggleMobileMenu()">Collection</a></li>
+            <li><a href="contact-mobile.html" onclick="toggleMobileMenu()">Contact</a></li>
+        </ul>
+        
+        <div class="mobile-user-section">
+            <div class="user-section" id="mobileUserSection" onclick="handleUserClick(); toggleMobileMenu();">
+                <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span class="user-text" id="mobileUserText">Sign In</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>WinterSolace</h1>
+                <p>Embrace the cold with our premium winter collection. Crafted for those who find beauty in the frost.</p>
+                <a href="collections-mobile.html" class="cta-button">Explore Collection</a>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features">
+            <h2>Why Choose WinterSolace?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🧥</div>
+                    <h3>Premium Materials</h3>
+                    <p>Only the finest fabrics and materials, designed to keep you warm and stylish in the harshest conditions.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">❄️</div>
+                    <h3>Winter Tested</h3>
+                    <p>Every piece is rigorously tested in extreme winter conditions to ensure maximum comfort and durability.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Unique Design</h3>
+                    <p>Distinctive designs that capture the essence of winter while maintaining modern style and functionality.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <img src="assets/Wntrsolace.png" alt="WinterSolace Logo" class="footer-logo">
+            <p class="footer-text">&copy; 2024 WinterSolace. Crafted for the coldest moments.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('active');
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            
+            if (mobileMenu && mobileToggle && !mobileMenu.contains(event.target) && !mobileToggle.contains(event.target)) {
+                mobileMenu.classList.remove('active');
+            }
+        });
+
+        // Handle user click
+        function handleUserClick() {
+            const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+            if (isLoggedIn) {
+                window.location.href = 'profile-mobile.html';
+            } else {
+                window.location.href = 'auth-mobile.html';
+            }
+        }
+
+        // Update user profile
+        async function updateUserProfile() {
+            const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+            const userTextElement = document.getElementById('userText');
+            const mobileUserTextElement = document.getElementById('mobileUserText');
+            
+            if (isLoggedIn) {
+                const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                const displayName = userData.full_name || userData.first_name || userData.email || 'User';
+                
+                if (userTextElement) userTextElement.textContent = displayName;
+                if (mobileUserTextElement) mobileUserTextElement.textContent = displayName;
+            } else {
+                if (userTextElement) userTextElement.textContent = 'Sign In';
+                if (mobileUserTextElement) mobileUserTextElement.textContent = 'Sign In';
+            }
+        }
+
+        // Update cart count
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const cartCountElement = document.getElementById('cartCount');
+            if (cartCountElement) {
+                cartCountElement.textContent = totalItems;
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateUserProfile();
+            updateCartCount();
+        });
+
+        // Listen for cart updates
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'cart') {
+                updateCartCount();
+            }
+        });
+    </script>
+</body>
+</html>
