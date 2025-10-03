@@ -7,16 +7,11 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 const app = express();
 const PORT = 3002;
 
-// Middleware
+// Middleware - Allow all origins for now
 app.use(cors({
-    origin: ['https://www.wntrsolace.uk', 'https://wntrsolace.uk', 'http://localhost:3000', 'http://127.0.0.1:5500'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    origin: true,
     credentials: true
 }));
-
-// Handle preflight requests
-app.options('*', cors());
 
 app.use(express.json());
 
