@@ -153,6 +153,12 @@
             height: 70px;
         }
 
+        .nav-center {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
         .logo {
             height: 40px;
             filter: none;
@@ -173,6 +179,18 @@
             gap: 2rem;
             margin: 0;
             padding: 0;
+        }
+
+        .cart-icon {
+            color: #cccccc;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .cart-icon:hover {
+            color: #ffffff;
         }
 
         .nav-menu li {
@@ -654,7 +672,7 @@
         }
 
         .user-profile.active {
-            display: block;
+            display: flex;
         }
 
         .profile-button {
@@ -951,12 +969,22 @@
         <nav class="nav">
             <img src="assets/Wntrsolace.png" alt="WinterSolace Logo" class="logo">
             <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
-            <ul class="nav-menu" id="navMenu">
-                <button class="close-btn" onclick="toggleMobileMenu()">×</button>
-                <li><a href="layout-winter-frost.html">Home</a></li>
-                <li><a href="collections.html">Collection</a></li>
-                <li><a href="contact.html">Contact</a></li>
-                <li><a href="cart.html">Checkout</a></li>
+            
+            <div class="nav-center">
+                <ul class="nav-menu" id="navMenu">
+                    <button class="close-btn" onclick="toggleMobileMenu()">×</button>
+                    <li><a href="layout-winter-frost.html">Home</a></li>
+                    <li><a href="collections.html">Collection</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li>
+                        <a href="cart.html" class="cart-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="9" cy="21" r="1"></circle>
+                                <circle cx="20" cy="21" r="1"></circle>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                            </svg>
+                        </a>
+                    </li>
                 <li id="mobileUserProfile" style="display: none;">
                     <a href="#" onclick="handlePersonClick()">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
@@ -1102,7 +1130,7 @@
             
             if (isLoggedIn) {
                 // Show desktop user profile
-                userProfile.style.display = 'flex';
+                userProfile.classList.add('active');
                 mobileUserProfile.style.display = 'block';
                 mobileAuthButton.style.display = 'none';
                 
@@ -1135,7 +1163,7 @@
                 }
             } else {
                 // Hide user profile, show auth button
-                userProfile.style.display = 'none';
+                userProfile.classList.remove('active');
                 mobileUserProfile.style.display = 'none';
                 mobileAuthButton.style.display = 'block';
             }
