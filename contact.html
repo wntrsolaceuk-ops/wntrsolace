@@ -1047,17 +1047,20 @@
                         }
                         
                         console.log('Setting user name to:', userName);
-                        document.getElementById('userName').textContent = userName;
-                        mobileUserName.textContent = userName;
+                        const userTextElement = document.getElementById('userText');
+                        if (userTextElement) userTextElement.textContent = userName;
+                        if (mobileUserName) mobileUserName.textContent = userName;
                     } else {
                         console.log('No user found, showing Guest');
-                        document.getElementById('userName').textContent = 'Guest';
-                        mobileUserName.textContent = 'Guest';
+                        const userTextElement = document.getElementById('userText');
+                        if (userTextElement) userTextElement.textContent = 'Guest';
+                        if (mobileUserName) mobileUserName.textContent = 'Guest';
                     }
                 } catch (error) {
                     console.error('Error loading user name:', error);
-                    document.getElementById('userName').textContent = 'User';
-                    mobileUserName.textContent = 'User';
+                    const userTextElement = document.getElementById('userText');
+                    if (userTextElement) userTextElement.textContent = 'User';
+                    if (mobileUserName) mobileUserName.textContent = 'User';
                 }
             } else {
                 // Hide user profile, show auth button
