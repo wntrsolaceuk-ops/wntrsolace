@@ -4,7 +4,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WinterSolace - Urban Collection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Desktop Header Styles */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: #000000;
+            z-index: 1000;
+            height: 60px;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-center {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Dancing Script', cursive;
+            font-size: 24px;
+            font-weight: 400;
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 4rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 400;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.7;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .user-section:hover {
+            opacity: 0.7;
+        }
+
+        .user-icon {
+            width: 20px;
+            height: 20px;
+            color: #ffffff;
+        }
+
+        .user-text {
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .cart-icon {
+            width: 20px;
+            height: 20px;
+            color: #ffffff;
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .cart-icon:hover {
+            opacity: 0.7;
+        }
+
+        .cart-icon svg {
+            width: 20px;
+            height: 20px;
+            stroke: #ffffff;
+            fill: none;
+        }
+
         @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;600&family=Roboto:wght@300;400;700&display=swap');
 
         * {
@@ -281,15 +389,35 @@
 </head>
 <body>
     <header class="header">
-        <div class="nav-container">
-            <img src="assets/wntsolacewhite.png" alt="WinterSolace Logo" class="logo">
-            <ul class="nav-menu">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#collection">Collection</a></li>
-                <li><a href="#street">Street</a></li>
-                <li><a href="contact.html">Contact</a></li>
-            </ul>
-        </div>
+        <nav class="nav">
+            <a href="layout-winter-frost.html" class="logo">Wntrsolace</a>
+            
+            <div class="nav-center">
+                <ul class="nav-links">
+                    <li><a href="layout-winter-frost.html">Home</a></li>
+                    <li><a href="collections.html">Collection</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-right">
+                <div class="user-section" id="userSection" onclick="handleUserClick()">
+                    <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span class="user-text" id="userText">Sign In</span>
+                </div>
+                
+                <a href="cart.html" class="cart-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                </a>
+            </div>
+        </nav>
     </header>
 
     <section class="hero" id="home">
