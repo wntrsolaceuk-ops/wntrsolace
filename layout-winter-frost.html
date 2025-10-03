@@ -154,6 +154,13 @@
             align-items: center;
         }
 
+        .nav-center {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
         .logo {
             font-family: 'Dancing Script', cursive;
             font-size: 24px;
@@ -164,10 +171,11 @@
 
         .nav-links {
             display: flex;
-            gap: 3rem;
+            gap: 4rem;
             list-style: none;
             margin: 0;
             padding: 0;
+            margin-left: 2rem;
         }
 
         .nav-links a {
@@ -988,11 +996,13 @@
         <nav class="nav">
             <a href="layout-winter-frost.html" class="logo">Wntrsolace</a>
             
-            <ul class="nav-links">
-                <li><a href="layout-winter-frost.html">Home</a></li>
-                <li><a href="collections.html">Collection</a></li>
-                <li><a href="contact.html">Contact</a></li>
-            </ul>
+            <div class="nav-center">
+                <ul class="nav-links">
+                    <li><a href="layout-winter-frost.html">Home</a></li>
+                    <li><a href="collections.html">Collection</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
             
             <div class="nav-right">
                 <div class="user-section" id="userSection" onclick="handleUserClick()">
