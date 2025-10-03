@@ -11,11 +11,19 @@ app.use(express.json());
 
 // Email configuration
 const EMAIL_CONFIG = {
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // true for 465, false for other ports
     auth: {
         user: process.env.EMAIL_USER || 'wntrsolace.uk@gmail.com',
         pass: process.env.EMAIL_PASS || 'afrq uoya outa tpcr'
-    }
+    },
+    tls: {
+        rejectUnauthorized: false
+    },
+    connectionTimeout: 60000, // 60 seconds
+    greetingTimeout: 30000,   // 30 seconds
+    socketTimeout: 60000      // 60 seconds
 };
 
 // Create transporter
