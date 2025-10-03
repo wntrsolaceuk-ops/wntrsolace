@@ -7,9 +7,15 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 const app = express();
 const PORT = process.env.PORT || 3002;
 
-// Middleware - Allow all origins for now
+// Middleware - Allow specific origins
 app.use(cors({
-    origin: true,
+    origin: [
+        'https://www.wntrsolace.uk',
+        'https://wntrsolace.uk', 
+        'https://d75da05a898b347a.vercel-dns-017.com',
+        'http://localhost:3000',
+        'http://127.0.0.1:5500'
+    ],
     credentials: true
 }));
 
@@ -154,6 +160,21 @@ app.post('/api/process-refund', async (req, res) => {
             details: error.message
         });
     }
+});
+
+// Root route
+app.get('/', (req, res) => {
+    res.status(200).json({ 
+        message: 'WinterSolace Payment Server',
+        status: 'Running',
+        port: PORT,
+        endpoints: [
+            'POST /api/create-payment-intent',
+            'POST /api/complete-order',
+            'POST /api/process-refund',
+            'GET /api/health'
+        ]
+    });
 });
 
 // Health check
