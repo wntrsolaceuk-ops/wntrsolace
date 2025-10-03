@@ -236,83 +236,16 @@
             display: none;
         }
 
-        .nav {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1rem 2rem;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-            align-items: center;
-            width: 100%;
-        }
 
-        .logo {
-            height: 60px;
-            filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.1));
-            transition: all 0.3s ease;
-            justify-self: center;
-        }
-        
-        .mobile-menu-toggle {
-            display: none;
-        }
-        
         .nav-menu .close-btn {
             display: none;
         }
 
-        .logo:hover {
-            filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.2));
-            transform: scale(1.05);
-        }
 
-        .nav-menu {
-            display: contents;
-            list-style: none;
-        }
 
-        .nav-menu li {
-            justify-self: center;
-            list-style: none;
-        }
 
-        .nav-menu a {
-            color: #cccccc;
-            text-decoration: none;
-            font-weight: 500;
-            padding: 8px 16px;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-            position: relative;
-        }
 
-        .nav-menu a::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
 
-        .nav-menu a:hover::before {
-            opacity: 1;
-        }
-
-        .nav-menu a:hover {
-            color: #ffffff;
-        }
-
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            justify-self: end;
-        }
 
         .user-profile {
             display: flex;
