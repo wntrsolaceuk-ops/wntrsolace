@@ -5,6 +5,117 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Messages - Admin Dashboard</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Desktop Header Styles */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: #000000;
+            z-index: 1000;
+            height: 60px;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-center {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Dancing Script', cursive;
+            font-size: 24px;
+            font-weight: 400;
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 4rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 400;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.7;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .user-section:hover {
+            opacity: 0.7;
+        }
+
+        .user-icon {
+            width: 20px;
+            height: 20px;
+            color: #ffffff;
+        }
+
+        .user-text {
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .logout-button {
+            width: 20px;
+            height: 20px;
+            color: #ffffff;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .logout-button:hover {
+            opacity: 0.7;
+        }
+
+        .logout-button svg {
+            width: 20px;
+            height: 20px;
+            stroke: #ffffff;
+            fill: none;
+        }
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -12,31 +123,36 @@
     
     <!-- Header -->
     <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <a href="admin-dashboard.html">
-                        <h1>❄️ Winter Solace Admin</h1>
-                    </a>
-                </div>
-                <nav class="nav">
-                    <a href="admin-dashboard.html" class="nav-link">Dashboard</a>
-                    <a href="admin-orders.html" class="nav-link">Orders</a>
-                    <a href="admin-contact.html" class="nav-link active">Contact Messages</a>
-                    <a href="admin-products.html" class="nav-link">Products</a>
-                </nav>
-                <div class="header-actions">
-                    <div class="user-name" id="userName">Admin</div>
-                    <button class="logout-button" onclick="logout()">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                            <polyline points="16,17 21,12 16,7"/>
-                            <line x1="21" y1="12" x2="9" y2="12"/>
-                        </svg>
-                    </button>
-                </div>
+        <nav class="nav">
+            <a href="admin-dashboard.html" class="logo">Wntrsolace Admin</a>
+            
+            <div class="nav-center">
+                <ul class="nav-links">
+                    <li><a href="admin-dashboard.html">Dashboard</a></li>
+                    <li><a href="admin-orders.html">Orders</a></li>
+                    <li><a href="admin-contact.html">Contact</a></li>
+                    <li><a href="admin-products.html">Products</a></li>
+                </ul>
             </div>
-        </div>
+            
+            <div class="nav-right">
+                <div class="user-section" id="userSection">
+                    <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span class="user-text" id="userText">Admin</span>
+                </div>
+                
+                <button class="logout-button" onclick="logout()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16,17 21,12 16,7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                </button>
+            </div>
+        </nav>
     </header>
 
     <!-- Main Content -->
