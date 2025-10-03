@@ -111,17 +111,15 @@ WinterSolace Team
             <div class="order-details">
                 <h3>Items Ordered</h3>
                 ${orderItems.map(item => `
-                    <div class="item">
+                    <div class="item" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee;">
                         <div style="display: flex; align-items: center; gap: 15px; flex: 1;">
                             <img src="${item.image || 'https://www.wntrsolace.uk/assets/Wntrsolace.png'}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #eee;">
-                            <div style="flex: 1;">
-                                <div style="font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
-                                    <span>${item.name}</span>
-                                    <span style="color: #000; font-weight: bold;">£${(item.price * item.quantity).toFixed(2)}</span>
-                                </div>
+                            <div>
+                                <div style="font-weight: bold;">${item.name}</div>
                                 <div style="color: #666; font-size: 14px;">Quantity: ${item.quantity}</div>
                             </div>
                         </div>
+                        <div style="font-weight: bold; font-size: 16px; color: #000;">£${(item.price * item.quantity).toFixed(2)}</div>
                     </div>
                 `).join('')}
                 <div class="total">
@@ -203,17 +201,15 @@ WinterSolace Team
             <div class="order-details">
                 <h3>Items Ordered</h3>
                 ${orderItems.map(item => `
-                    <div class="item">
+                    <div class="item" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee;">
                         <div style="display: flex; align-items: center; gap: 15px; flex: 1;">
                             <img src="${item.image || 'https://www.wntrsolace.uk/assets/Wntrsolace.png'}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #eee;">
-                            <div style="flex: 1;">
-                                <div style="font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
-                                    <span>${item.name}</span>
-                                    <span style="color: #000; font-weight: bold;">£${(item.price * item.quantity).toFixed(2)}</span>
-                                </div>
+                            <div>
+                                <div style="font-weight: bold;">${item.name}</div>
                                 <div style="color: #666; font-size: 14px;">Quantity: ${item.quantity}</div>
                             </div>
                         </div>
+                        <div style="font-weight: bold; font-size: 16px; color: #000;">£${(item.price * item.quantity).toFixed(2)}</div>
                     </div>
                 `).join('')}
                 <div class="total">
