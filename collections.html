@@ -623,6 +623,25 @@
                 padding: 2rem;
             }
             
+            .nav-menu .close-btn {
+                position: absolute;
+                top: 2rem;
+                right: 2rem;
+                background: none;
+                border: none;
+                color: white;
+                font-size: 2rem;
+                cursor: pointer;
+                padding: 0.5rem;
+                border-radius: 50%;
+                transition: all 0.3s ease;
+            }
+            
+            .nav-menu .close-btn:hover {
+                background: rgba(255, 255, 255, 0.1);
+                transform: scale(1.1);
+            }
+            
             .nav-menu.active {
                 display: flex;
             }
@@ -759,6 +778,7 @@
             <img src="assets/Wntrsolace.png" alt="WinterSolace Logo" class="logo">
             <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
             <ul class="nav-menu" id="navMenu">
+                <button class="close-btn" onclick="toggleMobileMenu()">×</button>
                 <li><a href="layout-winter-frost.html">Home</a></li>
                 <li><a href="collections.html">Collection</a></li>
                 <li><a href="contact.html">Contact</a></li>
