@@ -1024,17 +1024,11 @@
             const mobileUserName = document.getElementById('mobileUserName');
             const mobileAuthButton = document.getElementById('mobileAuthButton');
             
-            // Check if mobile elements exist before using them
-            if (!mobileUserProfile || !mobileAuthButton) {
-                console.log('Mobile elements not found, skipping mobile updates');
-                return;
-            }
-            
             if (isLoggedIn) {
                 // Show desktop user profile
                 if (userProfile) userProfile.style.display = 'flex';
-                mobileUserProfile.style.display = 'block';
-                mobileAuthButton.style.display = 'none';
+                if (mobileUserProfile) mobileUserProfile.style.display = 'block';
+                if (mobileAuthButton) mobileAuthButton.style.display = 'none';
                 
                 try {
                     console.log('Loading user name...');
@@ -1077,8 +1071,8 @@
             } else {
                 // Hide user profile, show auth button
                 if (userProfile) userProfile.style.display = 'none';
-                mobileUserProfile.style.display = 'none';
-                mobileAuthButton.style.display = 'block';
+                if (mobileUserProfile) mobileUserProfile.style.display = 'none';
+                if (mobileAuthButton) mobileAuthButton.style.display = 'block';
             }
         }
 
