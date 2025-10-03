@@ -280,8 +280,8 @@
 
         /* Main Content */
         .main-content {
-            margin-top: 100px;
-            padding: 2rem 0;
+            margin-top: 80px;
+            padding: 1rem 0;
             position: relative;
             z-index: 3;
         }
@@ -294,19 +294,19 @@
 
         .page-header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
         }
 
         .page-title {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: 700;
             color: #ffffff;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
         }
 
         .page-subtitle {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: #aaaaaa;
             font-weight: 400;
         }
@@ -315,7 +315,7 @@
         .cart-content {
             display: flex;
             gap: 2rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
         }
 
         .cart-items {
@@ -323,21 +323,21 @@
             background: rgba(26, 26, 26, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
-            padding: 1.5rem;
+            padding: 1rem;
         }
 
         .cart-items-title {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: 600;
             color: #ffffff;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
         }
 
         .cart-item {
             display: flex;
             align-items: center;
             gap: 1rem;
-            padding: 1rem 0;
+            padding: 0.8rem 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
@@ -346,14 +346,15 @@
         }
 
         .item-image {
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            border-radius: 8px;
+            border-radius: 6px;
             position: relative;
             overflow: hidden;
+            flex-shrink: 0;
         }
 
         .item-image.ice-overlay::before {
@@ -376,33 +377,38 @@
 
         .item-details {
             flex: 1;
+            min-width: 0;
         }
 
         .item-name {
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 600;
             color: #ffffff;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.2rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .item-size {
             color: #aaaaaa;
-            font-size: 0.8rem;
-            margin-bottom: 0.25rem;
+            font-size: 0.75rem;
+            margin-bottom: 0.2rem;
         }
 
         .item-price {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 700;
             color: #87ceeb;
             font-family: 'Space Grotesk', sans-serif;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
         }
 
         .item-quantity {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.5rem;
+            flex-shrink: 0;
         }
 
         .quantity-btn {
