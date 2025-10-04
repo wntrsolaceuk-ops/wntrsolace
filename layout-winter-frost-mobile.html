@@ -819,8 +819,26 @@
 
         // Debug functions
         function showDebugPanel() {
+            console.log('showDebugPanel called');
+            alert('Debug button clicked!');
+            
             const debugPanel = document.getElementById('debugPanel');
             const debugData = document.getElementById('debugData');
+            
+            console.log('debugPanel element:', debugPanel);
+            console.log('debugData element:', debugData);
+            
+            if (!debugPanel) {
+                console.error('Debug panel not found!');
+                alert('Debug panel not found!');
+                return;
+            }
+            
+            if (!debugData) {
+                console.error('Debug data element not found!');
+                alert('Debug data element not found!');
+                return;
+            }
             
             // Collect debug information
             const debugInfo = {
@@ -850,6 +868,8 @@
                 }
             };
             
+            console.log('Debug info collected:', debugInfo);
+            
             // Try to get Supabase user data
             if (supabase) {
                 supabase.auth.getUser().then(({ data: { user }, error }) => {
@@ -861,15 +881,20 @@
                     } : { error: error?.message || 'No user found' };
                     
                     debugData.textContent = JSON.stringify(debugInfo, null, 2);
+                    console.log('Debug panel should be visible now');
                 }).catch(err => {
                     debugInfo.supabase.user = { error: err.message };
                     debugData.textContent = JSON.stringify(debugInfo, null, 2);
+                    console.log('Debug panel should be visible now (error case)');
                 });
             } else {
                 debugData.textContent = JSON.stringify(debugInfo, null, 2);
+                console.log('Debug panel should be visible now (no supabase)');
             }
             
+            console.log('Adding active class to debug panel');
             debugPanel.classList.add('active');
+            console.log('Debug panel classes:', debugPanel.className);
         }
 
         function closeDebugPanel() {
