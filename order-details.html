@@ -1469,60 +1469,19 @@
 
             console.log('Loading fresh tracking data...');
 
-            try {
-                // Get real tracking data from Track123 API
-                const response = await fetch('http://localhost:3001/api/track', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        trackingNumber: currentOrder.tracking_number,
-                        carrier: currentOrder.shipping_company
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const trackingData = await response.json();
-                console.log('Track123 response:', trackingData);
-
-                // Cache the data for 24 hours
-                const cacheKey = `tracking_${currentOrder.tracking_number}`;
-                localStorage.setItem(cacheKey, JSON.stringify({
-                    data: trackingData,
-                    timestamp: Date.now()
-                }));
-
-                // Store tracking data globally for history access
-                window.currentTrackingData = trackingData;
-
-                // Update tracking details with real data
-                updateTrackingDetails(trackingData);
-
-                // Format Track123 data for display
-                const formattedData = formatTrack123Data(trackingData);
-                displayTrackingTimeline(formattedData);
-
-            } catch (error) {
-                console.error('Error loading tracking data:', error);
-                console.log('Falling back to simulated tracking...');
-                
-                // Fallback to simulated tracking if API fails
-                const trackingEvents = generateTrackingEvents(currentOrder.status, currentOrder.created_at);
-                const fallbackData = { events: trackingEvents };
-                
-                // Cache the fallback data too
-                const cacheKey = `tracking_${currentOrder.tracking_number}`;
-                localStorage.setItem(cacheKey, JSON.stringify({
-                    data: fallbackData,
-                    timestamp: Date.now()
-                }));
-                
-                displayTrackingTimeline(fallbackData);
-            }
+            // Generate simulated tracking data based on order status
+            console.log('Generating tracking data for status:', currentOrder.status);
+            const trackingEvents = generateTrackingEvents(currentOrder.status, currentOrder.created_at);
+            const trackingData = { events: trackingEvents };
+            
+            // Cache the data for 24 hours
+            const cacheKey = `tracking_${currentOrder.tracking_number}`;
+            localStorage.setItem(cacheKey, JSON.stringify({
+                data: trackingData,
+                timestamp: Date.now()
+            }));
+            
+            displayTrackingTimeline(trackingData);
         }
 
         // Format Track123 data for display
@@ -1582,31 +1541,29 @@
 
         // Create 4 shipping steps
         function createShippingSteps() {
-            const shippingSteps = document.getElementById('shippingSteps');
-            shippingSteps.innerHTML = '';
+            const progressSteps = document.querySelector('.progress-steps');
+            if (!progressSteps) {
+                console.log('Progress steps element not found');
+                return;
+            }
 
-            const steps = [
-                { icon: '✓', label: 'Shipped', position: 0 },
-                { icon: '✓', label: 'Sorting Center', position: 1 },
-                { icon: '✓', label: 'Local Depot', position: 2 },
-                { icon: '✓', label: 'Delivered', position: 3 }
-            ];
-
+            // Update the existing progress steps based on order status
+            const status = currentOrder.status;
+            const steps = progressSteps.querySelectorAll('.step');
+            
             steps.forEach((step, index) => {
-                const stepElement = document.createElement('div');
-                stepElement.className = 'shipping-step';
+                step.classList.remove('completed', 'current', 'pending');
                 
-                const iconElement = document.createElement('div');
-                iconElement.className = 'step-icon';
-                iconElement.textContent = step.icon;
-                
-                const labelElement = document.createElement('div');
-                labelElement.className = 'step-label';
-                labelElement.textContent = step.label;
-                
-                stepElement.appendChild(iconElement);
-                stepElement.appendChild(labelElement);
-                shippingSteps.appendChild(stepElement);
+                if (status === 'processing' && index === 0) {
+                    step.classList.add('current');
+                } else if (status === 'shipped' && index <= 1) {
+                    step.classList.add('completed');
+                    if (index === 1) step.classList.add('current');
+                } else if (status === 'delivered' && index <= 3) {
+                    step.classList.add('completed');
+                } else if (index > 0) {
+                    step.classList.add('pending');
+                }
             });
         }
 
