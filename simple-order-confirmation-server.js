@@ -41,8 +41,11 @@ app.post('/api/send-simple-confirmation', async (req, res) => {
         let totalAmount = orderData.total_amount || 0;
         
         orderItems.forEach(item => {
-            const itemTotal = item.price * item.quantity;
-            orderSummary += `• ${item.name} - £${item.price} x ${item.quantity} = £${itemTotal.toFixed(2)}\n`;
+            const itemPrice = item.price || item.product_price || 0;
+            const itemQuantity = item.quantity || 1;
+            const itemName = item.name || item.product_name || 'Product';
+            const itemTotal = itemPrice * itemQuantity;
+            orderSummary += `• ${itemName} - £${itemPrice} x ${itemQuantity} = £${itemTotal.toFixed(2)}\n`;
         });
 
         const mailOptions = {

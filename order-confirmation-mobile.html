@@ -601,13 +601,7 @@
                     .from('orders')
                     .select(`
                         *,
-                        order_items (
-                            *,
-                            products (
-                                name,
-                                main_image_public_id
-                            )
-                        )
+                        order_items (*)
                     `)
                     .eq('order_number', orderNumber)
                     .single();
@@ -650,8 +644,8 @@
             document.getElementById('orderId').textContent = order.order_number;
             document.getElementById('orderDate').textContent = new Date(order.created_at).toLocaleDateString();
             document.getElementById('orderStatus').textContent = order.status || 'Processing';
-            document.getElementById('orderEmail').textContent = order.customer_email;
-            document.getElementById('orderTotal').textContent = `$${(order.total_amount || 0).toFixed(2)}`;
+            document.getElementById('orderEmail').textContent = order.email;
+            document.getElementById('orderTotal').textContent = `£${(order.total || 0).toFixed(2)}`;
 
             // Render order items
             const orderItemsList = document.getElementById('orderItemsList');
@@ -660,13 +654,13 @@
                     const itemTotal = (item.price || 0) * (item.quantity || 1);
                     return `
                         <div class="order-item">
-                            <div class="order-item-image" style="background-image: url('${getCloudinaryUrl(item.products?.main_image_public_id || 'front_g9w8zc', 120, 120)}')"></div>
+                            <div class="order-item-image" style="background-image: url('${getCloudinaryUrl('front_g9w8zc', 120, 120)}')"></div>
                             <div class="order-item-details">
-                                <div class="order-item-name">${item.products?.name || 'Product'}</div>
+                                <div class="order-item-name">${item.product_name || 'Product'}</div>
                                 <div class="order-item-meta">Size: ${item.size} • Qty: ${item.quantity}</div>
-                                <div class="order-item-price">$${item.price.toFixed(2)} each</div>
+                                <div class="order-item-price">£${item.price.toFixed(2)} each</div>
                             </div>
-                            <div class="order-item-total">$${itemTotal.toFixed(2)}</div>
+                            <div class="order-item-total">£${itemTotal.toFixed(2)}</div>
                         </div>
                     `;
                 }).join('');

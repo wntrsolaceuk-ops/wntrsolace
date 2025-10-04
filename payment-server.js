@@ -187,8 +187,7 @@ app.post('/api/complete-order', async (req, res) => {
                         product_name: item.name || item.product_name,
                         price: item.price || item.product_price,
                         quantity: item.quantity,
-                        size: item.size,
-                        image_url: item.image || item.image_url
+                        size: item.size
                     }));
                     
                     const { error: itemsError } = await supabase
