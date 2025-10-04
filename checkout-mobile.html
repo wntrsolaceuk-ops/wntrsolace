@@ -1350,15 +1350,17 @@
                     throw new Error('Failed to process order');
                 }
                 
+                const responseData = await response.json();
                 debugLog('Order processed successfully', 'success');
+                debugLog(`Server returned order number: ${responseData.orderNumber}`, 'info');
                 
                 // Clear cart
                 localStorage.removeItem('cart');
                 debugLog('Cart cleared', 'info');
                 
-                // Redirect to confirmation with order number
+                // Redirect to confirmation with order number from server
                 debugLog('Redirecting to confirmation page...', 'info');
-                window.location.href = `order-confirmation-mobile.html?order=${orderData.order_number}`;
+                window.location.href = `order-confirmation-mobile.html?order=${responseData.orderNumber}`;
                 
             } catch (error) {
                 console.error('Order processing error:', error);
