@@ -503,6 +503,95 @@
         html {
             scroll-behavior: smooth;
         }
+
+        /* Debug Panel */
+        .debug-panel {
+            position: fixed;
+            top: 70px;
+            right: 10px;
+            width: 280px;
+            max-height: 300px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #c8e6ff;
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 11px;
+            color: #ffffff;
+            z-index: 10001;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            display: none;
+        }
+
+        .debug-panel.active {
+            display: block;
+        }
+
+        .debug-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #c8e6ff;
+        }
+
+        .debug-title {
+            font-weight: bold;
+            color: #c8e6ff;
+        }
+
+        .debug-toggle {
+            background: #c8e6ff;
+            color: #000000;
+            border: none;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .debug-entry {
+            margin-bottom: 5px;
+            padding: 3px;
+            border-radius: 3px;
+        }
+
+        .debug-entry.info {
+            background: rgba(33, 150, 243, 0.2);
+            border-left: 3px solid #2196F3;
+        }
+
+        .debug-entry.success {
+            background: rgba(76, 175, 80, 0.2);
+            border-left: 3px solid #4CAF50;
+        }
+
+        .debug-entry.error {
+            background: rgba(244, 67, 54, 0.2);
+            border-left: 3px solid #f44336;
+        }
+
+        .debug-entry.warning {
+            background: rgba(255, 193, 7, 0.2);
+            border-left: 3px solid #FFC107;
+        }
+
+        .debug-time {
+            color: #888;
+            font-size: 9px;
+        }
+
+        .debug-clear {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
@@ -515,6 +604,18 @@
         <div class="ice-crystal">❆</div>
     </div>
 
+    <!-- Debug Panel -->
+    <div class="debug-panel" id="debugPanel">
+        <div class="debug-header">
+            <span class="debug-title">🐛 Debug Console</span>
+            <div>
+                <button class="debug-toggle" onclick="toggleDebug()">Hide</button>
+                <button class="debug-clear" onclick="clearDebug()">Clear</button>
+            </div>
+        </div>
+        <div id="debugLog"></div>
+    </div>
+
     <!-- Header -->
     <header class="header">
         <nav class="nav">
@@ -523,6 +624,8 @@
             </a>
             
             <div class="nav-right">
+                <button class="debug-toggle" onclick="toggleDebug()" style="background: #c8e6ff; color: #000; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-right: 8px;">🐛</button>
+                
                 <div class="user-section" id="userSection" onclick="handleUserClick()">
                     <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -730,15 +833,15 @@
                 }
                 
                 if (typeof window.supabase === 'undefined') {
-                    console.log('Supabase library not loaded after 1 second, continuing without it');
+                    debugLog('Supabase library not loaded after 1 second, continuing without it', 'warning');
                     return false;
                 }
                 
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                console.log('Supabase initialized successfully');
+                debugLog('Supabase initialized successfully', 'success');
                 return true;
             } catch (error) {
-                console.log('Supabase initialization failed, continuing without it:', error.message);
+                debugLog(`Supabase initialization failed: ${error.message}`, 'error');
                 return false;
             }
         }
@@ -872,8 +975,50 @@
             }
         }
 
+        // Debug logging
+        function debugLog(message, type = 'info') {
+            const debugLog = document.getElementById('debugLog');
+            const time = new Date().toLocaleTimeString();
+            
+            const entry = document.createElement('div');
+            entry.className = `debug-entry ${type}`;
+            entry.innerHTML = `
+                <div class="debug-time">${time}</div>
+                <div>${message}</div>
+            `;
+            
+            debugLog.appendChild(entry);
+            debugLog.scrollTop = debugLog.scrollHeight;
+            
+            // Keep only last 20 entries
+            while (debugLog.children.length > 20) {
+                debugLog.removeChild(debugLog.firstChild);
+            }
+        }
+
+        // Toggle debug panel
+        function toggleDebug() {
+            const panel = document.getElementById('debugPanel');
+            const button = document.querySelector('.debug-toggle');
+            
+            if (panel.classList.contains('active')) {
+                panel.classList.remove('active');
+                button.textContent = 'Show';
+            } else {
+                panel.classList.add('active');
+                button.textContent = 'Hide';
+            }
+        }
+
+        // Clear debug log
+        function clearDebug() {
+            document.getElementById('debugLog').innerHTML = '';
+        }
+
         // Show notification
         function showNotification(message, type = 'info') {
+            debugLog(`Notification: ${message}`, type);
+            
             const notification = document.createElement('div');
             notification.style.cssText = `
                 position: fixed;
@@ -959,6 +1104,8 @@
         // Initialize Stripe
         async function initStripe() {
             try {
+                debugLog(`Initializing Stripe with key: ${STRIPE_PUBLISHABLE_KEY.substring(0, 20)}...`, 'info');
+                
                 stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
                 elements = stripe.elements();
                 
@@ -980,14 +1127,17 @@
                     const displayError = document.getElementById('card-errors');
                     if (event.error) {
                         displayError.textContent = event.error.message;
+                        debugLog(`Card validation error: ${event.error.message}`, 'error');
                     } else {
                         displayError.textContent = '';
+                        debugLog('Card validation successful', 'success');
                     }
                 });
                 
-                console.log('Stripe initialized successfully');
+                debugLog('Stripe initialized successfully', 'success');
             } catch (error) {
                 console.error('Error initializing Stripe:', error);
+                debugLog(`Stripe initialization failed: ${error.message}`, 'error');
             }
         }
 
@@ -996,26 +1146,42 @@
             const checkoutBtn = document.getElementById('stripeCheckoutBtn');
             const originalText = checkoutBtn.textContent;
             
+            debugLog('Starting payment process...', 'info');
             checkoutBtn.disabled = true;
             checkoutBtn.textContent = 'Processing...';
             
             try {
+                const amount = Math.round(parseFloat(document.getElementById('total').textContent.replace('£', '')) * 100);
+                debugLog(`Payment amount: £${amount/100} (${amount} pence)`, 'info');
+                debugLog(`Cart items: ${cart.length}`, 'info');
+                
                 // Create payment intent
+                debugLog('Creating payment intent...', 'info');
                 const response = await fetch('https://wntrsolace-payment.onrender.com/api/create-payment-intent', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        amount: Math.round(parseFloat(document.getElementById('total').textContent.replace('£', '')) * 100),
+                        amount: amount,
                         currency: 'gbp',
                         items: cart
                     })
                 });
                 
+                debugLog(`Payment intent response status: ${response.status}`, response.ok ? 'success' : 'error');
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    debugLog(`Payment intent error: ${errorText}`, 'error');
+                    throw new Error(`Payment intent failed: ${response.status}`);
+                }
+                
                 const { client_secret } = await response.json();
+                debugLog('Payment intent created successfully', 'success');
                 
                 // Confirm payment
+                debugLog('Confirming payment with Stripe...', 'info');
                 const { error, paymentIntent } = await stripe.confirmCardPayment(client_secret, {
                     payment_method: {
                         card: cardElement,
@@ -1034,14 +1200,18 @@
                 });
                 
                 if (error) {
+                    debugLog(`Stripe payment error: ${error.message}`, 'error');
                     throw error;
                 }
+                
+                debugLog(`Payment confirmed: ${paymentIntent.id}`, 'success');
                 
                 // Process order
                 await processOrder(paymentIntent.id);
                 
             } catch (error) {
                 console.error('Payment error:', error);
+                debugLog(`Payment failed: ${error.message}`, 'error');
                 showNotification('Payment failed: ' + error.message, 'error');
             } finally {
                 checkoutBtn.disabled = false;
@@ -1052,6 +1222,8 @@
         // Process order
         async function processOrder(paymentIntentId) {
             try {
+                debugLog('Processing order...', 'info');
+                
                 const orderData = {
                     order_id: generateOrderNumber(),
                     customer_name: document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value,
@@ -1065,6 +1237,10 @@
                     status: 'confirmed'
                 };
                 
+                debugLog(`Order ID: ${orderData.order_id}`, 'info');
+                debugLog(`Customer: ${orderData.customer_name}`, 'info');
+                debugLog(`Total: £${orderData.total_amount}`, 'info');
+                
                 const response = await fetch('https://wntrsolace-payment.onrender.com/api/complete-order', {
                     method: 'POST',
                     headers: {
@@ -1073,18 +1249,30 @@
                     body: JSON.stringify(orderData)
                 });
                 
+                debugLog(`Order completion response status: ${response.status}`, response.ok ? 'success' : 'error');
+                
                 if (!response.ok) {
+                    const errorText = await response.text();
+                    debugLog(`Order completion error: ${errorText}`, 'error');
                     throw new Error('Failed to process order');
                 }
                 
+                debugLog('Order processed successfully', 'success');
+                
                 // Clear cart
                 localStorage.removeItem('cart');
+                debugLog('Cart cleared', 'info');
+                
+                // Store order ID for confirmation page
+                localStorage.setItem('confirmedOrderId', orderData.order_id);
                 
                 // Redirect to confirmation
-                window.location.href = `order-confirmation-mobile.html?order=${orderData.order_id}`;
+                debugLog('Redirecting to confirmation page...', 'info');
+                window.location.href = `order-confirmation-mobile.html`;
                 
             } catch (error) {
                 console.error('Order processing error:', error);
+                debugLog(`Order processing failed: ${error.message}`, 'error');
                 showNotification('Order processing failed. Please contact support.', 'error');
             }
         }
@@ -1111,15 +1299,23 @@
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', async function() {
+            debugLog('Page loaded, initializing...', 'info');
+            debugLog(`Cart items: ${JSON.parse(localStorage.getItem('cart') || '[]').length}`, 'info');
+            debugLog(`User logged in: ${localStorage.getItem('userLoggedIn') === 'true'}`, 'info');
+            
             updateUserProfile();
             updateCartCount();
             loadCart();
             
             // Initialize Supabase
+            debugLog('Initializing Supabase...', 'info');
             await initSupabase();
             
             // Initialize Stripe
+            debugLog('Initializing Stripe...', 'info');
             await initStripe();
+            
+            debugLog('Initialization complete', 'success');
         });
 
         // Listen for cart updates
