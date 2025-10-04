@@ -43,6 +43,36 @@
             50% { opacity: 1; transform: translateX(20px); }
         }
 
+        /* Debug Panel */
+        .debug-panel {
+            position: fixed;
+            top: 70px;
+            right: 10px;
+            width: 280px;
+            max-height: 300px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #c8e6ff;
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 11px;
+            color: #ffffff;
+            z-index: 10001;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            display: none;
+        }
+        .debug-panel.active { display: block; }
+        .debug-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid #c8e6ff; }
+        .debug-title { font-weight: bold; color: #c8e6ff; }
+        .debug-toggle { background: #c8e6ff; color: #000000; border: none; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; }
+        .debug-entry { margin-bottom: 5px; padding: 3px; border-radius: 3px; }
+        .debug-entry.info { background: rgba(33, 150, 243, 0.2); border-left: 3px solid #2196F3; }
+        .debug-entry.success { background: rgba(76, 175, 80, 0.2); border-left: 3px solid #4CAF50; }
+        .debug-entry.error { background: rgba(244, 67, 54, 0.2); border-left: 3px solid #f44336; }
+        .debug-entry.warning { background: rgba(255, 193, 7, 0.2); border-left: 3px solid #FFC107; }
+        .debug-time { color: #888; font-size: 9px; }
+        .debug-clear { background: #ff4444; color: white; border: none; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; margin-left: 5px; }
+
         /* Mobile ice crystals */
         .ice-crystals {
             position: fixed;
@@ -411,6 +441,7 @@
             </a>
             
             <a href="layout-winter-frost-mobile.html" class="back-btn">← Back</a>
+            <button class="debug-toggle" onclick="toggleDebug()" style="background: #c8e6ff; color: #000; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">🐛</button>
         </nav>
     </header>
 
@@ -486,6 +517,18 @@
         </div>
     </main>
 
+    <!-- Debug Panel -->
+    <div class="debug-panel" id="debugPanel">
+        <div class="debug-header">
+            <span class="debug-title">🐛 Debug Console</span>
+            <div>
+                <button class="debug-toggle" onclick="toggleDebug()">Hide</button>
+                <button class="debug-clear" onclick="clearDebug()">Clear</button>
+            </div>
+        </div>
+        <div id="debugLog"></div>
+    </div>
+
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script>
         // Supabase configuration
@@ -495,14 +538,36 @@
         
         let supabase;
 
+        // Debug functions
+        function debugLog(message, type = 'info') {
+            const debugLog = document.getElementById('debugLog');
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = `debug-entry ${type}`;
+            entry.innerHTML = `<span class="debug-time">[${time}]</span> ${message}`;
+            debugLog.appendChild(entry);
+            debugLog.scrollTop = debugLog.scrollHeight;
+        }
+
+        function toggleDebug() {
+            const panel = document.getElementById('debugPanel');
+            panel.classList.toggle('active');
+        }
+
+        function clearDebug() {
+            document.getElementById('debugLog').innerHTML = '';
+        }
+
         // Initialize Supabase
         async function initSupabase() {
             try {
+                debugLog('Initializing Supabase...', 'info');
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                console.log('Supabase initialized successfully');
+                debugLog('Supabase initialized successfully', 'success');
                 return true;
             } catch (error) {
                 console.error('Error initializing Supabase:', error);
+                debugLog(`Supabase initialization failed: ${error.message}`, 'error');
                 return false;
             }
         }
@@ -514,15 +579,24 @@
 
         // Load order details
         async function loadOrderDetails() {
+            debugLog('Starting to load order details...', 'info');
+            
             const urlParams = new URLSearchParams(window.location.search);
             const orderNumber = urlParams.get('order');
             
+            debugLog(`URL params: ${window.location.search}`, 'info');
+            debugLog(`Order number from URL: ${orderNumber}`, orderNumber ? 'success' : 'error');
+            
             if (!orderNumber) {
+                debugLog('No order number found in URL', 'error');
                 showError();
                 return;
             }
 
             try {
+                debugLog('Querying Supabase for order...', 'info');
+                debugLog(`Query: orders table, order_number = ${orderNumber}`, 'info');
+                
                 const { data: order, error } = await supabase
                     .from('orders')
                     .select(`
@@ -538,12 +612,30 @@
                     .eq('order_number', orderNumber)
                     .single();
 
-                if (error) throw error;
+                debugLog(`Supabase query completed`, 'info');
+                debugLog(`Query result - Order: ${order ? 'Found' : 'Not found'}, Error: ${error ? error.message : 'None'}`, order ? 'success' : 'error');
 
+                if (error) {
+                    debugLog(`Supabase error: ${error.message}`, 'error');
+                    debugLog(`Error code: ${error.code}`, 'error');
+                    debugLog(`Error details: ${JSON.stringify(error)}`, 'error');
+                    throw error;
+                }
+
+                if (!order) {
+                    debugLog('No order data returned from Supabase', 'error');
+                    throw new Error('Order not found in database');
+                }
+
+                debugLog(`Order found: ${order.order_number}`, 'success');
+                debugLog(`Order items count: ${order.order_items ? order.order_items.length : 0}`, 'info');
+                
                 renderOrderDetails(order);
                 
             } catch (error) {
                 console.error('Error loading order details:', error);
+                debugLog(`Error loading order: ${error.message}`, 'error');
+                debugLog(`Error stack: ${error.stack}`, 'error');
                 showError();
             }
         }
@@ -591,14 +683,19 @@
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', async function() {
+            debugLog('Page loaded, starting initialization...', 'info');
+            
             // Initialize Supabase
+            debugLog('Initializing Supabase...', 'info');
             const supabaseInitialized = await initSupabase();
             if (!supabaseInitialized) {
+                debugLog('Supabase initialization failed, showing error', 'error');
                 showError();
                 return;
             }
 
             // Load order details
+            debugLog('Loading order details...', 'info');
             await loadOrderDetails();
         });
     </script>
