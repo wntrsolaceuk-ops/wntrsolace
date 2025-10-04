@@ -66,12 +66,27 @@ app.post('/api/complete-order', async (req, res) => {
         console.log('=== COMPLETE ORDER REQUEST ===');
         console.log('Order data received:', JSON.stringify(orderData, null, 2));
         
-        // Use the order ID from the request, don't generate a new one
-        const orderNumber = orderData.order_id;
+        // Handle both desktop and mobile formats
+        const orderNumber = orderData.order_id || orderData.order_number;
         
         // Store payment intent ID for refund tracking
         const paymentIntentId = orderData.payment_intent_id;
         console.log('Payment Intent ID for tracking:', paymentIntentId);
+        
+        // Extract customer info from either format
+        const customerName = orderData.customer_name || `${orderData.first_name || ''} ${orderData.last_name || ''}`.trim() || 'Customer';
+        const customerEmail = orderData.customer_email || orderData.email || 'customer@example.com';
+        const customerPhone = orderData.customer_phone || orderData.phone || '';
+        
+        // Handle shipping address from either format
+        let shippingAddress = 'Address not provided';
+        if (orderData.shipping_address) {
+            if (typeof orderData.shipping_address === 'string') {
+                shippingAddress = orderData.shipping_address;
+            } else if (typeof orderData.shipping_address === 'object') {
+                shippingAddress = `${orderData.shipping_address.street || ''}, ${orderData.shipping_address.city || ''}, ${orderData.shipping_address.state || ''} ${orderData.shipping_address.zip || ''}, ${orderData.shipping_address.country || ''}`.trim().replace(/,\s*,/g, ',').replace(/^,\s*/, '').replace(/,\s*$/, '');
+            }
+        }
         
         // Send order confirmation email using simple server
         console.log('About to send email to simple confirmation server...');
@@ -79,9 +94,9 @@ app.post('/api/complete-order', async (req, res) => {
             const emailPayload = {
                 orderData: {
                     order_id: orderNumber,
-                    customer_name: orderData.customer_name || 'Customer',
-                    customer_email: orderData.customer_email || 'customer@example.com',
-                    shipping_address: orderData.shipping_address || 'Address not provided',
+                    customer_name: customerName,
+                    customer_email: customerEmail,
+                    shipping_address: shippingAddress,
                     payment_intent_id: paymentIntentId
                 },
                 orderItems: orderData.items || []
@@ -118,12 +133,12 @@ app.post('/api/complete-order', async (req, res) => {
                 .from('orders')
                 .insert({
                     order_id: orderNumber,
-                    customer_name: orderData.customer_name,
-                    customer_email: orderData.customer_email,
-                    customer_phone: orderData.customer_phone,
-                    shipping_address: orderData.shipping_address,
+                    customer_name: customerName,
+                    customer_email: customerEmail,
+                    customer_phone: customerPhone,
+                    shipping_address: shippingAddress,
                     payment_intent_id: paymentIntentId,
-                    total_amount: orderData.total_amount,
+                    total_amount: orderData.total_amount || orderData.total,
                     status: orderData.status || 'confirmed',
                     notes: orderData.notes || ''
                 })
@@ -139,12 +154,12 @@ app.post('/api/complete-order', async (req, res) => {
                 if (orderData.items && orderData.items.length > 0) {
                     const orderItems = orderData.items.map(item => ({
                         order_id: order.id,
-                        product_id: item.id,
-                        product_name: item.name,
-                        price: item.price,
+                        product_id: item.id || item.product_id,
+                        product_name: item.name || item.product_name,
+                        price: item.price || item.product_price,
                         quantity: item.quantity,
                         size: item.size,
-                        image_url: item.image
+                        image_url: item.image || item.image_url
                     }));
                     
                     const { error: itemsError } = await supabase
