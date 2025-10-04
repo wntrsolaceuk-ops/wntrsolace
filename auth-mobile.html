@@ -276,6 +276,22 @@
             text-decoration: underline;
         }
 
+        .forgot-password {
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .forgot-password a {
+            color: #aaaaaa;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .forgot-password a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
         /* Loading State */
         .loading {
             display: none;
@@ -392,6 +408,10 @@
                     <p>Signing in...</p>
                 </div>
             </form>
+
+            <div class="forgot-password">
+                <a href="#" onclick="forgotPassword()">Forgot your password?</a>
+            </div>
 
             <div class="form-toggle">
                 <span class="form-toggle-text">Don't have an account?</span>
@@ -649,6 +669,33 @@
             } finally {
                 document.getElementById('signupLoading').style.display = 'none';
                 document.getElementById('signupBtn').disabled = false;
+            }
+        }
+
+        // Forgot password function
+        async function forgotPassword() {
+            const email = prompt('Enter your email address to reset your password:');
+            if (!email) return;
+            
+            if (!email.includes('@')) {
+                showError('Please enter a valid email address');
+                return;
+            }
+            
+            try {
+                const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: 'https://wntrsolace.uk/reset-password.html'
+                });
+                
+                if (error) {
+                    showError('Error sending reset email: ' + error.message);
+                    return;
+                }
+                
+                showSuccess('Password reset email sent! Check your inbox and follow the instructions.');
+            } catch (error) {
+                console.error('Password reset error:', error);
+                showError('Failed to send reset email. Please try again.');
             }
         }
 

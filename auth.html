@@ -853,8 +853,30 @@
             }
         }
 
-        function forgotPassword() {
-            showNotification('Password reset functionality coming soon! For now, contact support at admin@wintersolace.com', 'info');
+        async function forgotPassword() {
+            const email = prompt('Enter your email address to reset your password:');
+            if (!email) return;
+            
+            if (!email.includes('@')) {
+                showNotification('Please enter a valid email address', 'error');
+                return;
+            }
+            
+            try {
+                const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: 'https://wntrsolace.uk/reset-password.html'
+                });
+                
+                if (error) {
+                    showNotification('Error sending reset email: ' + error.message, 'error');
+                    return;
+                }
+                
+                showNotification('Password reset email sent! Check your inbox and follow the instructions.', 'success');
+            } catch (error) {
+                console.error('Password reset error:', error);
+                showNotification('Failed to send reset email. Please try again.', 'error');
+            }
         }
 
         // Real Google SSO Implementation Guide
