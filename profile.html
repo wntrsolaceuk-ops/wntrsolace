@@ -988,6 +988,16 @@
             // Initialize Supabase
             const supabaseReady = await initSupabase();
             
+            // Check if user is logged in FIRST - redirect if not
+            const { data: { user }, error } = await supabase.auth.getUser();
+            if (error || !user) {
+                console.log('User not logged in, redirecting to login');
+                window.location.href = 'auth.html';
+                return;
+            }
+            
+            console.log('User is logged in:', user.email);
+            
             // Update user profile
             await updateUserProfile();
             console.log('User profile updated, current user:', currentUser);
