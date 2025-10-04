@@ -107,71 +107,68 @@
         .ice-crystal:nth-child(8) { left: 80%; animation-delay: 4.5s; font-size: 19px; }
         .ice-crystal:nth-child(9) { left: 90%; animation-delay: 1.5s; font-size: 21px; }
 
-        /* Header */
+        /* Header - Complete Redesign */
         .header {
             position: fixed;
             top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            background: #000000;
             z-index: 1000;
-            padding: 1rem 0;
+            height: 60px;
+            display: flex;
+            align-items: center;
         }
 
         .nav {
+            width: 100%;
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 2rem;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 2rem;
         }
 
-        .nav-left {
-            justify-self: start;
+        .nav-center {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .logo {
-            height: 60px;
-            filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.1));
-            transition: all 0.3s ease;
-            justify-self: center;
-        }
-
-        .logo:hover {
-            filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.2));
-            transform: scale(1.05);
-        }
-
-        .nav-menu {
-            display: contents;
-            justify-self: center;
-        }
-
-        .nav-link {
+            font-family: 'Dancing Script', cursive;
+            font-size: 24px;
+            font-weight: 400;
             color: #ffffff;
             text-decoration: none;
-            font-weight: 400;
-            font-size: 0.95rem;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            margin: 0 0.5rem;
         }
 
-        .nav-link:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: #c8e6ff;
+        .nav-links {
+            display: flex;
+            gap: 4rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 400;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.7;
         }
 
         .nav-right {
             display: flex;
             align-items: center;
             gap: 1rem;
-            justify-self: end;
         }
 
         .cart-icon {
@@ -627,32 +624,17 @@
     <!-- Header -->
     <header class="header">
         <nav class="nav">
-            <img src="assets/Wntrsolace.png" alt="WinterSolace Logo" class="logo">
-            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
-            <ul class="nav-menu" id="navMenu">
-                <button class="close-btn" onclick="toggleMobileMenu()">×</button>
-                <li><a href="layout-winter-frost.html">Home</a></li>
-                <li><a href="collections.html">Collection</a></li>
-                <li><a href="contact.html">Contact</a></li>
-                <li id="mobileUserProfile" style="display: none;">
-                    <a href="#" onclick="handlePersonClick()">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
-                        <span id="mobileUserName">User Name</span>
-                    </a>
-                </li>
-                <li id="mobileAuthButton" style="display: none;">
-                    <a href="#" onclick="handlePersonClick()">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
-                        Sign In
-                    </a>
-                </li>
-            </ul>
+            <div class="nav-left">
+                <a href="layout-winter-frost.html" class="logo">WinterSolace</a>
+            </div>
+            
+            <div class="nav-center">
+                <ul class="nav-links">
+                    <li><a href="layout-winter-frost.html">Home</a></li>
+                    <li><a href="collections.html">Collection</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
             
             <div class="nav-right">
                 <a href="cart.html" class="cart-icon">
@@ -759,11 +741,29 @@
                     return;
                 }
 
-                const { data: { user } } = await supabase.auth.getUser();
+                // Check if user is logged in via localStorage first
+                const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+                if (!isLoggedIn) {
+                    document.getElementById('userProfile').style.display = 'none';
+                    document.getElementById('loginIcon').style.display = 'flex';
+                    return;
+                }
+
+                const { data: { user }, error } = await supabase.auth.getUser();
+                
+                if (error) {
+                    console.log('Auth error (session missing):', error.message);
+                    // Fallback to localStorage
+                    const username = localStorage.getItem('username') || localStorage.getItem('userData')?.full_name || 'User';
+                    document.getElementById('username').textContent = username;
+                    document.getElementById('userProfile').style.display = 'flex';
+                    document.getElementById('loginIcon').style.display = 'none';
+                    return;
+                }
                 
                 if (user) {
                     currentUser = user;
-                    const username = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
+                    const username = user.user_metadata?.full_name || user.user_metadata?.first_name || user.email?.split('@')[0] || 'User';
                     document.getElementById('username').textContent = username;
                     document.getElementById('userProfile').style.display = 'flex';
                     document.getElementById('loginIcon').style.display = 'none';
@@ -777,7 +777,7 @@
             } catch (error) {
                 console.log('Error updating user profile:', error);
                 // Fallback to localStorage
-                const username = localStorage.getItem('username') || 'User';
+                const username = localStorage.getItem('username') || localStorage.getItem('userData')?.full_name || 'User';
                 document.getElementById('username').textContent = username;
                 document.getElementById('userProfile').style.display = 'flex';
                 document.getElementById('loginIcon').style.display = 'none';
@@ -787,20 +787,59 @@
         // Load orders from Supabase
         async function loadOrders() {
             try {
-                if (!supabase || !currentUser) {
-                    console.log('Supabase or user not available');
+                // Check if user is logged in via localStorage first
+                const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+                if (!isLoggedIn) {
+                    console.log('User not logged in');
                     showEmptyState();
                     return;
                 }
 
-                console.log('Loading orders for user:', currentUser.id);
+                if (!supabase) {
+                    console.log('Supabase not available');
+                    showEmptyState();
+                    return;
+                }
+
+                // Try to get user from Supabase, but fallback to localStorage if session is missing
+                let userId = null;
+                try {
+                    const { data: { user }, error } = await supabase.auth.getUser();
+                    if (user && !error) {
+                        userId = user.id;
+                        currentUser = user;
+                    }
+                } catch (authError) {
+                    console.log('Auth session missing, using localStorage fallback');
+                }
+
+                // If no Supabase user, try to get user ID from localStorage
+                if (!userId) {
+                    const userData = localStorage.getItem('userData');
+                    if (userData) {
+                        try {
+                            const parsedUserData = JSON.parse(userData);
+                            userId = parsedUserData.id;
+                        } catch (e) {
+                            console.log('Could not parse userData from localStorage');
+                        }
+                    }
+                }
+
+                if (!userId) {
+                    console.log('No user ID available');
+                    showEmptyState();
+                    return;
+                }
+
+                console.log('Loading orders for user:', userId);
                 const { data: ordersData, error } = await supabase
                     .from('orders')
                     .select(`
                         *,
                         order_items (*)
                     `)
-                    .eq('user_id', currentUser.id)
+                    .eq('user_id', userId)
                     .order('created_at', { ascending: false });
 
                 if (error) {
