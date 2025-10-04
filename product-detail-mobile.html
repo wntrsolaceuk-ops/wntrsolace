@@ -322,6 +322,137 @@
             border-radius: 12px;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .main-image:hover {
+            transform: scale(1.02);
+        }
+
+        /* Image Overlay Modal */
+        .image-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .image-overlay.active {
+            display: flex;
+        }
+
+        .overlay-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .overlay-image {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 10px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .overlay-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(200, 230, 255, 0.3);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #c8e6ff;
+        }
+
+        .overlay-nav:hover {
+            background: rgba(200, 230, 255, 0.2);
+            border-color: rgba(200, 230, 255, 0.5);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .overlay-nav.prev {
+            left: -70px;
+        }
+
+        .overlay-nav.next {
+            right: -70px;
+        }
+
+        .overlay-close {
+            position: absolute;
+            top: -60px;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(200, 230, 255, 0.3);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #c8e6ff;
+        }
+
+        .overlay-close:hover {
+            background: rgba(220, 53, 69, 0.3);
+            border-color: rgba(220, 53, 69, 0.5);
+            transform: scale(1.1);
+        }
+
+        .overlay-counter {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(200, 230, 255, 0.3);
+            border-radius: 20px;
+            padding: 8px 16px;
+            color: #c8e6ff;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .overlay-nav {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .overlay-nav.prev {
+                left: -50px;
+            }
+            
+            .overlay-nav.next {
+                right: -50px;
+            }
+            
+            .overlay-close {
+                top: -50px;
+                width: 35px;
+                height: 35px;
+            }
         }
 
         .preorder-badge {
@@ -735,7 +866,7 @@
                 <div class="product-detail">
                     <div class="product-image-section">
                         <div class="main-image-container">
-                            <div class="main-image" id="mainImage">
+                            <div class="main-image" id="mainImage" onclick="openImageOverlay()">
                                 <div class="preorder-badge" id="preorderBadge" style="display: none;">Pre-Order</div>
                             </div>
                             <div class="nav-buttons">
@@ -902,6 +1033,7 @@
         let currentProduct = null;
         let currentImageIndex = 0;
         let selectedSize = 'L';
+        let currentOverlayImageIndex = 0;
         let quantity = 1;
 
         // Initialize Supabase
@@ -1004,25 +1136,53 @@
             const mainImage = document.getElementById('mainImage');
             const thumbnailGallery = document.getElementById('thumbnailGallery');
 
+            // Reset allImages array
+            allImages = [];
+
             if (product.image_variants && product.image_variants.length > 0) {
-                // Use image variants
-                const firstImage = product.image_variants[0];
+                // Add main image first if it exists
+                if (product.main_image_public_id) {
+                    allImages.push({
+                        public_id: product.main_image_public_id,
+                        type: 'main'
+                    });
+                }
+
+                // Add image variants
+                product.image_variants.forEach(variant => {
+                    allImages.push({
+                        public_id: variant.public_id,
+                        type: 'variant'
+                    });
+                });
+
+                // Use first image (main image if available, otherwise first variant)
+                const firstImage = allImages[0];
                 const imageUrl = getCloudinaryUrl(firstImage.public_id, 400, 400);
                 mainImage.style.backgroundImage = `url('${imageUrl}')`;
 
                 // Render thumbnails
-                thumbnailGallery.innerHTML = product.image_variants.map((variant, index) => `
+                thumbnailGallery.innerHTML = allImages.map((image, index) => `
                     <div class="thumbnail ${index === 0 ? 'active' : ''}" 
                          onclick="selectImage(${index})"
-                         style="background-image: url('${getCloudinaryUrl(variant.public_id, 120, 120)}')">
+                         style="background-image: url('${getCloudinaryUrl(image.public_id, 120, 120)}')">
                     </div>
                 `).join('');
             } else {
-                // Use main image
-                const imageUrl = getCloudinaryUrl(product.main_image_public_id, 400, 400);
-                mainImage.style.backgroundImage = `url('${imageUrl}')`;
+                // Use main image only
+                if (product.main_image_public_id) {
+                    allImages.push({
+                        public_id: product.main_image_public_id,
+                        type: 'main'
+                    });
+                    const imageUrl = getCloudinaryUrl(product.main_image_public_id, 400, 400);
+                    mainImage.style.backgroundImage = `url('${imageUrl}')`;
+                }
                 thumbnailGallery.innerHTML = '';
             }
+
+            // Reset overlay index
+            currentOverlayImageIndex = 0;
         }
 
         // Render size options
@@ -1267,6 +1427,60 @@
             }, 3000);
         }
 
+        // Image Overlay Functions
+        function openImageOverlay() {
+            if (allImages.length === 0) return;
+            
+            const overlay = document.getElementById('imageOverlay');
+            const overlayImage = document.getElementById('overlayImage');
+            const overlayCounter = document.getElementById('overlayCounter');
+            
+            currentOverlayImageIndex = currentImageIndex;
+            updateOverlayImage();
+            updateOverlayCounter();
+            
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeImageOverlay() {
+            const overlay = document.getElementById('imageOverlay');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function previousOverlayImage() {
+            if (allImages.length === 0) return;
+            
+            currentOverlayImageIndex = (currentOverlayImageIndex - 1 + allImages.length) % allImages.length;
+            updateOverlayImage();
+            updateOverlayCounter();
+        }
+
+        function nextOverlayImage() {
+            if (allImages.length === 0) return;
+            
+            currentOverlayImageIndex = (currentOverlayImageIndex + 1) % allImages.length;
+            updateOverlayImage();
+            updateOverlayCounter();
+        }
+
+        function updateOverlayImage() {
+            if (allImages.length === 0) return;
+            
+            const overlayImage = document.getElementById('overlayImage');
+            const currentImage = allImages[currentOverlayImageIndex];
+            const imageUrl = getCloudinaryUrl(currentImage.public_id, 800, 800);
+            
+            overlayImage.src = imageUrl;
+            overlayImage.alt = `Product Image ${currentOverlayImageIndex + 1}`;
+        }
+
+        function updateOverlayCounter() {
+            const overlayCounter = document.getElementById('overlayCounter');
+            overlayCounter.textContent = `${currentOverlayImageIndex + 1} / ${allImages.length}`;
+        }
+
         // Initialize page
         document.addEventListener('DOMContentLoaded', async function() {
             updateUserProfile();
@@ -1280,6 +1494,31 @@
                 console.error('Failed to initialize Supabase');
                 loadFallbackProduct();
             }
+            
+            // Add keyboard event listeners for overlay
+            document.addEventListener('keydown', function(e) {
+                const overlay = document.getElementById('imageOverlay');
+                if (!overlay.classList.contains('active')) return;
+                
+                switch(e.key) {
+                    case 'Escape':
+                        closeImageOverlay();
+                        break;
+                    case 'ArrowLeft':
+                        previousOverlayImage();
+                        break;
+                    case 'ArrowRight':
+                        nextOverlayImage();
+                        break;
+                }
+            });
+            
+            // Close overlay when clicking outside the image
+            document.getElementById('imageOverlay').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeImageOverlay();
+                }
+            });
         });
 
         // Listen for cart updates
@@ -1289,5 +1528,33 @@
             }
         });
     </script>
+
+    <!-- Image Overlay Modal -->
+    <div class="image-overlay" id="imageOverlay">
+        <div class="overlay-content">
+            <button class="overlay-close" onclick="closeImageOverlay()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            
+            <button class="overlay-nav prev" onclick="previousOverlayImage()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15,18 9,12 15,6"></polyline>
+                </svg>
+            </button>
+            
+            <img class="overlay-image" id="overlayImage" src="" alt="Product Image">
+            
+            <button class="overlay-nav next" onclick="nextOverlayImage()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9,18 15,12 9,6"></polyline>
+                </svg>
+            </button>
+            
+            <div class="overlay-counter" id="overlayCounter">1 / 1</div>
+        </div>
+    </div>
 </body>
 </html>
