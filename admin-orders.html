@@ -2154,23 +2154,39 @@
         // Process Stripe refund
         async function processStripeRefund(orderId, paymentIntentId, amount) {
             try {
+                console.log('=== PROCESSING STRIPE REFUND ===');
+                console.log('Order ID:', orderId);
+                console.log('Payment Intent ID:', paymentIntentId);
+                console.log('Refund Amount (pounds):', amount);
+                console.log('Refund Amount (cents):', Math.round(amount * 100));
+                
+                const refundData = {
+                    payment_intent_id: paymentIntentId,
+                    amount: Math.round(amount * 100) // Convert pounds to cents
+                };
+                
+                console.log('Sending refund request to:', 'https://wntrsolace-payment.onrender.com/api/process-refund');
+                console.log('Refund payload:', refundData);
+                
                 const response = await fetch('https://wntrsolace-payment.onrender.com/api/process-refund', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        payment_intent_id: paymentIntentId,
-                        amount: Math.round(amount * 100) // Convert pounds to cents
-                    })
+                    body: JSON.stringify(refundData)
                 });
 
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+
                 if (!response.ok) {
-                    throw new Error('Refund failed');
+                    const errorText = await response.text();
+                    console.error('Refund failed - Response:', errorText);
+                    throw new Error(`Refund failed: ${response.status} - ${errorText}`);
                 }
 
                 const result = await response.json();
-                console.log('Refund processed:', result);
+                console.log('Refund processed successfully:', result);
                 
                 // Update order with refund ID
                 const { error } = await supabase
