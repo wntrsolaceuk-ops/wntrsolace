@@ -1276,24 +1276,36 @@
                 debugLog('Processing order...', 'info');
                 
                 const orderData = {
-                    order_id: generateOrderNumber(),
-                    customer_name: document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value,
-                    customer_email: document.getElementById('email').value,
-                    customer_phone: document.getElementById('phone').value,
-                    shipping_address: `${document.getElementById('address').value}, ${document.getElementById('city').value}, ${document.getElementById('postalCode').value}, ${document.getElementById('country').value}`,
-                    payment_intent_id: paymentIntentId,
-                    total_amount: parseFloat(document.getElementById('total').textContent.replace('£', '')),
-                    items: cart,
+                    order_number: generateOrderNumber(),
+                    first_name: document.getElementById('firstName').value,
+                    last_name: document.getElementById('lastName').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    total: parseFloat(document.getElementById('total').textContent.replace('£', '')),
                     notes: document.getElementById('notes').value || '',
-                    status: 'confirmed'
+                    shipping_address: {
+                        street: document.getElementById('address').value,
+                        city: document.getElementById('city').value,
+                        state: '', // Not used in mobile form
+                        zip: document.getElementById('postalCode').value,
+                        country: document.getElementById('country').value
+                    }
                 };
                 
-                debugLog(`Order ID: ${orderData.order_id}`, 'info');
-                debugLog(`Customer: ${orderData.customer_name}`, 'info');
-                debugLog(`Total: £${orderData.total_amount}`, 'info');
+                // Create order items in desktop format
+                const orderItems = cart.map(item => ({
+                    product_name: item.name,
+                    size: item.size,
+                    quantity: item.quantity,
+                    product_price: item.price
+                }));
+                
+                debugLog(`Order Number: ${orderData.order_number}`, 'info');
+                debugLog(`Customer: ${orderData.first_name} ${orderData.last_name}`, 'info');
+                debugLog(`Total: £${orderData.total}`, 'info');
                 
                 debugLog(`Request URL: https://wntrsolace-payment.onrender.com/api/complete-order`, 'info');
-                debugLog(`Order data: ${JSON.stringify({order_id: orderData.order_id, total: orderData.total_amount, items: orderData.items.length})}`, 'info');
+                debugLog(`Order data: ${JSON.stringify({order_number: orderData.order_number, total: orderData.total, items: orderItems.length})}`, 'info');
                 
                 let response;
                 try {
@@ -1302,7 +1314,10 @@
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify(orderData)
+                        body: JSON.stringify({
+                            ...orderData,
+                            items: orderItems
+                        })
                     });
                     debugLog(`Network request completed, status: ${response.status}`, response.ok ? 'success' : 'error');
                 } catch (networkError) {
@@ -1327,7 +1342,7 @@
                 debugLog('Cart cleared', 'info');
                 
                 // Store order ID for confirmation page
-                localStorage.setItem('confirmedOrderId', orderData.order_id);
+                localStorage.setItem('confirmedOrderId', orderData.order_number);
                 
                 // Redirect to confirmation
                 debugLog('Redirecting to confirmation page...', 'info');
