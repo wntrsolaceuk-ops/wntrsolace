@@ -2059,8 +2059,13 @@
             };
 
             try {
+                console.log('=== PROCESSING ORDER CANCELLATION ===');
+                console.log('Order ID:', orderId);
+                console.log('Cancellation data:', cancellationData);
+                
                 // Update order status in database
-                const { error: updateError } = await supabase
+                console.log('Updating order status to cancelled...');
+                const { data: updateData, error: updateError } = await supabase
                     .from('orders')
                     .update({
                         status: 'cancelled',
@@ -2069,13 +2074,18 @@
                         cancellation_date: new Date().toISOString(),
                         refund_amount: cancellationData.refund_amount
                     })
-                    .eq('id', orderId);
+                    .eq('id', orderId)
+                    .select();
+
+                console.log('Update result:', { updateData, updateError });
 
                 if (updateError) {
                     console.error('Error updating order:', updateError);
-                    alert('Error updating order status');
+                    alert('Error updating order status: ' + updateError.message);
                     return;
                 }
+                
+                console.log('Order status updated successfully');
 
                 // Process Stripe refund if requested
                 if (cancellationData.auto_refund) {
