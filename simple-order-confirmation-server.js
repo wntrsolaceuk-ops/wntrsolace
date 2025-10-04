@@ -65,7 +65,7 @@ Date: ${new Date().toLocaleDateString()}
 Items Ordered:
 ${orderSummary}
 
-Total Amount: £${totalAmount.toFixed(2)}
+Total Amount: £${(totalAmount || 0).toFixed(2)}
 
 Shipping Address:
 ${orderData.shipping_address}
@@ -132,10 +132,10 @@ WinterSolace Team
                     <tbody>
                         ${orderItems.map(item => `
                             <tr style="border-bottom: 1px solid #eee;">
-                                <td style="padding: 12px; font-weight: bold;">${item.name}</td>
-                                <td style="padding: 12px; text-align: center;">${item.quantity}</td>
-                                <td style="padding: 12px; text-align: right;">£${item.price.toFixed(2)}</td>
-                                <td style="padding: 12px; text-align: right; font-weight: bold;">£${(item.price * item.quantity).toFixed(2)}</td>
+                                <td style="padding: 12px; font-weight: bold;">${item.name || item.product_name || 'Product'}</td>
+                                <td style="padding: 12px; text-align: center;">${item.quantity || 1}</td>
+                                <td style="padding: 12px; text-align: right;">£${(item.price || item.product_price || 0).toFixed(2)}</td>
+                                <td style="padding: 12px; text-align: right; font-weight: bold;">£${((item.price || item.product_price || 0) * (item.quantity || 1)).toFixed(2)}</td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -233,10 +233,10 @@ WinterSolace Team
                     <tbody>
                         ${orderItems.map(item => `
                             <tr style="border-bottom: 1px solid #eee;">
-                                <td style="padding: 12px; font-weight: bold;">${item.name}</td>
-                                <td style="padding: 12px; text-align: center;">${item.quantity}</td>
-                                <td style="padding: 12px; text-align: right;">£${item.price.toFixed(2)}</td>
-                                <td style="padding: 12px; text-align: right; font-weight: bold;">£${(item.price * item.quantity).toFixed(2)}</td>
+                                <td style="padding: 12px; font-weight: bold;">${item.name || item.product_name || 'Product'}</td>
+                                <td style="padding: 12px; text-align: center;">${item.quantity || 1}</td>
+                                <td style="padding: 12px; text-align: right;">£${(item.price || item.product_price || 0).toFixed(2)}</td>
+                                <td style="padding: 12px; text-align: right; font-weight: bold;">£${((item.price || item.product_price || 0) * (item.quantity || 1)).toFixed(2)}</td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -475,7 +475,7 @@ Date: ${new Date().toLocaleDateString()}
 Items Ordered:
 ${orderSummary}
 
-Total Amount: £${totalAmount.toFixed(2)}
+Total Amount: £${(totalAmount || 0).toFixed(2)}
 
 Shipping Address:
 ${mockOrderData.shipping_address}
