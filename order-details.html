@@ -1149,7 +1149,7 @@
                 </div>
 
                 <!-- Live Tracking - 4-Step Shipping -->
-                <div class="tracking-section" id="trackingSection" style="display: block;">
+                <div class="tracking-section" id="trackingSection" style="display: none;">
                     <div class="tracking-header">
                         <h3 class="section-title">🚚 Shipping Progress</h3>
                         <div class="tracking-number" id="trackingNumber">Tracking: -</div>
@@ -1335,7 +1335,9 @@
 
         // Load tracking information
         function loadTrackingInfo() {
-            if (!currentOrder.tracking_number) {
+            // Only show tracking if order is shipped and has tracking number
+            if (currentOrder.status !== 'shipped' || !currentOrder.tracking_number) {
+                document.getElementById('trackingSection').style.display = 'none';
                 return;
             }
 
