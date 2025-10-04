@@ -837,9 +837,13 @@
                 }
                 
                 if (data.user && !data.user.email_confirmed_at) {
-                    showNotification('Please check your email to confirm your account!', 'success')
+                    // Store success message and redirect to home page
+                    localStorage.setItem('signupSuccess', 'Account created successfully! Please check your email to confirm your account.')
+                    window.location.href = 'layout-winter-frost.html'
                 } else {
                     console.log('Sign up successful:', data.user)
+                    // Store success message and redirect to home page
+                    localStorage.setItem('signupSuccess', 'Account created successfully! Welcome to WinterSolace.')
                     window.location.href = 'layout-winter-frost.html'
                 }
                 

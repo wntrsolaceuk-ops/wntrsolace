@@ -638,12 +638,9 @@
                 
                 if (error) throw error;
                 
-                showSuccess('Account created successfully! Please check your email to verify your account.');
-                
-                // Switch to login form after a delay
-                setTimeout(() => {
-                    showLoginForm();
-                }, 2000);
+                // Store success message and redirect to home page
+                localStorage.setItem('signupSuccess', 'Account created successfully! Please check your email to verify your account.');
+                window.location.href = 'layout-winter-frost-mobile.html';
                 
             } catch (error) {
                 console.error('Signup error:', error);

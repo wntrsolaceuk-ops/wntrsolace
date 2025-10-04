@@ -1172,12 +1172,69 @@
             }
         }
 
+        // Show success message
+        function showSuccessMessage(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #28a745, #20c997);
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+                z-index: 10000;
+                font-family: 'Inter', sans-serif;
+                font-size: 14px;
+                font-weight: 500;
+                max-width: 300px;
+                animation: slideInRight 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            
+            // Add animation keyframes
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideInRight {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOutRight {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Add to page
+            document.body.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease-in';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 5000);
+        }
+
         // Check authentication state on page load
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('=== AUTH STATUS CHECK ===')
             console.log('Supabase available:', !!supabase)
             console.log('localStorage userLoggedIn:', localStorage.getItem('userLoggedIn'))
             console.log('localStorage username:', localStorage.getItem('username'))
+            
+            // Check for signup success message
+            const signupSuccess = localStorage.getItem('signupSuccess');
+            if (signupSuccess) {
+                showSuccessMessage(signupSuccess);
+                localStorage.removeItem('signupSuccess');
+            }
             
             // Update mobile user profile
             await updateUserProfile();

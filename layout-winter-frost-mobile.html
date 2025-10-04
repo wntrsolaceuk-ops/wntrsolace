@@ -605,8 +605,65 @@
             }
         }
 
+        // Show success message
+        function showSuccessMessage(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #28a745, #20c997);
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+                z-index: 10000;
+                font-family: 'Inter', sans-serif;
+                font-size: 14px;
+                font-weight: 500;
+                animation: slideInDown 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            
+            // Add animation keyframes
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideInDown {
+                    from { transform: translateY(-100%); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+                @keyframes slideOutUp {
+                    from { transform: translateY(0); opacity: 1; }
+                    to { transform: translateY(-100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Add to page
+            document.body.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOutUp 0.3s ease-in';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 5000);
+        }
+
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
+            // Check for signup success message
+            const signupSuccess = localStorage.getItem('signupSuccess');
+            if (signupSuccess) {
+                showSuccessMessage(signupSuccess);
+                localStorage.removeItem('signupSuccess');
+            }
+            
             updateUserProfile();
             updateCartCount();
         });
