@@ -1141,6 +1141,40 @@
             }
         }
 
+        // Test network connectivity
+        async function testNetworkConnectivity() {
+            try {
+                debugLog('Testing network connectivity...', 'info');
+                debugLog('Checking payment server health...', 'info');
+                
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+                
+                const testResponse = await fetch('https://wntrsolace-payment.onrender.com/', {
+                    method: 'GET',
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                debugLog(`Network test response: ${testResponse.status}`, testResponse.ok ? 'success' : 'warning');
+                
+                if (testResponse.ok) {
+                    const responseText = await testResponse.text();
+                    debugLog(`Server response: ${responseText.substring(0, 100)}...`, 'info');
+                }
+                
+                return testResponse.ok;
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    debugLog('Network test timed out after 10 seconds', 'error');
+                } else {
+                    debugLog(`Network test failed: ${error.message}`, 'error');
+                    debugLog(`Error type: ${error.name}`, 'error');
+                }
+                return false;
+            }
+        }
+
         // Process Stripe payment
         async function processStripePayment() {
             const checkoutBtn = document.getElementById('stripeCheckoutBtn');
@@ -1151,23 +1185,40 @@
             checkoutBtn.textContent = 'Processing...';
             
             try {
+                // Test network connectivity first
+                const isNetworkOk = await testNetworkConnectivity();
+                if (!isNetworkOk) {
+                    throw new Error('Network connectivity issue - cannot reach payment server');
+                }
                 const amount = Math.round(parseFloat(document.getElementById('total').textContent.replace('£', '')) * 100);
                 debugLog(`Payment amount: £${amount/100} (${amount} pence)`, 'info');
                 debugLog(`Cart items: ${cart.length}`, 'info');
                 
                 // Create payment intent
                 debugLog('Creating payment intent...', 'info');
-                const response = await fetch('https://wntrsolace-payment.onrender.com/api/create-payment-intent', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        amount: amount,
-                        currency: 'gbp',
-                        items: cart
-                    })
-                });
+                debugLog(`Request URL: https://wntrsolace-payment.onrender.com/api/create-payment-intent`, 'info');
+                debugLog(`Request payload: ${JSON.stringify({amount: amount, currency: 'gbp', items: cart.length})}`, 'info');
+                
+                let response;
+                try {
+                    response = await fetch('https://wntrsolace-payment.onrender.com/api/create-payment-intent', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            amount: amount,
+                            currency: 'gbp',
+                            items: cart
+                        })
+                    });
+                    debugLog(`Network request completed, status: ${response.status}`, response.ok ? 'success' : 'error');
+                } catch (networkError) {
+                    debugLog(`Network error: ${networkError.message}`, 'error');
+                    debugLog(`Error type: ${networkError.name}`, 'error');
+                    debugLog(`Error stack: ${networkError.stack}`, 'error');
+                    throw networkError;
+                }
                 
                 debugLog(`Payment intent response status: ${response.status}`, response.ok ? 'success' : 'error');
                 
@@ -1241,13 +1292,25 @@
                 debugLog(`Customer: ${orderData.customer_name}`, 'info');
                 debugLog(`Total: £${orderData.total_amount}`, 'info');
                 
-                const response = await fetch('https://wntrsolace-payment.onrender.com/api/complete-order', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(orderData)
-                });
+                debugLog(`Request URL: https://wntrsolace-payment.onrender.com/api/complete-order`, 'info');
+                debugLog(`Order data: ${JSON.stringify({order_id: orderData.order_id, total: orderData.total_amount, items: orderData.items.length})}`, 'info');
+                
+                let response;
+                try {
+                    response = await fetch('https://wntrsolace-payment.onrender.com/api/complete-order', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(orderData)
+                    });
+                    debugLog(`Network request completed, status: ${response.status}`, response.ok ? 'success' : 'error');
+                } catch (networkError) {
+                    debugLog(`Network error: ${networkError.message}`, 'error');
+                    debugLog(`Error type: ${networkError.name}`, 'error');
+                    debugLog(`Error stack: ${networkError.stack}`, 'error');
+                    throw networkError;
+                }
                 
                 debugLog(`Order completion response status: ${response.status}`, response.ok ? 'success' : 'error');
                 
