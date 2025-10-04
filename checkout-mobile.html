@@ -1282,15 +1282,15 @@
                     last_name: document.getElementById('lastName').value,
                     email: document.getElementById('email').value,
                     phone: document.getElementById('phone').value,
+                    address: document.getElementById('address').value,
+                    city: document.getElementById('city').value,
+                    state: '', // Not used in mobile form
+                    zip_code: document.getElementById('postalCode').value,
+                    country: document.getElementById('country').value,
                     total: parseFloat(document.getElementById('total').textContent.replace('£', '')),
                     notes: document.getElementById('notes').value || '',
-                    shipping_address: {
-                        street: document.getElementById('address').value,
-                        city: document.getElementById('city').value,
-                        state: '', // Not used in mobile form
-                        zip: document.getElementById('postalCode').value,
-                        country: document.getElementById('country').value
-                    }
+                    stripe_payment_intent_id: paymentIntentId,
+                    status: 'processing'
                 };
 
                 // Get user if logged in (same as desktop)
@@ -1375,7 +1375,13 @@
                                 quantity: item.quantity,
                                 price: item.product_price
                             })),
-                            shipping_address: orderData.shipping_address
+                            shipping_address: {
+                                street: orderData.address,
+                                city: orderData.city,
+                                state: orderData.state,
+                                zip: orderData.zip_code,
+                                country: orderData.country
+                            }
                         })
                     });
                     
