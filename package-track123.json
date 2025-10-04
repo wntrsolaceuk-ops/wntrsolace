@@ -1,0 +1,26 @@
+{
+  "name": "wntrsolace-tracking-server",
+  "version": "1.0.0",
+  "description": "Track123 tracking server for WinterSolace",
+  "main": "track123-server.js",
+  "scripts": {
+    "start": "node track123-server.js",
+    "dev": "nodemon track123-server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "tracking",
+    "track123",
+    "shipping",
+    "wintersolace"
+  ],
+  "author": "WinterSolace",
+  "license": "MIT"
+}

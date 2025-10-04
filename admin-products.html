@@ -975,17 +975,26 @@
         // Delete product
         async function deleteProduct(productId) {
             const product = products.find(p => p.id === productId);
-            if (!product) return;
+            if (!product) {
+                console.error('Product not found in local array:', productId);
+                alert('Product not found!');
+                return;
+            }
             
             if (!confirm(`Are you sure you want to delete "${product.name}"?`)) {
                 return;
             }
 
+            console.log('Attempting to delete product:', productId, product.name);
+
             try {
-                const { error } = await supabase
+                const { data, error } = await supabase
                     .from('products')
                     .delete()
-                    .eq('id', productId);
+                    .eq('id', productId)
+                    .select();
+
+                console.log('Delete response:', { data, error });
 
                 if (error) {
                     console.error('Error deleting product:', error);
@@ -993,8 +1002,19 @@
                     return;
                 }
 
-                console.log('Product deleted successfully');
-                await loadProducts(); // Reload products
+                if (!data || data.length === 0) {
+                    console.error('No rows deleted - product may not exist or RLS policy blocking deletion');
+                    alert('Failed to delete product. It may not exist or you may not have permission.');
+                    return;
+                }
+
+                console.log('Product deleted successfully:', data);
+                
+                // Remove from local array immediately
+                products = products.filter(p => p.id !== productId);
+                
+                // Reload products from database
+                await loadProducts();
                 alert('Product deleted successfully!');
             } catch (error) {
                 console.error('Error deleting product:', error);
@@ -1030,6 +1050,27 @@
             closeAddProductModal();
         });
 
+        // Check admin authentication
+        async function checkAdminAuth() {
+            try {
+                const { data: { user }, error } = await supabase.auth.getUser();
+                if (error || !user) {
+                    console.log('No authenticated user, redirecting to login');
+                    window.location.href = 'auth.html?redirect=admin-products.html';
+                    return false;
+                }
+                
+                // Check if user is admin (you can customize this logic)
+                // For now, we'll allow any authenticated user to access admin
+                console.log('User authenticated:', user.email);
+                return true;
+            } catch (error) {
+                console.error('Auth check error:', error);
+                window.location.href = 'auth.html?redirect=admin-products.html';
+                return false;
+            }
+        }
+
         // Initialize admin products page
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Admin Products - Starting initialization...');
@@ -1038,8 +1079,13 @@
             const supabaseReady = await initSupabase();
             
             if (supabaseReady) {
-                // Load products
-                await loadProducts();
+                // Check authentication
+                const isAuthenticated = await checkAdminAuth();
+                
+                if (isAuthenticated) {
+                    // Load products
+                    await loadProducts();
+                }
             }
             
             console.log('Admin Products initialization complete!');

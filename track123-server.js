@@ -19,6 +19,9 @@ const TRACK123_BASE_URL = 'https://api.track123.com/gateway/open-api/tk/v2';
 // Evri API configuration (if we want to call Evri directly)
 const EVRI_API_BASE_URL = 'https://api.evri.com';
 
+// Royal Mail API configuration
+const ROYAL_MAIL_API_BASE_URL = 'https://api.royalmail.net';
+
 // Cache configuration - 24 hours in milliseconds
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 const trackingCache = new Map(); // In-memory cache for tracking data

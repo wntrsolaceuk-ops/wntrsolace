@@ -293,10 +293,16 @@
 
     <script>
         // Simple admin authentication (for demo purposes)
-        const ADMIN_CREDENTIALS = {
-            username: 'admin',
-            password: 'wintersolace2024'
-        };
+        const ADMIN_CREDENTIALS = [
+            {
+                username: 'admin',
+                password: 'wintersolace2024'
+            },
+            {
+                username: 'admin2@wntrsolace.uk',
+                password: 'wintersolace2024'
+            }
+        ];
 
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -305,7 +311,12 @@
             const username = formData.get('username');
             const password = formData.get('password');
             
-            if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+            // Check if credentials match any admin account
+            const validCredentials = ADMIN_CREDENTIALS.find(cred => 
+                cred.username === username && cred.password === password
+            );
+            
+            if (validCredentials) {
                 // Store admin session
                 localStorage.setItem('adminLoggedIn', 'true');
                 localStorage.setItem('adminLoginTime', new Date().toISOString());
