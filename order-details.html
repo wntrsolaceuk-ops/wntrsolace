@@ -1472,27 +1472,54 @@
                 console.log('Cache bypassed - generating fresh data');
             }
 
-            console.log('Loading fresh tracking data...');
+            console.log('Loading fresh tracking data from Track123 API...');
 
-            // Generate simulated tracking data based on order status
-            console.log('Generating tracking data for status:', currentOrder.status);
-            console.log('Order details:', {
-                order_number: currentOrder.order_number,
-                status: currentOrder.status,
-                tracking_number: currentOrder.tracking_number,
-                shipping_company: currentOrder.shipping_company
-            });
-            const trackingEvents = generateTrackingEvents(currentOrder.status, currentOrder.created_at);
-            console.log('Generated tracking events:', trackingEvents);
-            const trackingData = { events: trackingEvents };
-            
-            // Cache the data for 24 hours
-            localStorage.setItem(cacheKey, JSON.stringify({
-                data: trackingData,
-                timestamp: Date.now()
-            }));
-            
-            displayTrackingTimeline(trackingData);
+            try {
+                // Get real tracking data from our Track123 server
+                const response = await fetch('http://localhost:3001/api/track', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        trackingNumber: currentOrder.tracking_number,
+                        carrier: currentOrder.shipping_company
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Track123 API error: ${response.status}`);
+                }
+
+                const trackingData = await response.json();
+                console.log('Track123 API response:', trackingData);
+
+                // Cache the data for 24 hours
+                localStorage.setItem(cacheKey, JSON.stringify({
+                    data: trackingData,
+                    timestamp: Date.now()
+                }));
+
+                // Format and display the real tracking data
+                const formattedData = formatTrack123Data(trackingData);
+                displayTrackingTimeline(formattedData);
+
+            } catch (error) {
+                console.error('Track123 API error:', error);
+                console.log('Falling back to simulated tracking...');
+                
+                // Fallback to simulated tracking if API fails
+                const trackingEvents = generateTrackingEvents(currentOrder.status, currentOrder.created_at);
+                const fallbackData = { events: trackingEvents };
+                
+                // Cache the fallback data
+                localStorage.setItem(cacheKey, JSON.stringify({
+                    data: fallbackData,
+                    timestamp: Date.now()
+                }));
+                
+                displayTrackingTimeline(fallbackData);
+            }
         }
 
         // Format Track123 data for display
