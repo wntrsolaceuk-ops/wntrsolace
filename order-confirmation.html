@@ -547,7 +547,7 @@
         // Update user profile
         async function updateUserProfile() {
             const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
-            const userProfile = document.getElementById('userProfile');
+            const userText = document.getElementById('userText');
             
             if (isLoggedIn) {
                 try {
@@ -556,22 +556,20 @@
                     if (error) {
                         console.error('Error getting user:', error);
                         const username = localStorage.getItem('username') || 'User';
-                        document.getElementById('userName').textContent = username;
+                        if (userText) userText.textContent = username;
                     } else if (user) {
                         const username = user.user_metadata?.full_name || user.email.split('@')[0];
-                        document.getElementById('userName').textContent = username;
+                        if (userText) userText.textContent = username;
                         localStorage.setItem('username', username);
                     }
                     
-                    userProfile.style.display = 'flex';
                 } catch (error) {
                     console.error('Error updating user profile:', error);
                     const username = localStorage.getItem('username') || 'User';
-                    document.getElementById('userName').textContent = username;
-                    userProfile.style.display = 'flex';
+                    if (userText) userText.textContent = username;
                 }
             } else {
-                userProfile.style.display = 'none';
+                if (userText) userText.textContent = 'Account';
             }
         }
 
