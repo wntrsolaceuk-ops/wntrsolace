@@ -231,12 +231,64 @@
         </div>
     </div>
 
+    <!-- Supabase JavaScript Client -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
     <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://pbbmrajuptceokpjnynz.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiYm1yYWp1cHRjZW9rcGpueW56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NzY1MzcsImV4cCI6MjA3NDA1MjUzN30.BYxGzM6G7MROTDTdj6KN3gCcrs6nxUaa_ylFZwMBT9o';
+        
+        let supabase = null;
+        
+        // Initialize Supabase
+        function initializeSupabase() {
+            try {
+                if (window.supabase && window.supabase.createClient) {
+                    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                    console.log('Supabase initialized successfully');
+                    return true;
+                } else {
+                    console.error('Supabase library not loaded');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error initializing Supabase:', error);
+                return false;
+            }
+        }
+        
         // Clear admin session on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            localStorage.removeItem('adminLoggedIn');
-            localStorage.removeItem('adminLoginTime');
-            console.log('Admin session cleared');
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Admin logout page loaded');
+            
+            // Initialize Supabase
+            const supabaseReady = initializeSupabase();
+            
+            try {
+                // Sign out from Supabase
+                if (supabaseReady && supabase) {
+                    const { error } = await supabase.auth.signOut();
+                    if (error) {
+                        console.error('Supabase logout error:', error);
+                    } else {
+                        console.log('Supabase logout successful');
+                    }
+                }
+                
+                // Clear all session data
+                localStorage.removeItem('adminLoggedIn');
+                localStorage.removeItem('adminLoginTime');
+                localStorage.removeItem('adminEmail');
+                localStorage.removeItem('userLoggedIn');
+                localStorage.removeItem('username');
+                localStorage.removeItem('userData');
+                localStorage.removeItem('userEmail');
+                
+                console.log('All session data cleared');
+            } catch (error) {
+                console.error('Error during logout:', error);
+            }
         });
     </script>
 </body>
