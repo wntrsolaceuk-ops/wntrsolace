@@ -1244,19 +1244,25 @@
             if (supabaseReady) {
                 console.log('Supabase initialized, checking for admin users...')
                 
-                // Check if user is admin and redirect to admin dashboard
-                const { data: { user } } = await supabase.auth.getUser();
-                if (user) {
-                    const { data: profile } = await supabase
-                        .from('user_profiles')
-                        .select('is_admin')
-                        .eq('id', user.id)
-                        .single();
-                    
-                    if (profile && profile.is_admin) {
-                        console.log('Admin user detected, redirecting to admin dashboard')
-                        window.location.href = 'admin-dashboard.html';
-                        return;
+                // Only check for admin redirect if not already on an admin page
+                const currentPage = window.location.pathname;
+                const isAdminPage = currentPage.includes('admin-') || currentPage.includes('admin/');
+                
+                if (!isAdminPage) {
+                    // Check if user is admin and redirect to admin dashboard
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (user) {
+                        const { data: profile } = await supabase
+                            .from('user_profiles')
+                            .select('is_admin')
+                            .eq('id', user.id)
+                            .single();
+                        
+                        if (profile && profile.is_admin) {
+                            console.log('Admin user detected, redirecting to admin dashboard')
+                            window.location.href = 'admin-dashboard.html';
+                            return;
+                        }
                     }
                 }
             }
