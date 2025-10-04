@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WinterSolace - Product Detail</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;600;700&family=Dancing+Script:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Mobile-optimized fog effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse 400px 200px at 20% 10%, rgba(255, 255, 255, 0.1) 0%, transparent 60%),
+                radial-gradient(ellipse 300px 150px at 80% 30%, rgba(200, 230, 255, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+            animation: mobileFogDrift 15s ease-in-out infinite;
+        }
+
+        @keyframes mobileFogDrift {
+            0%, 100% { opacity: 0.6; transform: translateX(-20px); }
+            50% { opacity: 1; transform: translateX(20px); }
+        }
+
+        /* Mobile ice crystals */
+        .ice-crystals {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .ice-crystal {
+            position: absolute;
+            color: rgba(200, 230, 255, 0.4);
+            font-size: 14px;
+            animation: mobileCrystalFloat 6s linear infinite;
+        }
+
+        @keyframes mobileCrystalFloat {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10%, 90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .ice-crystal:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .ice-crystal:nth-child(2) { left: 30%; animation-delay: 1s; }
+        .ice-crystal:nth-child(3) { left: 50%; animation-delay: 2s; }
+        .ice-crystal:nth-child(4) { left: 70%; animation-delay: 3s; }
+        .ice-crystal:nth-child(5) { left: 90%; animation-delay: 4s; }
+
+        /* Mobile Header */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: #000000;
+            z-index: 1000;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+        }
+
+        .nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Dancing Script', cursive;
+            font-size: 20px;
+            font-weight: 400;
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .logo img {
+            height: 35px;
+        }
+
+        .mobile-menu-toggle {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .user-section:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .user-icon {
+            width: 20px;
+            height: 20px;
+            color: #ffffff;
+        }
+
+        .user-text {
+            font-size: 14px;
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .cart-icon {
+            width: 20px;
+            height: 20px;
+            color: #ffffff;
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+            position: relative;
+        }
+
+        .cart-icon:hover {
+            opacity: 0.7;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Mobile Menu Overlay */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 30px;
+            cursor: pointer;
+        }
+
+        .mobile-nav-links {
+            list-style: none;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .mobile-nav-links li {
+            margin: 1.5rem 0;
+        }
+
+        .mobile-nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 24px;
+            font-weight: 500;
+            transition: opacity 0.3s ease;
+        }
+
+        .mobile-nav-links a:hover {
+            opacity: 0.7;
+        }
+
+        .mobile-user-section {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .mobile-user-section .user-section {
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 60px;
+            min-height: calc(100vh - 60px);
+            position: relative;
+            z-index: 10;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 100%;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 3rem 1rem;
+            opacity: 0.7;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .breadcrumb a {
+            color: #c8e6ff;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* Product Detail */
+        .product-detail {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Product Image Section */
+        .product-image-section {
+            order: 1;
+        }
+
+        .main-image-container {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .main-image {
+            width: 100%;
+            height: 300px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preorder-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #c8e6ff 0%, #ffffff 100%);
+            color: #000000;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 10px rgba(200, 230, 255, 0.3);
+            z-index: 10;
+        }
+
+        .nav-buttons {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 1rem;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.7);
+            color: #ffffff;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            pointer-events: all;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .thumbnail-gallery {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding: 0.5rem 0;
+        }
+
+        .thumbnail {
+            width: 60px;
+            height: 60px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .thumbnail:hover,
+        .thumbnail.active {
+            border-color: #c8e6ff;
+        }
+
+        /* Product Info */
+        .product-info {
+            order: 2;
+        }
+
+        .product-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+            line-height: 1.2;
+        }
+
+        .product-price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #c8e6ff;
+            font-family: 'Space Grotesk', sans-serif;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Size Selector */
+        .size-selector {
+            margin-bottom: 1.5rem;
+        }
+
+        .size-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.75rem;
+        }
+
+        .size-options {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .size-option {
+            padding: 10px 16px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .size-option:hover {
+            border-color: rgba(200, 230, 255, 0.5);
+            background: rgba(200, 230, 255, 0.1);
+        }
+
+        .size-option.selected {
+            border-color: #c8e6ff;
+            background: rgba(200, 230, 255, 0.2);
+            color: #c8e6ff;
+        }
+
+        /* Quantity Selector */
+        .quantity-selector {
+            margin-bottom: 1.5rem;
+        }
+
+        .quantity-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.75rem;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .quantity-btn {
+            width: 36px;
+            height: 36px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .quantity-btn:hover {
+            border-color: rgba(200, 230, 255, 0.5);
+            background: rgba(200, 230, 255, 0.1);
+        }
+
+        .quantity-display {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        /* Sizing Chart */
+        .sizing-chart {
+            margin-bottom: 1.5rem;
+        }
+
+        .sizing-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .sizing-toggle {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .toggle-btn {
+            padding: 6px 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .toggle-btn:hover {
+            border-color: rgba(200, 230, 255, 0.5);
+            background: rgba(200, 230, 255, 0.1);
+        }
+
+        .toggle-btn.active {
+            border-color: #c8e6ff;
+            background: rgba(200, 230, 255, 0.2);
+            color: #c8e6ff;
+        }
+
+        .size-table-container {
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 0.75rem;
+            overflow-x: auto;
+        }
+
+        .size-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .size-table th {
+            background: rgba(200, 230, 255, 0.1);
+            color: #c8e6ff;
+            padding: 0.5rem 0.25rem;
+            text-align: center;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(200, 230, 255, 0.3);
+        }
+
+        .size-table td {
+            color: #ffffff;
+            padding: 0.4rem 0.25rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .size-table td:first-child {
+            text-align: left;
+            color: #cccccc;
+            font-weight: 500;
+        }
+
+        .size-table tr:hover {
+            background: rgba(200, 230, 255, 0.05);
+        }
+
+        .size-note {
+            color: #aaaaaa;
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+            text-align: center;
+            font-style: italic;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            padding: 14px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #c8e6ff, #007bff);
+            color: #000000;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(200, 230, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Touch optimizations */
+        .btn, .size-option, .quantity-btn, .nav-btn, .thumbnail, .user-section, .cart-icon, .mobile-menu-toggle {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body>
+    <!-- Ice Crystals -->
+    <div class="ice-crystals">
+        <div class="ice-crystal">❅</div>
+        <div class="ice-crystal">❆</div>
+        <div class="ice-crystal">❄</div>
+        <div class="ice-crystal">❅</div>
+        <div class="ice-crystal">❆</div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="layout-winter-frost-mobile.html" class="logo">
+                <img src="assets/Wntrsolace.png" alt="WinterSolace Logo">
+            </a>
+            
+            <div class="nav-right">
+                <div class="user-section" id="userSection" onclick="handleUserClick()">
+                    <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span class="user-text" id="userText">Sign In</span>
+                </div>
+                
+                <a href="cart-mobile.html" class="cart-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                    <span class="cart-count" id="cartCount">0</span>
+                </a>
+                
+                <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                    ☰
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="mobile-menu-close" onclick="toggleMobileMenu()">×</button>
+        
+        <ul class="mobile-nav-links">
+            <li><a href="layout-winter-frost-mobile.html" onclick="toggleMobileMenu()">Home</a></li>
+            <li><a href="collections-mobile.html" onclick="toggleMobileMenu()">Collection</a></li>
+            <li><a href="contact-mobile.html" onclick="toggleMobileMenu()">Contact</a></li>
+        </ul>
+        
+        <div class="mobile-user-section">
+            <div class="user-section" id="mobileUserSection" onclick="handleUserClick(); toggleMobileMenu();">
+                <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span class="user-text" id="mobileUserText">Sign In</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Loading State -->
+            <div id="loadingState" class="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading product details...</p>
+            </div>
+
+            <!-- Product Content -->
+            <div id="productContent" style="display: none;">
+                <!-- Breadcrumb -->
+                <nav class="breadcrumb">
+                    <a href="layout-winter-frost-mobile.html">Home</a> / 
+                    <a href="collections-mobile.html">Collections</a> / 
+                    <span id="breadcrumbProductName">Product</span>
+                </nav>
+
+                <div class="product-detail">
+                    <div class="product-image-section">
+                        <div class="main-image-container">
+                            <div class="main-image" id="mainImage">
+                                <div class="preorder-badge" id="preorderBadge" style="display: none;">Pre-Order</div>
+                            </div>
+                            <div class="nav-buttons">
+                                <button class="nav-btn" id="prevBtn" onclick="previousImage()">‹</button>
+                                <button class="nav-btn" id="nextBtn" onclick="nextImage()">›</button>
+                            </div>
+                        </div>
+                        <div class="thumbnail-gallery" id="thumbnailGallery">
+                            <!-- Thumbnails will be generated dynamically -->
+                        </div>
+                    </div>
+
+                    <div class="product-info">
+                        <h1 class="product-title" id="productTitle">Product Title</h1>
+                        <div class="product-price" id="productPrice">$0</div>
+
+                        <div class="size-selector">
+                            <h3 class="size-title">Size</h3>
+                            <div class="size-options" id="sizeOptions">
+                                <!-- Size options will be generated dynamically -->
+                            </div>
+                        </div>
+
+                        <div class="sizing-chart">
+                            <div class="sizing-header">
+                                <h3 class="size-title">Size Guide</h3>
+                                <div class="sizing-toggle">
+                                    <button class="toggle-btn active" id="hoodieBtn" onclick="showHoodieSizes()">Hoodie</button>
+                                    <button class="toggle-btn" id="trousersBtn" onclick="showTrousersSizes()">Trousers</button>
+                                </div>
+                            </div>
+                            
+                            <div class="size-table-container">
+                                <!-- Hoodie Sizing Table -->
+                                <table class="size-table" id="hoodieTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Size</th>
+                                            <th>S</th>
+                                            <th>M</th>
+                                            <th>L</th>
+                                            <th>XL</th>
+                                            <th>XXL</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Shoulder</strong></td>
+                                            <td>58</td>
+                                            <td>60</td>
+                                            <td>62</td>
+                                            <td>64</td>
+                                            <td>66</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Bust</strong></td>
+                                            <td>56</td>
+                                            <td>58</td>
+                                            <td>60</td>
+                                            <td>62</td>
+                                            <td>64</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Sleeve</strong></td>
+                                            <td>58</td>
+                                            <td>60</td>
+                                            <td>62</td>
+                                            <td>64</td>
+                                            <td>66</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Length</strong></td>
+                                            <td>67</td>
+                                            <td>69</td>
+                                            <td>71</td>
+                                            <td>73</td>
+                                            <td>75</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <!-- Trousers Sizing Table -->
+                                <table class="size-table" id="trousersTable" style="display: none;">
+                                    <thead>
+                                        <tr>
+                                            <th>Size</th>
+                                            <th>S</th>
+                                            <th>M</th>
+                                            <th>L</th>
+                                            <th>XL</th>
+                                            <th>XXL</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Waist</strong></td>
+                                            <td>48.5</td>
+                                            <td>50.5</td>
+                                            <td>52.5</td>
+                                            <td>54.5</td>
+                                            <td>56.5</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Hips</strong></td>
+                                            <td>49.5</td>
+                                            <td>51.5</td>
+                                            <td>53.5</td>
+                                            <td>55.5</td>
+                                            <td>57.5</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Length</strong></td>
+                                            <td>101</td>
+                                            <td>102</td>
+                                            <td>104</td>
+                                            <td>106</td>
+                                            <td>108</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Thigh</strong></td>
+                                            <td>30.7</td>
+                                            <td>32</td>
+                                            <td>33.3</td>
+                                            <td>34.6</td>
+                                            <td>35.9</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p class="size-note">All measurements are in centimeters (cm)</p>
+                        </div>
+
+                        <div class="quantity-selector">
+                            <h3 class="quantity-title">Quantity</h3>
+                            <div class="quantity-controls">
+                                <button class="quantity-btn" onclick="decreaseQuantity()">-</button>
+                                <span class="quantity-display" id="quantity">1</span>
+                                <button class="quantity-btn" onclick="increaseQuantity()">+</button>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" id="addToCartBtn" onclick="addToCart()">
+                                Add to Cart
+                            </button>
+                            <button class="btn btn-secondary" onclick="goToCart()">
+                                View Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://pbbmrajuptceokpjnynz.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiYm1yYWp1cHRjZW9rcGpueW56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NzY1MzcsImV4cCI6MjA3NDA1MjUzN30.BYxGzM6G7MROTDTdj6KN3gCcrs6nxUaa_ylFZwMBT9o';
+        const CLOUDINARY_CLOUD_NAME = 'dlfsfybx3';
+        
+        let supabase;
+        let currentProduct = null;
+        let currentImageIndex = 0;
+        let selectedSize = 'L';
+        let quantity = 1;
+
+        // Initialize Supabase
+        async function initSupabase() {
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('Supabase initialized successfully');
+                return true;
+            } catch (error) {
+                console.error('Error initializing Supabase:', error);
+                return false;
+            }
+        }
+
+        // Get Cloudinary URL
+        function getCloudinaryUrl(publicId, width = 800, height = 800) {
+            return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/w_${width},h_${height},c_fill/${publicId}`;
+        }
+
+        // Load product details
+        async function loadProduct() {
+            const productId = localStorage.getItem('selectedProduct') || 'wntr-solace-hoodie';
+            
+            try {
+                const { data, error } = await supabase
+                    .from('products')
+                    .select('*')
+                    .eq('id', productId)
+                    .single();
+
+                if (error) throw error;
+                
+                currentProduct = data;
+                renderProduct(data);
+            } catch (error) {
+                console.error('Error loading product:', error);
+                // Fallback to hardcoded product
+                loadFallbackProduct();
+            }
+        }
+
+        // Fallback product
+        function loadFallbackProduct() {
+            currentProduct = {
+                id: 'wntr-solace-hoodie',
+                name: 'Wntr Solace Hoodie',
+                description: 'Premium winter hoodie crafted with the finest materials for ultimate comfort and style.',
+                price: 125,
+                sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+                stock_quantity: 25,
+                main_image_public_id: 'front_g9w8zc',
+                image_variants: [
+                    {"type": "front", "public_id": "front_g9w8zc"},
+                    {"type": "back", "public_id": "Back_qlvac0"},
+                    {"type": "pants", "public_id": "pants_bphqzq"},
+                    {"type": "sample1", "public_id": "Sample1-min_o1wn8v"},
+                    {"type": "sample2", "public_id": "Sample2-min_fx7bqh"},
+                    {"type": "sample3", "public_id": "Sample3-min_ywsavk"}
+                ],
+                is_preorder: true
+            };
+            renderProduct(currentProduct);
+        }
+
+        // Render product
+        function renderProduct(product) {
+            // Hide loading, show content
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('productContent').style.display = 'block';
+
+            // Update breadcrumb
+            document.getElementById('breadcrumbProductName').textContent = product.name;
+
+            // Update product info
+            document.getElementById('productTitle').textContent = product.name;
+            document.getElementById('productPrice').textContent = `$${product.price}`;
+
+            // Show preorder badge if applicable
+            if (product.is_preorder) {
+                document.getElementById('preorderBadge').style.display = 'block';
+            }
+
+            // Render images
+            renderImages(product);
+
+            // Render size options
+            renderSizeOptions(product.sizes);
+
+            // Update add to cart button
+            const addToCartBtn = document.getElementById('addToCartBtn');
+            if (product.is_preorder) {
+                addToCartBtn.textContent = 'Pre-Order Now';
+            } else {
+                addToCartBtn.textContent = 'Add to Cart';
+            }
+        }
+
+        // Render images
+        function renderImages(product) {
+            const mainImage = document.getElementById('mainImage');
+            const thumbnailGallery = document.getElementById('thumbnailGallery');
+
+            if (product.image_variants && product.image_variants.length > 0) {
+                // Use image variants
+                const firstImage = product.image_variants[0];
+                const imageUrl = getCloudinaryUrl(firstImage.public_id, 400, 400);
+                mainImage.style.backgroundImage = `url('${imageUrl}')`;
+
+                // Render thumbnails
+                thumbnailGallery.innerHTML = product.image_variants.map((variant, index) => `
+                    <div class="thumbnail ${index === 0 ? 'active' : ''}" 
+                         onclick="selectImage(${index})"
+                         style="background-image: url('${getCloudinaryUrl(variant.public_id, 120, 120)}')">
+                    </div>
+                `).join('');
+            } else {
+                // Use main image
+                const imageUrl = getCloudinaryUrl(product.main_image_public_id, 400, 400);
+                mainImage.style.backgroundImage = `url('${imageUrl}')`;
+                thumbnailGallery.innerHTML = '';
+            }
+        }
+
+        // Render size options
+        function renderSizeOptions(sizes) {
+            const sizeOptions = document.getElementById('sizeOptions');
+            sizeOptions.innerHTML = sizes.map(size => `
+                <div class="size-option ${size === selectedSize ? 'selected' : ''}" 
+                     onclick="selectSize('${size}')">
+                    ${size}
+                </div>
+            `).join('');
+        }
+
+        // Select image
+        function selectImage(index) {
+            if (!currentProduct || !currentProduct.image_variants) return;
+
+            currentImageIndex = index;
+            const variant = currentProduct.image_variants[index];
+            const mainImage = document.getElementById('mainImage');
+            const imageUrl = getCloudinaryUrl(variant.public_id, 400, 400);
+            
+            mainImage.style.backgroundImage = `url('${imageUrl}')`;
+
+            // Update active thumbnail
+            document.querySelectorAll('.thumbnail').forEach((thumb, i) => {
+                thumb.classList.toggle('active', i === index);
+            });
+        }
+
+        // Select size
+        function selectSize(size) {
+            selectedSize = size;
+            document.querySelectorAll('.size-option').forEach(option => {
+                option.classList.toggle('selected', option.textContent === size);
+            });
+        }
+
+        // Image navigation
+        function previousImage() {
+            if (!currentProduct || !currentProduct.image_variants) return;
+            const newIndex = currentImageIndex > 0 ? currentImageIndex - 1 : currentProduct.image_variants.length - 1;
+            selectImage(newIndex);
+        }
+
+        function nextImage() {
+            if (!currentProduct || !currentProduct.image_variants) return;
+            const newIndex = currentImageIndex < currentProduct.image_variants.length - 1 ? currentImageIndex + 1 : 0;
+            selectImage(newIndex);
+        }
+
+        // Quantity controls
+        function increaseQuantity() {
+            quantity = Math.min(quantity + 1, 10);
+            document.getElementById('quantity').textContent = quantity;
+        }
+
+        function decreaseQuantity() {
+            quantity = Math.max(quantity - 1, 1);
+            document.getElementById('quantity').textContent = quantity;
+        }
+
+        // Size guide toggles
+        function showHoodieSizes() {
+            document.getElementById('hoodieTable').style.display = 'table';
+            document.getElementById('trousersTable').style.display = 'none';
+            document.getElementById('hoodieBtn').classList.add('active');
+            document.getElementById('trousersBtn').classList.remove('active');
+        }
+
+        function showTrousersSizes() {
+            document.getElementById('hoodieTable').style.display = 'none';
+            document.getElementById('trousersTable').style.display = 'table';
+            document.getElementById('hoodieBtn').classList.remove('active');
+            document.getElementById('trousersBtn').classList.add('active');
+        }
+
+        // Add to cart
+        function addToCart() {
+            if (!currentProduct) return;
+
+            const cartItem = {
+                id: currentProduct.id,
+                name: currentProduct.name,
+                price: currentProduct.price,
+                size: selectedSize,
+                quantity: quantity,
+                image: getCloudinaryUrl(currentProduct.main_image_public_id, 200, 200),
+                isPreorder: currentProduct.is_preorder
+            };
+
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            
+            // Check if item already exists
+            const existingItemIndex = cart.findIndex(item => 
+                item.id === currentProduct.id && item.size === selectedSize
+            );
+
+            if (existingItemIndex > -1) {
+                cart[existingItemIndex].quantity += quantity;
+            } else {
+                cart.push(cartItem);
+            }
+
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            showNotification('Added to cart!', 'success');
+        }
+
+        // Go to cart
+        function goToCart() {
+            window.location.href = 'cart-mobile.html';
+        }
+
+        // Update cart count
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const cartCountElement = document.getElementById('cartCount');
+            if (cartCountElement) {
+                cartCountElement.textContent = totalItems;
+            }
+        }
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('active');
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            
+            if (mobileMenu && mobileToggle && !mobileMenu.contains(event.target) && !mobileToggle.contains(event.target)) {
+                mobileMenu.classList.remove('active');
+            }
+        });
+
+        // Handle user click
+        function handleUserClick() {
+            const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+            if (isLoggedIn) {
+                window.location.href = 'profile-mobile.html';
+            } else {
+                window.location.href = 'auth-mobile.html';
+            }
+        }
+
+        // Update user profile
+        async function updateUserProfile() {
+            const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+            const userTextElement = document.getElementById('userText');
+            const mobileUserTextElement = document.getElementById('mobileUserText');
+            
+            if (isLoggedIn) {
+                try {
+                    // First try to get user data from localStorage
+                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    let displayName = 'User';
+                    
+                    if (userData.full_name) {
+                        displayName = userData.full_name;
+                    } else if (userData.first_name) {
+                        displayName = userData.first_name;
+                    } else if (userData.email) {
+                        displayName = userData.email.split('@')[0];
+                    } else if (localStorage.getItem('username')) {
+                        displayName = localStorage.getItem('username');
+                    }
+                    
+                    if (userTextElement) userTextElement.textContent = displayName;
+                    if (mobileUserTextElement) mobileUserTextElement.textContent = displayName;
+                    
+                    // Also try to get fresh data from Supabase if available
+                    if (supabase) {
+                        const { data: { user }, error } = await supabase.auth.getUser();
+                        if (!error && user) {
+                            const freshName = user.user_metadata?.full_name || user.user_metadata?.first_name || user.email.split('@')[0];
+                            if (userTextElement) userTextElement.textContent = freshName;
+                            if (mobileUserTextElement) mobileUserTextElement.textContent = freshName;
+                            // Update localStorage with fresh data
+                            localStorage.setItem('userData', JSON.stringify({
+                                full_name: user.user_metadata?.full_name,
+                                first_name: user.user_metadata?.first_name,
+                                email: user.email
+                            }));
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error updating user profile:', error);
+                    // Fallback to localStorage
+                    const username = localStorage.getItem('username') || 'User';
+                    if (userTextElement) userTextElement.textContent = username;
+                    if (mobileUserTextElement) mobileUserTextElement.textContent = username;
+                }
+            } else {
+                if (userTextElement) userTextElement.textContent = 'Sign In';
+                if (mobileUserTextElement) mobileUserTextElement.textContent = 'Sign In';
+            }
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+                color: white;
+                padding: 12px 24px;
+                border-radius: 25px;
+                font-size: 14px;
+                font-weight: 500;
+                z-index: 10000;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                animation: slideDown 0.3s ease;
+            `;
+            notification.textContent = message;
+            
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideDown {
+                    from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+                    to { transform: translateX(-50%) translateY(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideUp 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            updateUserProfile();
+            updateCartCount();
+            
+            // Initialize Supabase and load product
+            const supabaseInitialized = await initSupabase();
+            if (supabaseInitialized) {
+                await loadProduct();
+            } else {
+                console.error('Failed to initialize Supabase');
+                loadFallbackProduct();
+            }
+        });
+
+        // Listen for cart updates
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'cart') {
+                updateCartCount();
+            }
+        });
+    </script>
+</body>
+</html>
