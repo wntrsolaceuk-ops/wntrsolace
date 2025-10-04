@@ -1319,48 +1319,85 @@
                 debugLog(`Customer: ${orderData.first_name} ${orderData.last_name}`, 'info');
                 debugLog(`Total: £${orderData.total}`, 'info');
                 
-                debugLog(`Request URL: https://wntrsolace-payment.onrender.com/api/complete-order`, 'info');
-                debugLog(`Order data: ${JSON.stringify({order_number: orderData.order_number, total: orderData.total, items: orderItems.length})}`, 'info');
+                // Save order to Supabase first (same as desktop)
+                debugLog('Saving order to Supabase...', 'info');
+                const { data: order, error: orderError } = await supabase
+                    .from('orders')
+                    .insert([orderData])
+                    .select()
+                    .single();
+
+                if (orderError) {
+                    debugLog(`Order creation error: ${orderError.message}`, 'error');
+                    throw new Error('Failed to create order: ' + orderError.message);
+                }
+                debugLog('Order created successfully in Supabase', 'success');
                 
-                let response;
+                // Save order items to Supabase
+                debugLog('Saving order items to Supabase...', 'info');
+                const orderItemsForDB = orderItems.map(item => ({
+                    order_id: order.id,
+                    product_id: item.product_id || null,
+                    product_name: item.product_name,
+                    product_price: item.product_price,
+                    unit_price: item.product_price,
+                    total_price: item.product_price * item.quantity,
+                    quantity: item.quantity,
+                    size: item.size
+                }));
+                
+                const { error: itemsError } = await supabase
+                    .from('order_items')
+                    .insert(orderItemsForDB);
+                
+                if (itemsError) {
+                    debugLog(`Order items creation error: ${itemsError.message}`, 'error');
+                    throw new Error('Failed to create order items: ' + itemsError.message);
+                }
+                debugLog('Order items created successfully in Supabase', 'success');
+                
+                // Send order confirmation email via payment server (same as desktop)
+                debugLog('Sending confirmation email...', 'info');
                 try {
-                    response = await fetch('https://wntrsolace-payment.onrender.com/api/complete-order', {
+                    const emailResponse = await fetch('https://wntrsolace-payment.onrender.com/api/complete-order', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            ...orderData,
-                            items: orderItems
+                            order_number: orderData.order_number,
+                            customer_name: `${orderData.first_name} ${orderData.last_name}`,
+                            customer_email: orderData.email,
+                            total_amount: orderData.total,
+                            items: orderItems.map(item => ({
+                                name: item.product_name,
+                                size: item.size,
+                                quantity: item.quantity,
+                                price: item.product_price
+                            })),
+                            shipping_address: orderData.shipping_address
                         })
                     });
-                    debugLog(`Network request completed, status: ${response.status}`, response.ok ? 'success' : 'error');
-                } catch (networkError) {
-                    debugLog(`Network error: ${networkError.message}`, 'error');
-                    debugLog(`Error type: ${networkError.name}`, 'error');
-                    debugLog(`Error stack: ${networkError.stack}`, 'error');
-                    throw networkError;
+                    
+                    debugLog(`Email response status: ${emailResponse.status}`, emailResponse.ok ? 'success' : 'error');
+                    if (emailResponse.ok) {
+                        const result = await emailResponse.json();
+                        debugLog('Order confirmation email sent successfully', 'success');
+                    } else {
+                        const errorText = await emailResponse.text();
+                        debugLog(`Email sending failed: ${errorText}`, 'warning');
+                    }
+                } catch (emailError) {
+                    debugLog(`Email sending error: ${emailError.message}`, 'warning');
                 }
-                
-                debugLog(`Order completion response status: ${response.status}`, response.ok ? 'success' : 'error');
-                
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    debugLog(`Order completion error: ${errorText}`, 'error');
-                    throw new Error('Failed to process order');
-                }
-                
-                const responseData = await response.json();
-                debugLog('Order processed successfully', 'success');
-                debugLog(`Server returned order number: ${responseData.orderNumber}`, 'info');
                 
                 // Clear cart
                 localStorage.removeItem('cart');
                 debugLog('Cart cleared', 'info');
                 
-                // Redirect to confirmation with order number from server
+                // Redirect to confirmation with order number
                 debugLog('Redirecting to confirmation page...', 'info');
-                window.location.href = `order-confirmation-mobile.html?order=${responseData.orderNumber}`;
+                window.location.href = `order-confirmation-mobile.html?order=${orderData.order_number}`;
                 
             } catch (error) {
                 console.error('Order processing error:', error);
