@@ -65,6 +65,7 @@ app.post('/api/complete-order', async (req, res) => {
         
         console.log('=== COMPLETE ORDER REQUEST ===');
         console.log('Order data received:', JSON.stringify(orderData, null, 2));
+        console.log('User ID in order data:', orderData.user_id);
         
         // Handle both desktop and mobile formats
         const orderNumber = orderData.order_id || orderData.order_number;
@@ -157,6 +158,7 @@ app.post('/api/complete-order', async (req, res) => {
                 .from('orders')
                 .insert({
                     order_number: orderNumber,
+                    user_id: orderData.user_id || null,
                     first_name: orderData.first_name || customerName.split(' ')[0] || '',
                     last_name: orderData.last_name || customerName.split(' ').slice(1).join(' ') || '',
                     email: customerEmail,
