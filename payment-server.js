@@ -3,6 +3,12 @@ const express = require('express');
 const cors = require('cors');
 const stripe = require('./stripe-config');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+const { createClient } = require('@supabase/supabase-js');
+
+// Initialize Supabase client
+const supabaseUrl = 'https://pbbmrajuptceokpjnynz.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiYm1yYWp1cHRjZW9rcGpueW56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NzY1MzcsImV4cCI6MjA3NDA1MjUzN30.BYxGzM6G7MROTDTdj6KN3gCcrs6nxUaa_ylFZwMBT9o';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -60,11 +66,11 @@ app.post('/api/complete-order', async (req, res) => {
         console.log('=== COMPLETE ORDER REQUEST ===');
         console.log('Order data received:', JSON.stringify(orderData, null, 2));
         
-        // Generate order number
-        const orderNumber = 'WS-' + Date.now();
+        // Use the order ID from the request, don't generate a new one
+        const orderNumber = orderData.order_id;
         
         // Store payment intent ID for refund tracking
-        const paymentIntentId = orderData.payment_details?.stripe_payment_intent_id;
+        const paymentIntentId = orderData.payment_intent_id;
         console.log('Payment Intent ID for tracking:', paymentIntentId);
         
         // Send order confirmation email using simple server
@@ -73,11 +79,9 @@ app.post('/api/complete-order', async (req, res) => {
             const emailPayload = {
                 orderData: {
                     order_id: orderNumber,
-                    customer_name: orderData.customer_name || `${orderData.first_name || ''} ${orderData.last_name || ''}`.trim() || 'Customer',
-                    customer_email: orderData.customer_email || orderData.email || 'customer@example.com',
-                    shipping_address: orderData.shipping_address ? 
-                        `${orderData.shipping_address.street || ''}, ${orderData.shipping_address.city || ''}, ${orderData.shipping_address.state || ''} ${orderData.shipping_address.zip || ''}`.trim() :
-                        'Address not provided',
+                    customer_name: orderData.customer_name || 'Customer',
+                    customer_email: orderData.customer_email || 'customer@example.com',
+                    shipping_address: orderData.shipping_address || 'Address not provided',
                     payment_intent_id: paymentIntentId
                 },
                 orderItems: orderData.items || []
@@ -103,6 +107,59 @@ app.post('/api/complete-order', async (req, res) => {
             }
         } catch (emailError) {
             console.error('Email sending error:', emailError);
+        }
+        
+        // Save order to database
+        try {
+            console.log('Saving order to database...');
+            
+            // Insert order
+            const { data: order, error: orderError } = await supabase
+                .from('orders')
+                .insert({
+                    order_id: orderNumber,
+                    customer_name: orderData.customer_name,
+                    customer_email: orderData.customer_email,
+                    customer_phone: orderData.customer_phone,
+                    shipping_address: orderData.shipping_address,
+                    payment_intent_id: paymentIntentId,
+                    total_amount: orderData.total_amount,
+                    status: orderData.status || 'confirmed',
+                    notes: orderData.notes || ''
+                })
+                .select()
+                .single();
+            
+            if (orderError) {
+                console.error('Error saving order:', orderError);
+            } else {
+                console.log('Order saved to database:', order.id);
+                
+                // Insert order items
+                if (orderData.items && orderData.items.length > 0) {
+                    const orderItems = orderData.items.map(item => ({
+                        order_id: order.id,
+                        product_id: item.id,
+                        product_name: item.name,
+                        price: item.price,
+                        quantity: item.quantity,
+                        size: item.size,
+                        image_url: item.image
+                    }));
+                    
+                    const { error: itemsError } = await supabase
+                        .from('order_items')
+                        .insert(orderItems);
+                    
+                    if (itemsError) {
+                        console.error('Error saving order items:', itemsError);
+                    } else {
+                        console.log('Order items saved to database');
+                    }
+                }
+            }
+        } catch (dbError) {
+            console.error('Database error:', dbError);
         }
         
         res.json({
