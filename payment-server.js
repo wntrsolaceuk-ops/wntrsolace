@@ -181,14 +181,22 @@ app.post('/api/complete-order', async (req, res) => {
                 
                 // Insert order items
                 if (orderData.items && orderData.items.length > 0) {
-                    const orderItems = orderData.items.map(item => ({
-                        order_id: order.id,
-                        product_id: item.id || item.product_id,
-                        product_name: item.name || item.product_name,
-                        price: item.price || item.product_price,
-                        quantity: item.quantity,
-                        size: item.size
-                    }));
+                    const orderItems = orderData.items.map(item => {
+                        const unitPrice = item.price || item.product_price || 0;
+                        const quantity = item.quantity || 1;
+                        const totalPrice = unitPrice * quantity;
+                        
+                        return {
+                            order_id: order.id,
+                            product_id: item.id || item.product_id,
+                            product_name: item.name || item.product_name,
+                            product_price: unitPrice,
+                            unit_price: unitPrice,
+                            total_price: totalPrice,
+                            quantity: quantity,
+                            size: item.size
+                        };
+                    });
                     
                     const { error: itemsError } = await supabase
                         .from('order_items')

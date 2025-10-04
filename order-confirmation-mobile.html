@@ -651,14 +651,14 @@
             const orderItemsList = document.getElementById('orderItemsList');
             if (order.order_items && order.order_items.length > 0) {
                 orderItemsList.innerHTML = order.order_items.map(item => {
-                    const itemTotal = (item.price || 0) * (item.quantity || 1);
+                    const itemTotal = item.total_price || (item.product_price || 0) * (item.quantity || 1);
                     return `
                         <div class="order-item">
                             <div class="order-item-image" style="background-image: url('${getCloudinaryUrl('front_g9w8zc', 120, 120)}')"></div>
                             <div class="order-item-details">
                                 <div class="order-item-name">${item.product_name || 'Product'}</div>
                                 <div class="order-item-meta">Size: ${item.size} • Qty: ${item.quantity}</div>
-                                <div class="order-item-price">£${item.price.toFixed(2)} each</div>
+                                <div class="order-item-price">£${(item.product_price || 0).toFixed(2)} each</div>
                             </div>
                             <div class="order-item-total">£${itemTotal.toFixed(2)}</div>
                         </div>
