@@ -1475,7 +1475,6 @@
             const trackingData = { events: trackingEvents };
             
             // Cache the data for 24 hours
-            const cacheKey = `tracking_${currentOrder.tracking_number}`;
             localStorage.setItem(cacheKey, JSON.stringify({
                 data: trackingData,
                 timestamp: Date.now()
