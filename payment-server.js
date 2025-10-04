@@ -178,6 +178,7 @@ app.post('/api/complete-order', async (req, res) => {
             
             if (orderError) {
                 console.error('Error saving order:', orderError);
+                throw new Error('Failed to save order to database: ' + orderError.message);
             } else {
                 console.log('Order saved to database:', order.id);
                 
@@ -206,6 +207,7 @@ app.post('/api/complete-order', async (req, res) => {
                     
                     if (itemsError) {
                         console.error('Error saving order items:', itemsError);
+                        throw new Error('Failed to save order items: ' + itemsError.message);
                     } else {
                         console.log('Order items saved to database');
                     }
@@ -213,6 +215,7 @@ app.post('/api/complete-order', async (req, res) => {
             }
         } catch (dbError) {
             console.error('Database error:', dbError);
+            throw new Error('Database operation failed: ' + dbError.message);
         }
         
         res.json({
