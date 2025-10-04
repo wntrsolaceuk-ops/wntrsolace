@@ -1451,12 +1451,13 @@
                 return;
             }
 
-            // Check cache first (24 hours)
+            // Check cache first (24 hours) - but allow cache bypass for debugging
             const cacheKey = `tracking_${currentOrder.tracking_number}`;
             const cachedData = localStorage.getItem(cacheKey);
             const now = Date.now();
+            const bypassCache = new URLSearchParams(window.location.search).get('refresh') === 'true';
             
-            if (cachedData) {
+            if (cachedData && !bypassCache) {
                 const { data, timestamp } = JSON.parse(cachedData);
                 const hoursSinceCache = (now - timestamp) / (1000 * 60 * 60);
                 
@@ -1466,12 +1467,23 @@
                     return;
                 }
             }
+            
+            if (bypassCache) {
+                console.log('Cache bypassed - generating fresh data');
+            }
 
             console.log('Loading fresh tracking data...');
 
             // Generate simulated tracking data based on order status
             console.log('Generating tracking data for status:', currentOrder.status);
+            console.log('Order details:', {
+                order_number: currentOrder.order_number,
+                status: currentOrder.status,
+                tracking_number: currentOrder.tracking_number,
+                shipping_company: currentOrder.shipping_company
+            });
             const trackingEvents = generateTrackingEvents(currentOrder.status, currentOrder.created_at);
+            console.log('Generated tracking events:', trackingEvents);
             const trackingData = { events: trackingEvents };
             
             // Cache the data for 24 hours
