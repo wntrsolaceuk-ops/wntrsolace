@@ -792,7 +792,13 @@
                     .from('orders')
                     .select(`
                         *,
-                        order_items (*)
+                        order_items (
+                            *,
+                            products (
+                                name,
+                                main_image_public_id
+                            )
+                        )
                     `)
                     .eq('user_id', user.id)
                     .order('created_at', { ascending: false });
@@ -858,7 +864,7 @@
                             console.log('Order item data:', item); // Debug: see what fields we have
                             return `
                             <div class="order-item">
-                                <div class="item-image" style="${item.product_image_public_id ? `background-image: url('${getCloudinaryUrl(item.product_image_public_id, 60, 60)}'); background-size: cover; background-position: center;` : ''}">${!item.product_image_public_id ? 'IMG' : ''}</div>
+                                <div class="item-image" style="background-image: url('${getCloudinaryUrl(item.product_image_public_id || item.products?.main_image_public_id || 'front_g9w8zc', 60, 60)}'); background-size: cover; background-position: center;"></div>
                                 <div class="item-details">
                                     <div class="item-name">${item.product_name || 'Product'}</div>
                                     <div class="item-specs">Size: ${item.size} • Qty: ${item.quantity}</div>
