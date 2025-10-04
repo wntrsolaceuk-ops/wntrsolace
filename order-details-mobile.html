@@ -986,9 +986,9 @@
 
         // Load tracking information
         function loadTrackingInfo() {
-            // Only show tracking if order is shipped and has tracking number
-            if (currentOrder.status !== 'shipped' || !currentOrder.tracking_number) {
-                addDebugLog('Order not shipped or no tracking number available');
+            // Only show tracking if order is shipped/delivered and has tracking number
+            if ((currentOrder.status !== 'shipped' && currentOrder.status !== 'delivered') || !currentOrder.tracking_number) {
+                addDebugLog('Order not shipped/delivered or no tracking number available');
                 document.getElementById('trackingSection').style.display = 'none';
                 return;
             }

@@ -1337,8 +1337,8 @@
 
         // Load tracking information
         function loadTrackingInfo() {
-            // Only show tracking if order is shipped and has tracking number
-            if (currentOrder.status !== 'shipped' || !currentOrder.tracking_number) {
+            // Only show tracking if order is shipped/delivered and has tracking number
+            if ((currentOrder.status !== 'shipped' && currentOrder.status !== 'delivered') || !currentOrder.tracking_number) {
                 document.getElementById('trackingSection').style.display = 'none';
                 return;
             }
@@ -1347,8 +1347,28 @@
             document.getElementById('trackingSection').style.display = 'block';
             document.getElementById('trackingNumber').textContent = `Tracking: ${currentOrder.tracking_number}`;
 
+            // Check cache first (24 hours)
+            const cacheKey = `tracking_${currentOrder.tracking_number}`;
+            const cachedData = localStorage.getItem(cacheKey);
+            const now = Date.now();
+            
+            if (cachedData) {
+                const { data, timestamp } = JSON.parse(cachedData);
+                const hoursSinceCache = (now - timestamp) / (1000 * 60 * 60);
+                
+                if (hoursSinceCache < 24) {
+                    console.log('Using cached tracking data');
+                    displayTrackingTimeline(data);
+                    updateTrackingDisplay();
+                    return;
+                }
+            }
+
             // Update tracking display based on status
             updateTrackingDisplay();
+            
+            // Load fresh tracking data
+            loadTrackingData();
         }
 
         // Update tracking display
@@ -1434,6 +1454,22 @@
                 return;
             }
 
+            // Check cache first (24 hours)
+            const cacheKey = `tracking_${currentOrder.tracking_number}`;
+            const cachedData = localStorage.getItem(cacheKey);
+            const now = Date.now();
+            
+            if (cachedData) {
+                const { data, timestamp } = JSON.parse(cachedData);
+                const hoursSinceCache = (now - timestamp) / (1000 * 60 * 60);
+                
+                if (hoursSinceCache < 24) {
+                    console.log('Using cached tracking data');
+                    displayTrackingTimeline(data);
+                    return;
+                }
+            }
+
             // Show loading state
             document.getElementById('trackingDetails').style.display = 'block';
             document.getElementById('detailsStatus').textContent = 'Loading...';
@@ -1460,6 +1496,13 @@
                 const trackingData = await response.json();
                 console.log('Track123 response:', trackingData);
 
+                // Cache the data for 24 hours
+                const cacheKey = `tracking_${currentOrder.tracking_number}`;
+                localStorage.setItem(cacheKey, JSON.stringify({
+                    data: trackingData,
+                    timestamp: Date.now()
+                }));
+
                 // Store tracking data globally for history access
                 window.currentTrackingData = trackingData;
 
@@ -1476,7 +1519,16 @@
                 
                 // Fallback to simulated tracking if API fails
                 const trackingEvents = generateTrackingEvents(currentOrder.status, currentOrder.created_at);
-                displayTrackingTimeline({ events: trackingEvents });
+                const fallbackData = { events: trackingEvents };
+                
+                // Cache the fallback data too
+                const cacheKey = `tracking_${currentOrder.tracking_number}`;
+                localStorage.setItem(cacheKey, JSON.stringify({
+                    data: fallbackData,
+                    timestamp: Date.now()
+                }));
+                
+                displayTrackingTimeline(fallbackData);
             }
         }
 
@@ -1705,7 +1757,7 @@
             const dropdown = document.getElementById('profileDropdown');
             const profileButton = document.querySelector('.profile-button');
             
-            if (!profileButton.contains(event.target) && !dropdown.contains(event.target)) {
+            if (profileButton && dropdown && !profileButton.contains(event.target) && !dropdown.contains(event.target)) {
                 dropdown.classList.remove('show');
             }
         });
