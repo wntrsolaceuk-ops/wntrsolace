@@ -217,8 +217,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 40px;
-            height: 40px;
+            width: 20px;
+            height: 20px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 50%;
             color: #ffffff;
@@ -798,6 +798,7 @@
                     if (user && !error) {
                         userId = user.id;
                         currentUser = user;
+                        console.log('Found Supabase user:', user.id);
                     }
                 } catch (authError) {
                     console.log('Auth session missing, using localStorage fallback');
@@ -810,19 +811,40 @@
                         try {
                             const parsedUserData = JSON.parse(userData);
                             userId = parsedUserData.id;
+                            console.log('Found localStorage user ID:', userId);
                         } catch (e) {
                             console.log('Could not parse userData from localStorage');
+                        }
+                    }
+                    
+                    // Also try to get from username or email
+                    if (!userId) {
+                        const username = localStorage.getItem('username');
+                        const userEmail = localStorage.getItem('userEmail');
+                        if (username || userEmail) {
+                            // For now, use a placeholder ID since we don't have the actual user ID
+                            // This is a temporary solution until we can properly link localStorage to Supabase
+                            userId = 'local-user-' + (username || userEmail);
+                            console.log('Using placeholder user ID:', userId);
                         }
                     }
                 }
 
                 if (!userId) {
-                    console.log('No user ID available');
+                    console.log('No user ID available - showing empty state');
                     showEmptyState();
                     return;
                 }
 
                 console.log('Loading orders for user:', userId);
+                
+                // If using placeholder ID, show empty state
+                if (userId.startsWith('local-user-')) {
+                    console.log('Using placeholder user ID - showing empty state');
+                    showEmptyState();
+                    return;
+                }
+                
                 const { data: ordersData, error } = await supabase
                     .from('orders')
                     .select(`
