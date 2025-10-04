@@ -557,76 +557,7 @@
             font-size: 0.9rem;
         }
 
-        /* Debug Panel */
-        .debug-panel {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 300px;
-            max-height: 400px;
-            background: rgba(0, 0, 0, 0.9);
-            border: 2px solid #c8e6ff;
-            border-radius: 10px;
-            padding: 15px;
-            z-index: 10000;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            color: #ffffff;
-            overflow-y: auto;
-            display: none;
-        }
 
-        .debug-panel.active {
-            display: block;
-        }
-
-        .debug-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #c8e6ff;
-        }
-
-        .debug-title {
-            font-weight: bold;
-            color: #c8e6ff;
-        }
-
-        .debug-toggle {
-            background: #c8e6ff;
-            color: #000;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 10px;
-        }
-
-        .debug-log {
-            max-height: 300px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            word-break: break-all;
-        }
-
-        .debug-log-entry {
-            margin-bottom: 5px;
-            padding: 2px 0;
-            border-bottom: 1px solid rgba(200, 230, 255, 0.1);
-        }
-
-        .debug-clear {
-            background: #ff4444;
-            color: #fff;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 10px;
-            margin-top: 10px;
-        }
 
         /* Touch optimizations */
         .order-item, .order-info-item, .summary-item {
@@ -781,15 +712,6 @@
         </div>
     </main>
 
-    <!-- Debug Panel -->
-    <div class="debug-panel" id="debugPanel">
-        <div class="debug-header">
-            <div class="debug-title">Debug Log</div>
-            <button class="debug-toggle" onclick="toggleDebug()">Hide</button>
-        </div>
-        <div class="debug-log" id="debugLog"></div>
-        <button class="debug-clear" onclick="clearDebug()">Clear Log</button>
-    </div>
 
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script>
@@ -801,43 +723,13 @@
         let supabase;
         let currentOrder = null;
 
-        // Debug functions
-        function addDebugLog(message) {
-            const debugLog = document.getElementById('debugLog');
-            const timestamp = new Date().toLocaleTimeString();
-            const logEntry = document.createElement('div');
-            logEntry.className = 'debug-log-entry';
-            logEntry.textContent = `[${timestamp}] ${message}`;
-            debugLog.appendChild(logEntry);
-            debugLog.scrollTop = debugLog.scrollHeight;
-            console.log(message);
-        }
-
-        function toggleDebug() {
-            const debugPanel = document.getElementById('debugPanel');
-            const toggleBtn = document.querySelector('.debug-toggle');
-            if (debugPanel.classList.contains('active')) {
-                debugPanel.classList.remove('active');
-                toggleBtn.textContent = 'Show';
-            } else {
-                debugPanel.classList.add('active');
-                toggleBtn.textContent = 'Hide';
-            }
-        }
-
-        function clearDebug() {
-            document.getElementById('debugLog').innerHTML = '';
-        }
 
         // Initialize Supabase
         async function initSupabase() {
             try {
-                addDebugLog('Initializing Supabase...');
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                addDebugLog('Supabase initialized successfully');
                 return true;
             } catch (error) {
-                addDebugLog(`Error initializing Supabase: ${error.message}`);
                 console.error('Error initializing Supabase:', error);
                 return false;
             }
@@ -851,17 +743,14 @@
         // Load order details
         async function loadOrderDetails() {
             try {
-                addDebugLog('Loading order details...');
                 
                 // Get order ID from localStorage
                 const orderId = localStorage.getItem('selectedOrder');
                 if (!orderId) {
-                    addDebugLog('No order ID found in localStorage');
                     showError();
                     return;
                 }
 
-                addDebugLog(`Loading order: ${orderId}`);
 
                 // Load order from Supabase
                 const { data: order, error } = await supabase
@@ -880,26 +769,19 @@
                     .single();
 
                 if (error) {
-                    addDebugLog(`Supabase error: ${error.message}`);
-                    addDebugLog(`Error code: ${error.code}`);
                     throw error;
                 }
 
                 if (!order) {
-                    addDebugLog('Order not found');
                     showError();
                     return;
                 }
 
                 currentOrder = order;
-                addDebugLog(`Order loaded: ${order.order_number}`);
-                addDebugLog(`Order status: ${order.status}`);
-                addDebugLog(`Order items: ${order.order_items ? order.order_items.length : 0}`);
 
                 renderOrderDetails();
                 
             } catch (error) {
-                addDebugLog(`Error loading order details: ${error.message}`);
                 console.error('Error loading order details:', error);
                 showError();
             }
@@ -909,7 +791,6 @@
         function renderOrderDetails() {
             if (!currentOrder) return;
 
-            addDebugLog('Rendering order details...');
 
             // Order header
             document.getElementById('orderId').textContent = `Order #${currentOrder.order_number || currentOrder.id}`;
@@ -988,12 +869,10 @@
         function loadTrackingInfo() {
             // Only show tracking if order is shipped/delivered and has tracking number
             if ((currentOrder.status !== 'shipped' && currentOrder.status !== 'delivered') || !currentOrder.tracking_number) {
-                addDebugLog('Order not shipped/delivered or no tracking number available');
                 document.getElementById('trackingSection').style.display = 'none';
                 return;
             }
 
-            addDebugLog(`Loading tracking info for: ${currentOrder.tracking_number}`);
             
             // Show tracking section
             document.getElementById('trackingSection').style.display = 'block';
@@ -1002,7 +881,6 @@
             // Update tracking display based on status
             updateTrackingDisplay();
 
-            addDebugLog('Tracking section updated with new design');
         }
 
         // Update tracking display
@@ -1068,12 +946,10 @@
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', async function() {
-            addDebugLog('Page loaded, initializing...');
             
             // Initialize Supabase
             const supabaseInitialized = await initSupabase();
             if (!supabaseInitialized) {
-                addDebugLog('Failed to initialize Supabase');
                 showError();
                 return;
             }
