@@ -170,22 +170,34 @@
             text-transform: uppercase;
         }
 
-        .order-status.completed {
-            background: rgba(76, 175, 80, 0.2);
-            color: #4CAF50;
-            border: 1px solid rgba(76, 175, 80, 0.3);
-        }
-
-        .order-status.processing {
+        .order-status.pending {
             background: rgba(255, 193, 7, 0.2);
-            color: #FFC107;
+            color: #ffc107;
             border: 1px solid rgba(255, 193, 7, 0.3);
         }
 
+        .order-status.processing {
+            background: rgba(0, 123, 255, 0.2);
+            color: #007bff;
+            border: 1px solid rgba(0, 123, 255, 0.3);
+        }
+
+        .order-status.shipped {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .order-status.delivered {
+            background: rgba(108, 117, 125, 0.2);
+            color: #6c757d;
+            border: 1px solid rgba(108, 117, 125, 0.3);
+        }
+
         .order-status.cancelled {
-            background: rgba(244, 67, 54, 0.2);
-            color: #f44336;
-            border: 1px solid rgba(244, 67, 54, 0.3);
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+            border: 1px solid rgba(220, 53, 69, 0.3);
         }
 
         /* Order Details */
@@ -315,6 +327,9 @@
 
         .summary-item:last-child {
             border-bottom: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #c8e6ff;
         }
 
         .summary-label {
@@ -328,75 +343,162 @@
             font-size: 0.9rem;
         }
 
-        .summary-total {
+        /* Tracking Section */
+        .tracking-section {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .tracking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .tracking-number {
             background: rgba(200, 230, 255, 0.1);
-            border: 2px solid rgba(200, 230, 255, 0.3);
+            border: 1px solid rgba(200, 230, 255, 0.2);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            color: #c8e6ff;
+        }
+
+        .tracking-link {
+            background: rgba(0, 123, 255, 0.2);
+            border: 1px solid rgba(0, 123, 255, 0.3);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: #007bff;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tracking-link:hover {
+            background: rgba(0, 123, 255, 0.3);
+            color: #ffffff;
+        }
+
+        /* Tracking Progress */
+        .tracking-progress {
+            margin: 1.5rem 0;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            position: relative;
+        }
+
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-icon.completed {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            border: 2px solid #28a745;
+        }
+
+        .step-icon.current {
+            background: rgba(0, 123, 255, 0.2);
+            color: #007bff;
+            border: 2px solid #007bff;
+            animation: pulse 2s infinite;
+        }
+
+        .step-icon.pending {
+            background: rgba(108, 117, 125, 0.2);
+            color: #6c757d;
+            border: 2px solid #6c757d;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .step-label {
+            font-size: 0.7rem;
+            color: #aaaaaa;
+            text-align: center;
+            max-width: 60px;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            height: 2px;
+            background: rgba(108, 117, 125, 0.3);
+            z-index: 1;
+        }
+
+        .progress-line.completed {
+            background: #28a745;
+        }
+
+        /* Tracking Details */
+        .tracking-details {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(200, 230, 255, 0.2);
             border-radius: 12px;
             padding: 1rem;
             margin-top: 1rem;
         }
 
-        .summary-total-label {
-            color: #c8e6ff;
+        .details-title {
             font-size: 0.9rem;
+            font-weight: 600;
+            color: #c8e6ff;
             margin-bottom: 0.5rem;
         }
 
-        .summary-total-amount {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.8rem;
+        .details-status {
+            font-size: 1rem;
             font-weight: 700;
             color: #ffffff;
+            margin-bottom: 0.25rem;
         }
 
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-bottom: 2rem;
+        .details-description {
+            font-size: 0.8rem;
+            color: #aaaaaa;
+            margin-bottom: 0.25rem;
         }
 
-        .btn {
-            padding: 14px 20px;
-            border-radius: 10px;
-            font-size: 1rem;
+        .details-time {
+            font-size: 0.7rem;
+            color: #007bff;
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            text-align: center;
-            border: none;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #c8e6ff, #007bff);
-            color: #000000;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(200, 230, 255, 0.3);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-danger {
-            background: rgba(244, 67, 54, 0.2);
-            color: #f44336;
-            border: 1px solid rgba(244, 67, 54, 0.3);
-        }
-
-        .btn-danger:hover {
-            background: rgba(244, 67, 54, 0.3);
         }
 
         /* Loading State */
@@ -431,7 +533,7 @@
         .error-icon {
             font-size: 3rem;
             margin-bottom: 1rem;
-            color: #f44336;
+            opacity: 0.5;
         }
 
         .error-text {
@@ -439,8 +541,79 @@
             font-size: 0.9rem;
         }
 
+        /* Debug Panel */
+        .debug-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            max-height: 400px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #c8e6ff;
+            border-radius: 10px;
+            padding: 15px;
+            z-index: 10000;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #ffffff;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .debug-panel.active {
+            display: block;
+        }
+
+        .debug-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #c8e6ff;
+        }
+
+        .debug-title {
+            font-weight: bold;
+            color: #c8e6ff;
+        }
+
+        .debug-toggle {
+            background: #c8e6ff;
+            color: #000;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .debug-log {
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .debug-log-entry {
+            margin-bottom: 5px;
+            padding: 2px 0;
+            border-bottom: 1px solid rgba(200, 230, 255, 0.1);
+        }
+
+        .debug-clear {
+            background: #ff4444;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 10px;
+            margin-top: 10px;
+        }
+
         /* Touch optimizations */
-        .btn {
+        .order-item, .order-info-item, .summary-item {
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -463,11 +636,13 @@
     <!-- Header -->
     <header class="header">
         <nav class="nav">
-            <a href="profile-mobile.html" class="logo">
+            <a href="profile-mobile.html" class="back-btn">← Back</a>
+            
+            <a href="layout-winter-frost-mobile.html" class="logo">
                 <img src="assets/Wntrsolace.png" alt="WinterSolace Logo">
             </a>
             
-            <a href="profile-mobile.html" class="back-btn">← Back</a>
+            <div></div>
         </nav>
     </header>
 
@@ -486,13 +661,13 @@
                 <div class="error-text">Order not found</div>
             </div>
 
-            <!-- Order Details Content -->
+            <!-- Order Content -->
             <div id="orderContent" style="display: none;">
                 <!-- Order Header -->
                 <div class="order-header">
-                    <h1 class="order-id" id="orderId">Order #WS-XXXXXX</h1>
-                    <p class="order-date" id="orderDate">-</p>
-                    <span class="order-status" id="orderStatus">Processing</span>
+                    <div class="order-id" id="orderId">Order #</div>
+                    <div class="order-date" id="orderDate">Date</div>
+                    <div class="order-status" id="orderStatus">Status</div>
                 </div>
 
                 <!-- Order Details -->
@@ -500,19 +675,19 @@
                     <h2 class="section-title">Order Information</h2>
                     <div class="order-info">
                         <div class="order-info-item">
-                            <span class="order-info-label">Order ID</span>
-                            <span class="order-info-value" id="orderIdValue">-</span>
-                        </div>
-                        <div class="order-info-item">
-                            <span class="order-info-label">Date</span>
-                            <span class="order-info-value" id="orderDateValue">-</span>
+                            <span class="order-info-label">Customer</span>
+                            <span class="order-info-value" id="customerName">-</span>
                         </div>
                         <div class="order-info-item">
                             <span class="order-info-label">Email</span>
-                            <span class="order-info-value" id="orderEmail">-</span>
+                            <span class="order-info-value" id="customerEmail">-</span>
                         </div>
                         <div class="order-info-item">
-                            <span class="order-info-label">Shipping Address</span>
+                            <span class="order-info-label">Phone</span>
+                            <span class="order-info-value" id="customerPhone">-</span>
+                        </div>
+                        <div class="order-info-item">
+                            <span class="order-info-label">Address</span>
                             <span class="order-info-value" id="shippingAddress">-</span>
                         </div>
                     </div>
@@ -522,7 +697,7 @@
                 <div class="order-items">
                     <h2 class="section-title">Items Ordered</h2>
                     <div id="orderItemsList">
-                        <!-- Order items will be loaded here -->
+                        <!-- Items will be loaded here -->
                     </div>
                 </div>
 
@@ -531,37 +706,67 @@
                     <h2 class="section-title">Order Summary</h2>
                     <div class="summary-item">
                         <span class="summary-label">Subtotal</span>
-                        <span class="summary-value" id="subtotal">$0.00</span>
+                        <span class="summary-value" id="subtotal">£0.00</span>
                     </div>
                     <div class="summary-item">
                         <span class="summary-label">Shipping</span>
-                        <span class="summary-value" id="shipping">$0.00</span>
+                        <span class="summary-value" id="shipping">£0.00</span>
                     </div>
                     <div class="summary-item">
-                        <span class="summary-label">Tax</span>
-                        <span class="summary-value" id="tax">$0.00</span>
-                    </div>
-                    <div class="summary-total">
-                        <div class="summary-total-label">Total</div>
-                        <div class="summary-total-amount" id="total">$0.00</div>
+                        <span class="summary-label">Total</span>
+                        <span class="summary-value" id="total">£0.00</span>
                     </div>
                 </div>
 
-                <!-- Action Buttons -->
-                <div class="action-buttons">
-                    <a href="collections-mobile.html" class="btn btn-primary">
-                        Continue Shopping
-                    </a>
-                    <a href="profile-mobile.html" class="btn btn-secondary">
-                        Back to Orders
-                    </a>
-                    <button class="btn btn-danger" id="cancelOrderBtn" onclick="cancelOrder()" style="display: none;">
-                        Cancel Order
-                    </button>
+                <!-- Tracking Section -->
+                <div class="tracking-section" id="trackingSection" style="display: none;">
+                    <div class="tracking-header">
+                        <h2 class="section-title">🚚 Shipping Progress</h2>
+                        <div class="tracking-number" id="trackingNumber">Tracking: -</div>
+                    </div>
+                    
+                    <div class="tracking-progress">
+                        <div class="progress-steps">
+                            <div class="progress-step">
+                                <div class="step-icon pending" id="step1">📦</div>
+                                <div class="step-label">Ordered</div>
+                            </div>
+                            <div class="progress-step">
+                                <div class="step-icon pending" id="step2">🏭</div>
+                                <div class="step-label">Processing</div>
+                            </div>
+                            <div class="progress-step">
+                                <div class="step-icon pending" id="step3">🚚</div>
+                                <div class="step-label">Shipped</div>
+                            </div>
+                            <div class="progress-step">
+                                <div class="step-icon pending" id="step4">🏠</div>
+                                <div class="step-label">Delivered</div>
+                            </div>
+                            <div class="progress-line" id="progressLine"></div>
+                        </div>
+                    </div>
+
+                    <div class="tracking-details" id="trackingDetails">
+                        <div class="details-title">Latest Update</div>
+                        <div class="details-status" id="detailsStatus">Loading...</div>
+                        <div class="details-description" id="detailsDescription">Getting latest tracking information</div>
+                        <div class="details-time" id="detailsTime">-</div>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
+
+    <!-- Debug Panel -->
+    <div class="debug-panel" id="debugPanel">
+        <div class="debug-header">
+            <div class="debug-title">Debug Log</div>
+            <button class="debug-toggle" onclick="toggleDebug()">Hide</button>
+        </div>
+        <div class="debug-log" id="debugLog"></div>
+        <button class="debug-clear" onclick="clearDebug()">Clear Log</button>
+    </div>
 
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script>
@@ -573,13 +778,43 @@
         let supabase;
         let currentOrder = null;
 
+        // Debug functions
+        function addDebugLog(message) {
+            const debugLog = document.getElementById('debugLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'debug-log-entry';
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            debugLog.appendChild(logEntry);
+            debugLog.scrollTop = debugLog.scrollHeight;
+            console.log(message);
+        }
+
+        function toggleDebug() {
+            const debugPanel = document.getElementById('debugPanel');
+            const toggleBtn = document.querySelector('.debug-toggle');
+            if (debugPanel.classList.contains('active')) {
+                debugPanel.classList.remove('active');
+                toggleBtn.textContent = 'Show';
+            } else {
+                debugPanel.classList.add('active');
+                toggleBtn.textContent = 'Hide';
+            }
+        }
+
+        function clearDebug() {
+            document.getElementById('debugLog').innerHTML = '';
+        }
+
         // Initialize Supabase
         async function initSupabase() {
             try {
+                addDebugLog('Initializing Supabase...');
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                console.log('Supabase initialized successfully');
+                addDebugLog('Supabase initialized successfully');
                 return true;
             } catch (error) {
+                addDebugLog(`Error initializing Supabase: ${error.message}`);
                 console.error('Error initializing Supabase:', error);
                 return false;
             }
@@ -592,14 +827,20 @@
 
         // Load order details
         async function loadOrderDetails() {
-            const orderId = localStorage.getItem('selectedOrder');
-            
-            if (!orderId) {
-                showError();
-                return;
-            }
-
             try {
+                addDebugLog('Loading order details...');
+                
+                // Get order ID from localStorage
+                const orderId = localStorage.getItem('selectedOrder');
+                if (!orderId) {
+                    addDebugLog('No order ID found in localStorage');
+                    showError();
+                    return;
+                }
+
+                addDebugLog(`Loading order: ${orderId}`);
+
+                // Load order from Supabase
                 const { data: order, error } = await supabase
                     .from('orders')
                     .select(`
@@ -615,100 +856,189 @@
                     .eq('id', orderId)
                     .single();
 
-                if (error) throw error;
+                if (error) {
+                    addDebugLog(`Supabase error: ${error.message}`);
+                    addDebugLog(`Error code: ${error.code}`);
+                    throw error;
+                }
+
+                if (!order) {
+                    addDebugLog('Order not found');
+                    showError();
+                    return;
+                }
 
                 currentOrder = order;
-                renderOrderDetails(order);
+                addDebugLog(`Order loaded: ${order.order_number}`);
+                addDebugLog(`Order status: ${order.status}`);
+                addDebugLog(`Order items: ${order.order_items ? order.order_items.length : 0}`);
+
+                renderOrderDetails();
                 
             } catch (error) {
+                addDebugLog(`Error loading order details: ${error.message}`);
                 console.error('Error loading order details:', error);
                 showError();
             }
         }
 
         // Render order details
-        function renderOrderDetails(order) {
+        function renderOrderDetails() {
+            if (!currentOrder) return;
+
+            addDebugLog('Rendering order details...');
+
+            // Order header
+            document.getElementById('orderId').textContent = `Order #${currentOrder.order_number || currentOrder.id}`;
+            document.getElementById('orderDate').textContent = new Date(currentOrder.created_at).toLocaleDateString();
+            
+            const statusElement = document.getElementById('orderStatus');
+            statusElement.textContent = currentOrder.status.charAt(0).toUpperCase() + currentOrder.status.slice(1);
+            statusElement.className = `order-status ${currentOrder.status}`;
+
+            // Customer information
+            document.getElementById('customerName').textContent = `${currentOrder.first_name || ''} ${currentOrder.last_name || ''}`.trim() || 'N/A';
+            document.getElementById('customerEmail').textContent = currentOrder.email || 'N/A';
+            document.getElementById('customerPhone').textContent = currentOrder.phone || 'N/A';
+            
+            // Shipping address
+            const address = [
+                currentOrder.address,
+                currentOrder.city,
+                currentOrder.state,
+                currentOrder.zip_code,
+                currentOrder.country
+            ].filter(Boolean).join(', ');
+            document.getElementById('shippingAddress').textContent = address || 'N/A';
+
+            // Order items
+            renderOrderItems();
+
+            // Order summary
+            document.getElementById('subtotal').textContent = `£${(currentOrder.subtotal || 0).toFixed(2)}`;
+            document.getElementById('shipping').textContent = `£${(currentOrder.shipping || 0).toFixed(2)}`;
+            document.getElementById('total').textContent = `£${(currentOrder.total || 0).toFixed(2)}`;
+
+            // Tracking section
+            if (currentOrder.status === 'shipped' || currentOrder.status === 'delivered') {
+                loadTrackingInfo();
+            }
+
             // Hide loading, show content
             document.getElementById('loadingState').style.display = 'none';
             document.getElementById('orderContent').style.display = 'block';
+        }
 
-            // Update order header
-            document.getElementById('orderId').textContent = `Order #${order.order_id}`;
-            document.getElementById('orderDate').textContent = new Date(order.created_at).toLocaleDateString();
-            document.getElementById('orderStatus').textContent = order.status || 'Processing';
-            document.getElementById('orderStatus').className = `order-status ${order.status || 'processing'}`;
-
-            // Update order information
-            document.getElementById('orderIdValue').textContent = order.order_id;
-            document.getElementById('orderDateValue').textContent = new Date(order.created_at).toLocaleDateString();
-            document.getElementById('orderEmail').textContent = order.customer_email;
-            document.getElementById('shippingAddress').textContent = order.shipping_address || 'Not provided';
-
-            // Render order items
-            const orderItemsList = document.getElementById('orderItemsList');
-            if (order.order_items && order.order_items.length > 0) {
-                orderItemsList.innerHTML = order.order_items.map(item => {
-                    const itemTotal = (item.price || 0) * (item.quantity || 1);
-                    return `
-                        <div class="order-item">
-                            <div class="order-item-image" style="background-image: url('${getCloudinaryUrl(item.products?.main_image_public_id || 'front_g9w8zc', 120, 120)}')"></div>
-                            <div class="order-item-details">
-                                <div class="order-item-name">${item.products?.name || 'Product'}</div>
-                                <div class="order-item-meta">Size: ${item.size} • Qty: ${item.quantity}</div>
-                                <div class="order-item-price">$${item.price.toFixed(2)} each</div>
-                            </div>
-                            <div class="order-item-total">$${itemTotal.toFixed(2)}</div>
-                        </div>
-                    `;
-                }).join('');
-            } else {
-                orderItemsList.innerHTML = '<div class="error-text">No items found</div>';
+        // Render order items
+        function renderOrderItems() {
+            const itemsContainer = document.getElementById('orderItemsList');
+            
+            if (!currentOrder.order_items || currentOrder.order_items.length === 0) {
+                itemsContainer.innerHTML = '<div class="error-text">No items found</div>';
+                return;
             }
 
-            // Update order summary
-            const subtotal = order.order_items?.reduce((sum, item) => sum + (item.price * item.quantity), 0) || 0;
-            const shipping = 0; // Free shipping
-            const tax = subtotal * 0.1; // 10% tax
-            const total = subtotal + shipping + tax;
+            itemsContainer.innerHTML = currentOrder.order_items.map(item => {
+                const imageUrl = getCloudinaryUrl(
+                    item.product_image_public_id || 
+                    item.products?.main_image_public_id || 
+                    'front_g9w8zc', 
+                    120, 
+                    120
+                );
 
-            document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
-            document.getElementById('shipping').textContent = `$${shipping.toFixed(2)}`;
-            document.getElementById('tax').textContent = `$${tax.toFixed(2)}`;
-            document.getElementById('total').textContent = `$${total.toFixed(2)}`;
+                return `
+                    <div class="order-item">
+                        <div class="order-item-image" style="background-image: url('${imageUrl}')"></div>
+                        <div class="order-item-details">
+                            <div class="order-item-name">${item.product_name || item.products?.name || 'Product'}</div>
+                            <div class="order-item-meta">Size: ${item.size} • Qty: ${item.quantity}</div>
+                            <div class="order-item-price">£${(item.unit_price || 0).toFixed(2)} each</div>
+                        </div>
+                        <div class="order-item-total">£${(item.total_price || 0).toFixed(2)}</div>
+                    </div>
+                `;
+            }).join('');
+        }
 
-            // Show cancel button if order is processing
-            if (order.status === 'processing') {
-                document.getElementById('cancelOrderBtn').style.display = 'block';
+        // Load tracking information
+        function loadTrackingInfo() {
+            if (!currentOrder.tracking_number) {
+                addDebugLog('No tracking number available');
+                return;
+            }
+
+            addDebugLog(`Loading tracking info for: ${currentOrder.tracking_number}`);
+            
+            // Show tracking section
+            document.getElementById('trackingSection').style.display = 'block';
+            document.getElementById('trackingNumber').textContent = `Tracking: ${currentOrder.tracking_number}`;
+
+            // Update progress steps based on status
+            updateProgressSteps();
+
+            // Load live tracking data
+            loadLiveTracking();
+        }
+
+        // Update progress steps
+        function updateProgressSteps() {
+            const status = currentOrder.status;
+            
+            // Reset all steps
+            document.querySelectorAll('.step-icon').forEach(icon => {
+                icon.className = 'step-icon pending';
+            });
+
+            // Update based on status
+            if (status === 'pending' || status === 'processing') {
+                document.getElementById('step1').className = 'step-icon completed';
+                document.getElementById('step2').className = 'step-icon current';
+            } else if (status === 'shipped') {
+                document.getElementById('step1').className = 'step-icon completed';
+                document.getElementById('step2').className = 'step-icon completed';
+                document.getElementById('step3').className = 'step-icon current';
+            } else if (status === 'delivered') {
+                document.getElementById('step1').className = 'step-icon completed';
+                document.getElementById('step2').className = 'step-icon completed';
+                document.getElementById('step3').className = 'step-icon completed';
+                document.getElementById('step4').className = 'step-icon completed';
             }
         }
 
-        // Cancel order
-        async function cancelOrder() {
-            if (!currentOrder) return;
-
-            if (!confirm('Are you sure you want to cancel this order?')) {
+        // Load live tracking data
+        async function loadLiveTracking() {
+            if (!currentOrder.tracking_number) {
+                document.getElementById('detailsStatus').textContent = 'No tracking number available';
+                document.getElementById('detailsDescription').textContent = 'No tracking number provided for this order';
+                document.getElementById('detailsTime').textContent = '-';
                 return;
             }
 
             try {
-                const { error } = await supabase
-                    .from('orders')
-                    .update({ status: 'cancelled' })
-                    .eq('id', currentOrder.id);
+                addDebugLog('Loading live tracking data...');
+                
+                // For now, show mock tracking data
+                // In a real implementation, you would call a tracking API
+                const mockTrackingData = {
+                    status: currentOrder.status === 'delivered' ? 'Delivered' : 'In Transit',
+                    description: currentOrder.status === 'delivered' 
+                        ? 'Your package has been delivered successfully'
+                        : 'Your package is on its way to you',
+                    time: new Date().toLocaleString()
+                };
 
-                if (error) throw error;
+                document.getElementById('detailsStatus').textContent = mockTrackingData.status;
+                document.getElementById('detailsDescription').textContent = mockTrackingData.description;
+                document.getElementById('detailsTime').textContent = mockTrackingData.time;
 
-                // Update the UI
-                currentOrder.status = 'cancelled';
-                document.getElementById('orderStatus').textContent = 'Cancelled';
-                document.getElementById('orderStatus').className = 'order-status cancelled';
-                document.getElementById('cancelOrderBtn').style.display = 'none';
-
-                alert('Order cancelled successfully');
+                addDebugLog(`Tracking data loaded: ${mockTrackingData.status}`);
                 
             } catch (error) {
-                console.error('Error cancelling order:', error);
-                alert('Failed to cancel order. Please try again.');
+                addDebugLog(`Error loading tracking data: ${error.message}`);
+                document.getElementById('detailsStatus').textContent = 'Unable to load tracking information';
+                document.getElementById('detailsDescription').textContent = 'Please try again later';
+                document.getElementById('detailsTime').textContent = '-';
             }
         }
 
@@ -720,9 +1050,12 @@
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', async function() {
+            addDebugLog('Page loaded, initializing...');
+            
             // Initialize Supabase
             const supabaseInitialized = await initSupabase();
             if (!supabaseInitialized) {
+                addDebugLog('Failed to initialize Supabase');
                 showError();
                 return;
             }
