@@ -118,17 +118,55 @@
         }
 
         .nav {
+            width: 100%;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 1rem 2rem;
+            padding: 0 2rem;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .nav-center {
+            flex: 1;
+            display: flex;
+            justify-content: center;
             align-items: center;
         }
 
         .logo {
-            height: 60px;
-            filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.1));
+            font-family: 'Dancing Script', cursive;
+            font-size: 24px;
+            font-weight: 400;
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 4rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 400;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.7;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
         .back-link {
@@ -578,8 +616,21 @@
 
     <header class="header">
         <nav class="nav">
-            <img src="assets/Wntrsolace.png" alt="WinterSolace Logo" class="logo">
-            <a href="layout-winter-frost.html" class="back-link">← Back to Home</a>
+            <a href="layout-winter-frost.html" class="logo">
+                <img src="assets/Wntrsolace.png" alt="WinterSolace Logo" style="height: 40px; width: auto;">
+            </a>
+            
+            <div class="nav-center">
+                <ul class="nav-links">
+                    <li><a href="layout-winter-frost.html">Home</a></li>
+                    <li><a href="collections.html">Collection</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-right">
+                <a href="layout-winter-frost.html" class="back-link">← Back to Home</a>
+            </div>
         </nav>
     </header>
 
