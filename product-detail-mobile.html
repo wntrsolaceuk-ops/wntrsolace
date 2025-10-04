@@ -355,6 +355,7 @@
             max-width: 90vw;
             max-height: 90vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
         }
@@ -396,8 +397,8 @@
 
         .overlay-close {
             position: absolute;
-            top: -60px;
-            right: 0;
+            top: 20px;
+            right: 20px;
             background: rgba(0, 0, 0, 0.7);
             border: 2px solid rgba(200, 230, 255, 0.3);
             border-radius: 50%;
@@ -409,6 +410,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             color: #c8e6ff;
+            z-index: 10002;
         }
 
         .overlay-close:hover {
@@ -433,6 +435,8 @@
             align-items: center;
             justify-content: center;
             margin-top: 20px;
+            position: relative;
+            z-index: 10001;
         }
 
         @media (max-width: 768px) {
@@ -450,7 +454,8 @@
             }
             
             .overlay-close {
-                top: -50px;
+                top: 15px;
+                right: 15px;
                 width: 35px;
                 height: 35px;
             }
