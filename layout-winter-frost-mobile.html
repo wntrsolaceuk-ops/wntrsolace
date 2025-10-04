@@ -276,6 +276,86 @@
             height: 18px;
         }
 
+        .debug-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 193, 7, 0.1);
+            border: 2px solid rgba(255, 193, 7, 0.3);
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: #ffc107;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            margin-top: 0.5rem;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .debug-btn:hover {
+            background: rgba(255, 193, 7, 0.2);
+            border-color: rgba(255, 193, 7, 0.5);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+        }
+
+        .debug-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .debug-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid rgba(255, 193, 7, 0.5);
+            border-radius: 10px;
+            padding: 1rem;
+            max-width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+            z-index: 10001;
+            display: none;
+            color: #ffffff;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .debug-panel.active {
+            display: block;
+        }
+
+        .debug-panel h3 {
+            color: #ffc107;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .debug-panel pre {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem;
+            border-radius: 5px;
+            margin: 0.5rem 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .debug-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: #ffc107;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
         /* Main Content */
         .main-content {
             margin-top: 60px;
@@ -509,6 +589,13 @@
                 </svg>
                 Logout
             </button>
+            <button class="debug-btn" onclick="showDebugPanel()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
+                </svg>
+                Debug
+            </button>
         </div>
     </div>
 
@@ -554,6 +641,15 @@
         </div>
     </footer>
 
+    <!-- Debug Panel -->
+    <div class="debug-panel" id="debugPanel">
+        <button class="debug-close" onclick="closeDebugPanel()">×</button>
+        <h3>Debug Information</h3>
+        <div id="debugContent">
+            <pre id="debugData">Loading debug data...</pre>
+        </div>
+    </div>
+
     <script>
         // Mobile menu toggle
         function toggleMobileMenu() {
@@ -588,21 +684,31 @@
             const mobileUserTextElement = document.getElementById('mobileUserText');
             const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
             
+            console.log('updateUserProfile called, isLoggedIn:', isLoggedIn);
+            
             if (isLoggedIn) {
                 try {
                     // First try to get user data from localStorage
                     const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                    console.log('userData from localStorage:', userData);
+                    
                     let displayName = 'User';
                     
                     if (userData.full_name) {
                         displayName = userData.full_name;
+                        console.log('Using full_name:', displayName);
                     } else if (userData.first_name) {
                         displayName = userData.first_name;
+                        console.log('Using first_name:', displayName);
                     } else if (userData.email) {
                         displayName = userData.email.split('@')[0];
+                        console.log('Using email username:', displayName);
                     } else if (localStorage.getItem('username')) {
                         displayName = localStorage.getItem('username');
+                        console.log('Using localStorage username:', displayName);
                     }
+                    
+                    console.log('Final displayName:', displayName);
                     
                     if (userTextElement) userTextElement.textContent = displayName;
                     if (mobileUserTextElement) mobileUserTextElement.textContent = displayName;
@@ -610,17 +716,30 @@
                     
                     // Also try to get fresh data from Supabase if available
                     if (supabase) {
+                        console.log('Getting fresh data from Supabase...');
                         const { data: { user }, error } = await supabase.auth.getUser();
                         if (!error && user) {
+                            console.log('Supabase user data:', user);
+                            console.log('user_metadata:', user.user_metadata);
+                            
                             const freshName = user.user_metadata?.full_name || user.user_metadata?.first_name || user.email.split('@')[0];
-                            if (userTextElement) userTextElement.textContent = freshName;
-                            if (mobileUserTextElement) mobileUserTextElement.textContent = freshName;
-                            // Update localStorage with fresh data
-                            localStorage.setItem('userData', JSON.stringify({
-                                full_name: user.user_metadata?.full_name,
-                                first_name: user.user_metadata?.first_name,
-                                email: user.email
-                            }));
+                            console.log('Fresh name from Supabase:', freshName);
+                            
+                            if (freshName && freshName !== 'User') {
+                                if (userTextElement) userTextElement.textContent = freshName;
+                                if (mobileUserTextElement) mobileUserTextElement.textContent = freshName;
+                                
+                                // Update localStorage with fresh data
+                                localStorage.setItem('userData', JSON.stringify({
+                                    full_name: user.user_metadata?.full_name,
+                                    first_name: user.user_metadata?.first_name,
+                                    last_name: user.user_metadata?.last_name,
+                                    email: user.email
+                                }));
+                                console.log('Updated localStorage with fresh data');
+                            }
+                        } else {
+                            console.log('Supabase error or no user:', error);
                         }
                     }
                 } catch (error) {
@@ -696,6 +815,65 @@
                     }
                 }, 300);
             }, 5000);
+        }
+
+        // Debug functions
+        function showDebugPanel() {
+            const debugPanel = document.getElementById('debugPanel');
+            const debugData = document.getElementById('debugData');
+            
+            // Collect debug information
+            const debugInfo = {
+                timestamp: new Date().toISOString(),
+                localStorage: {
+                    userLoggedIn: localStorage.getItem('userLoggedIn'),
+                    username: localStorage.getItem('username'),
+                    userEmail: localStorage.getItem('userEmail'),
+                    userData: localStorage.getItem('userData'),
+                    signupSuccess: localStorage.getItem('signupSuccess')
+                },
+                userDataParsed: (() => {
+                    try {
+                        return JSON.parse(localStorage.getItem('userData') || '{}');
+                    } catch (e) {
+                        return { error: 'Failed to parse userData' };
+                    }
+                })(),
+                domElements: {
+                    userText: document.getElementById('userText')?.textContent,
+                    mobileUserText: document.getElementById('mobileUserText')?.textContent,
+                    mobileLogoutBtn: document.getElementById('mobileLogoutBtn')?.style.display
+                },
+                supabase: {
+                    initialized: !!supabase,
+                    user: null
+                }
+            };
+            
+            // Try to get Supabase user data
+            if (supabase) {
+                supabase.auth.getUser().then(({ data: { user }, error }) => {
+                    debugInfo.supabase.user = user ? {
+                        id: user.id,
+                        email: user.email,
+                        user_metadata: user.user_metadata,
+                        created_at: user.created_at
+                    } : { error: error?.message || 'No user found' };
+                    
+                    debugData.textContent = JSON.stringify(debugInfo, null, 2);
+                }).catch(err => {
+                    debugInfo.supabase.user = { error: err.message };
+                    debugData.textContent = JSON.stringify(debugInfo, null, 2);
+                });
+            } else {
+                debugData.textContent = JSON.stringify(debugInfo, null, 2);
+            }
+            
+            debugPanel.classList.add('active');
+        }
+
+        function closeDebugPanel() {
+            document.getElementById('debugPanel').classList.remove('active');
         }
 
         // Logout function
