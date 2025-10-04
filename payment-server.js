@@ -130,6 +130,29 @@ app.post('/api/complete-order', async (req, res) => {
             console.log('Saving order to database...');
             
             // Insert order
+            // Parse shipping address into separate fields
+            let address = '', city = '', state = '', zipCode = '', country = '';
+            if (orderData.shipping_address) {
+                if (typeof orderData.shipping_address === 'object') {
+                    address = orderData.shipping_address.street || '';
+                    city = orderData.shipping_address.city || '';
+                    state = orderData.shipping_address.state || '';
+                    zipCode = orderData.shipping_address.zip || '';
+                    country = orderData.shipping_address.country || '';
+                } else {
+                    // Parse string format: "street, city, state zip, country"
+                    const parts = orderData.shipping_address.split(',').map(p => p.trim());
+                    address = parts[0] || '';
+                    city = parts[1] || '';
+                    if (parts[2]) {
+                        const stateZip = parts[2].split(' ');
+                        state = stateZip[0] || '';
+                        zipCode = stateZip[1] || '';
+                    }
+                    country = parts[3] || '';
+                }
+            }
+
             const { data: order, error: orderError } = await supabase
                 .from('orders')
                 .insert({
@@ -138,10 +161,14 @@ app.post('/api/complete-order', async (req, res) => {
                     last_name: orderData.last_name || customerName.split(' ').slice(1).join(' ') || '',
                     email: customerEmail,
                     phone: customerPhone,
-                    shipping_address: shippingAddress,
-                    payment_intent_id: paymentIntentId,
-                    total_amount: orderData.total_amount || orderData.total,
-                    status: orderData.status || 'confirmed',
+                    address: address,
+                    city: city,
+                    state: state,
+                    zip_code: zipCode,
+                    country: country,
+                    stripe_payment_intent_id: paymentIntentId,
+                    total: orderData.total_amount || orderData.total,
+                    status: orderData.status || 'processing',
                     notes: orderData.notes || ''
                 })
                 .select()
