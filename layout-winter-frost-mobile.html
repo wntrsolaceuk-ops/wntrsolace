@@ -245,6 +245,37 @@
             margin-bottom: 1rem;
         }
 
+        .mobile-logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(220, 53, 69, 0.1);
+            border: 2px solid rgba(220, 53, 69, 0.3);
+            border-radius: 8px;
+            padding: 12px 20px;
+            color: #dc3545;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            margin-top: 1rem;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .mobile-logout-btn:hover {
+            background: rgba(220, 53, 69, 0.2);
+            border-color: rgba(220, 53, 69, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        .mobile-logout-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
         /* Main Content */
         .main-content {
             margin-top: 60px;
@@ -470,6 +501,14 @@
                 </svg>
                 <span class="user-text" id="mobileUserText">Sign In</span>
             </div>
+            <button class="mobile-logout-btn" id="mobileLogoutBtn" onclick="logoutUser()" style="display: none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16,17 21,12 16,7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Logout
+            </button>
         </div>
     </div>
 
@@ -547,6 +586,7 @@
             const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
             const userTextElement = document.getElementById('userText');
             const mobileUserTextElement = document.getElementById('mobileUserText');
+            const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
             
             if (isLoggedIn) {
                 try {
@@ -566,6 +606,7 @@
                     
                     if (userTextElement) userTextElement.textContent = displayName;
                     if (mobileUserTextElement) mobileUserTextElement.textContent = displayName;
+                    if (mobileLogoutBtn) mobileLogoutBtn.style.display = 'flex';
                     
                     // Also try to get fresh data from Supabase if available
                     if (supabase) {
@@ -588,10 +629,12 @@
                     const username = localStorage.getItem('username') || 'User';
                     if (userTextElement) userTextElement.textContent = username;
                     if (mobileUserTextElement) mobileUserTextElement.textContent = username;
+                    if (mobileLogoutBtn) mobileLogoutBtn.style.display = 'flex';
                 }
             } else {
                 if (userTextElement) userTextElement.textContent = 'Sign In';
                 if (mobileUserTextElement) mobileUserTextElement.textContent = 'Sign In';
+                if (mobileLogoutBtn) mobileLogoutBtn.style.display = 'none';
             }
         }
 
@@ -653,6 +696,27 @@
                     }
                 }, 300);
             }, 5000);
+        }
+
+        // Logout function
+        async function logoutUser() {
+            try {
+                if (supabase) {
+                    const { error } = await supabase.auth.signOut();
+                    if (error) {
+                        console.error('Supabase logout error:', error);
+                    }
+                }
+                localStorage.removeItem('userLoggedIn');
+                localStorage.removeItem('username');
+                localStorage.removeItem('userEmail');
+                localStorage.removeItem('userData');
+                console.log('User logged out successfully');
+                window.location.href = 'auth-mobile.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+                alert('Logout failed. Please try again.');
+            }
         }
 
         // Initialize page
