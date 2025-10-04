@@ -97,7 +97,8 @@ app.post('/api/complete-order', async (req, res) => {
                     customer_name: customerName,
                     customer_email: customerEmail,
                     shipping_address: shippingAddress,
-                    payment_intent_id: paymentIntentId
+                    payment_intent_id: paymentIntentId,
+                    total_amount: orderData.total_amount || orderData.total || 0
                 },
                 orderItems: orderData.items || []
             };
@@ -132,10 +133,11 @@ app.post('/api/complete-order', async (req, res) => {
             const { data: order, error: orderError } = await supabase
                 .from('orders')
                 .insert({
-                    order_id: orderNumber,
-                    customer_name: customerName,
-                    customer_email: customerEmail,
-                    customer_phone: customerPhone,
+                    order_number: orderNumber,
+                    first_name: orderData.first_name || customerName.split(' ')[0] || '',
+                    last_name: orderData.last_name || customerName.split(' ').slice(1).join(' ') || '',
+                    email: customerEmail,
+                    phone: customerPhone,
                     shipping_address: shippingAddress,
                     payment_intent_id: paymentIntentId,
                     total_amount: orderData.total_amount || orderData.total,
