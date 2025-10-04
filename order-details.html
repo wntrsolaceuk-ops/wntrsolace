@@ -1568,43 +1568,9 @@
 
         // Update shipping progress based on tracking status
         function updateShippingProgress(latestEvent) {
-            const eventTitle = latestEvent.title.toLowerCase();
-            const eventDescription = latestEvent.description.toLowerCase();
-            
-            let currentStep = 0;
-            let progressWidth = 0;
-
-            // Determine current step based on tracking data
-            if (eventTitle.includes('delivered') || eventDescription.includes('delivered')) {
-                currentStep = 3;
-                progressWidth = 100;
-            } else if (eventDescription.includes('local depot') || eventDescription.includes('arrival center') || 
-                      eventDescription.includes('out for delivery') || eventDescription.includes('arrived at destination')) {
-                currentStep = 2;
-                progressWidth = 75;
-            } else if (eventDescription.includes('sorting center') || eventDescription.includes('picked up') || 
-                      eventDescription.includes('in transit') || eventDescription.includes('departed')) {
-                currentStep = 1;
-                progressWidth = 50;
-            } else if (eventTitle.includes('shipped') || eventDescription.includes('shipped') || 
-                      eventDescription.includes('processing') || eventDescription.includes('prepared')) {
-                currentStep = 0;
-                progressWidth = 25;
-            }
-
-            // Update progress line
-            document.getElementById('progressLineFill').style.width = `${progressWidth}%`;
-            
-            // Update step icons
-            const stepIcons = document.querySelectorAll('.step-icon');
-            stepIcons.forEach((icon, index) => {
-                icon.classList.remove('completed', 'active');
-                if (index < currentStep) {
-                    icon.classList.add('completed');
-                } else if (index === currentStep) {
-                    icon.classList.add('active');
-                }
-            });
+            console.log('Updating shipping progress for event:', latestEvent);
+            // Progress is already handled by updateTrackingDisplay() function
+            // This function is kept for compatibility but doesn't need to do anything
         }
 
         // Show tracking details at bottom
