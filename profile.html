@@ -636,7 +636,7 @@
             
             <div class="nav-right">
                 <div class="user-section" id="userSection" onclick="handleUserClick()">
-                    <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px;">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                         <circle cx="12" cy="7" r="4"></circle>
                     </svg>
@@ -822,10 +822,27 @@
                         const username = localStorage.getItem('username');
                         const userEmail = localStorage.getItem('userEmail');
                         if (username || userEmail) {
-                            // For now, use a placeholder ID since we don't have the actual user ID
-                            // This is a temporary solution until we can properly link localStorage to Supabase
-                            userId = 'local-user-' + (username || userEmail);
-                            console.log('Using placeholder user ID:', userId);
+                            // Try to find user by email in Supabase
+                            try {
+                                const { data: users, error } = await supabase
+                                    .from('auth.users')
+                                    .select('id')
+                                    .eq('email', userEmail || username + '@example.com')
+                                    .limit(1);
+                                
+                                if (users && users.length > 0) {
+                                    userId = users[0].id;
+                                    console.log('Found user by email:', userId);
+                                } else {
+                                    console.log('No user found by email, showing empty state');
+                                    showEmptyState();
+                                    return;
+                                }
+                            } catch (e) {
+                                console.log('Error querying users by email:', e);
+                                showEmptyState();
+                                return;
+                            }
                         }
                     }
                 }
@@ -837,13 +854,6 @@
                 }
 
                 console.log('Loading orders for user:', userId);
-                
-                // If using placeholder ID, show empty state
-                if (userId.startsWith('local-user-')) {
-                    console.log('Using placeholder user ID - showing empty state');
-                    showEmptyState();
-                    return;
-                }
                 
                 const { data: ordersData, error } = await supabase
                     .from('orders')
