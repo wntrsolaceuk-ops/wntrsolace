@@ -309,51 +309,96 @@
 
         .debug-panel {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(0, 0, 0, 0.95);
-            border: 2px solid rgba(255, 193, 7, 0.5);
-            border-radius: 10px;
-            padding: 1rem;
-            max-width: 90%;
-            max-height: 80%;
-            overflow-y: auto;
             z-index: 10001;
             display: none;
             color: #ffffff;
             font-family: monospace;
             font-size: 12px;
+            overflow-y: auto;
         }
 
         .debug-panel.active {
             display: block;
         }
 
-        .debug-panel h3 {
-            color: #ffc107;
-            margin-bottom: 1rem;
-            text-align: center;
+        .debug-header {
+            background: rgba(255, 193, 7, 0.2);
+            border-bottom: 2px solid rgba(255, 193, 7, 0.5);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10002;
         }
 
-        .debug-panel pre {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 0.5rem;
-            border-radius: 5px;
-            margin: 0.5rem 0;
-            white-space: pre-wrap;
-            word-wrap: break-word;
+        .debug-header h3 {
+            color: #ffc107;
+            margin: 0;
+            font-size: 16px;
         }
 
         .debug-close {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: none;
-            border: none;
+            background: rgba(255, 193, 7, 0.2);
+            border: 2px solid rgba(255, 193, 7, 0.5);
+            border-radius: 5px;
             color: #ffc107;
-            font-size: 18px;
+            font-size: 16px;
+            padding: 8px 12px;
             cursor: pointer;
+            font-weight: bold;
+        }
+
+        .debug-close:hover {
+            background: rgba(255, 193, 7, 0.3);
+        }
+
+        .debug-content {
+            padding: 1rem;
+        }
+
+        .debug-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .debug-section h4 {
+            color: #ffc107;
+            margin: 0 0 0.5rem 0;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255, 193, 7, 0.3);
+            padding-bottom: 0.5rem;
+        }
+
+        .debug-section pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.5rem;
+            border-radius: 5px;
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .debug-status {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid rgba(40, 167, 69, 0.5);
+            border-radius: 5px;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            color: #28a745;
+            font-weight: bold;
+            text-align: center;
         }
 
         /* Main Content */
@@ -643,10 +688,12 @@
 
     <!-- Debug Panel -->
     <div class="debug-panel" id="debugPanel">
-        <button class="debug-close" onclick="closeDebugPanel()">×</button>
-        <h3>Debug Information</h3>
-        <div id="debugContent">
-            <pre id="debugData">Loading debug data...</pre>
+        <div class="debug-header">
+            <h3>🔍 Debug Information</h3>
+            <button class="debug-close" onclick="closeDebugPanel()">Close</button>
+        </div>
+        <div class="debug-content" id="debugContent">
+            <div class="debug-status">Loading debug data...</div>
         </div>
     </div>
 
@@ -819,26 +866,17 @@
 
         // Debug functions
         function showDebugPanel() {
-            console.log('showDebugPanel called');
-            alert('Debug button clicked!');
-            
             const debugPanel = document.getElementById('debugPanel');
-            const debugData = document.getElementById('debugData');
+            const debugContent = document.getElementById('debugContent');
             
-            console.log('debugPanel element:', debugPanel);
-            console.log('debugData element:', debugData);
-            
-            if (!debugPanel) {
-                console.error('Debug panel not found!');
+            if (!debugPanel || !debugContent) {
                 alert('Debug panel not found!');
                 return;
             }
             
-            if (!debugData) {
-                console.error('Debug data element not found!');
-                alert('Debug data element not found!');
-                return;
-            }
+            // Show loading status
+            debugContent.innerHTML = '<div class="debug-status">Loading debug data...</div>';
+            debugPanel.classList.add('active');
             
             // Collect debug information
             const debugInfo = {
@@ -868,8 +906,6 @@
                 }
             };
             
-            console.log('Debug info collected:', debugInfo);
-            
             // Try to get Supabase user data
             if (supabase) {
                 supabase.auth.getUser().then(({ data: { user }, error }) => {
@@ -880,21 +916,55 @@
                         created_at: user.created_at
                     } : { error: error?.message || 'No user found' };
                     
-                    debugData.textContent = JSON.stringify(debugInfo, null, 2);
-                    console.log('Debug panel should be visible now');
+                    displayDebugInfo(debugInfo);
                 }).catch(err => {
                     debugInfo.supabase.user = { error: err.message };
-                    debugData.textContent = JSON.stringify(debugInfo, null, 2);
-                    console.log('Debug panel should be visible now (error case)');
+                    displayDebugInfo(debugInfo);
                 });
             } else {
-                debugData.textContent = JSON.stringify(debugInfo, null, 2);
-                console.log('Debug panel should be visible now (no supabase)');
+                displayDebugInfo(debugInfo);
             }
+        }
+
+        function displayDebugInfo(debugInfo) {
+            const debugContent = document.getElementById('debugContent');
             
-            console.log('Adding active class to debug panel');
-            debugPanel.classList.add('active');
-            console.log('Debug panel classes:', debugPanel.className);
+            const html = `
+                <div class="debug-status">✅ Debug data loaded successfully</div>
+                
+                <div class="debug-section">
+                    <h4>📱 Current Display</h4>
+                    <pre>User Text: "${debugInfo.domElements.userText}"
+Mobile User Text: "${debugInfo.domElements.mobileUserText}"
+Logout Button: ${debugInfo.domElements.mobileLogoutBtn}</pre>
+                </div>
+                
+                <div class="debug-section">
+                    <h4>💾 LocalStorage Data</h4>
+                    <pre>userLoggedIn: ${debugInfo.localStorage.userLoggedIn}
+username: ${debugInfo.localStorage.username || 'null'}
+userEmail: ${debugInfo.localStorage.userEmail || 'null'}
+userData: ${debugInfo.localStorage.userData || 'null'}</pre>
+                </div>
+                
+                <div class="debug-section">
+                    <h4>👤 Parsed User Data</h4>
+                    <pre>${JSON.stringify(debugInfo.userDataParsed, null, 2)}</pre>
+                </div>
+                
+                <div class="debug-section">
+                    <h4>🔐 Supabase Status</h4>
+                    <pre>Initialized: ${debugInfo.supabase.initialized}
+User Data: ${JSON.stringify(debugInfo.supabase.user, null, 2)}</pre>
+                </div>
+                
+                <div class="debug-section">
+                    <h4>⏰ Timestamp</h4>
+                    <pre>${debugInfo.timestamp}</pre>
+                </div>
+            `;
+            
+            debugContent.innerHTML = html;
         }
 
         function closeDebugPanel() {
