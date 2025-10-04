@@ -1459,12 +1459,17 @@
             
             if (cachedData && !bypassCache) {
                 const { data, timestamp } = JSON.parse(cachedData);
-                const hoursSinceCache = (now - timestamp) / (1000 * 60 * 60);
-                
-                if (hoursSinceCache < 24) {
-                    console.log('Using cached tracking data');
-                    displayTrackingTimeline(data);
-                    return;
+                // If cached data contains simulated events (like "Order Placed"), clear it
+                if (data.events && data.events.length > 0 && data.events[0].title === 'Order Placed') {
+                    console.log('Clearing cached fallback data - forcing fresh API call');
+                    localStorage.removeItem(cacheKey);
+                } else {
+                    const hoursSinceCache = (now - timestamp) / (1000 * 60 * 60);
+                    if (hoursSinceCache < 24) {
+                        console.log('Using cached tracking data');
+                        displayTrackingTimeline(data);
+                        return;
+                    }
                 }
             }
             
@@ -1493,6 +1498,14 @@
 
                 const trackingData = await response.json();
                 console.log('Track123 API response:', trackingData);
+                console.log('Track123 API response type:', typeof trackingData);
+                console.log('Track123 API response keys:', Object.keys(trackingData));
+                
+                // Check if we have valid tracking data
+                if (!trackingData || !trackingData.data) {
+                    console.error('Invalid Track123 response - no data field');
+                    throw new Error('Invalid tracking response from API');
+                }
 
                 // Cache the data for 24 hours
                 localStorage.setItem(cacheKey, JSON.stringify({
