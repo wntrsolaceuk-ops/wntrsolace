@@ -701,21 +701,41 @@
         // Logout function
         async function logoutUser() {
             try {
-                if (supabase) {
-                    const { error } = await supabase.auth.signOut();
-                    if (error) {
-                        console.error('Supabase logout error:', error);
-                    }
-                }
+                console.log('Starting logout process...');
+                
+                // Clear localStorage first
                 localStorage.removeItem('userLoggedIn');
                 localStorage.removeItem('username');
                 localStorage.removeItem('userEmail');
                 localStorage.removeItem('userData');
-                console.log('User logged out successfully');
+                console.log('LocalStorage cleared');
+                
+                // Try to sign out from Supabase if available
+                if (supabase) {
+                    console.log('Attempting Supabase signout...');
+                    const { error } = await supabase.auth.signOut();
+                    if (error) {
+                        console.error('Supabase logout error:', error);
+                        // Don't fail the logout if Supabase has issues
+                    } else {
+                        console.log('Supabase signout successful');
+                    }
+                } else {
+                    console.log('Supabase not available, skipping signout');
+                }
+                
+                console.log('Logout completed successfully');
                 window.location.href = 'auth-mobile.html';
+                
             } catch (error) {
                 console.error('Logout error:', error);
-                alert('Logout failed. Please try again.');
+                // Even if there's an error, clear localStorage and redirect
+                localStorage.removeItem('userLoggedIn');
+                localStorage.removeItem('username');
+                localStorage.removeItem('userEmail');
+                localStorage.removeItem('userData');
+                console.log('Forced logout - redirecting anyway');
+                window.location.href = 'auth-mobile.html';
             }
         }
 
