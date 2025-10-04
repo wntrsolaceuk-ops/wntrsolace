@@ -641,7 +641,7 @@
                         <div class="product-info">
                             <h3 class="product-title">${product.name}</h3>
                             <p class="product-description">${product.description}</p>
-                            <p class="product-price">$${product.price}</p>
+                            <p class="product-price">£${product.price}</p>
                             <button class="add-to-cart ${isPreorder ? 'preorder-btn' : ''}" 
                                     onclick="event.stopPropagation(); ${isPreorder ? 'goToProductDetail(\'' + product.id + '\')' : 'addToCart(\'' + product.id + '\')'}">
                                 ${isPreorder ? 'Pre-Order Now' : 'Add to Cart'}
