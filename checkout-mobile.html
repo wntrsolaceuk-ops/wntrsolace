@@ -913,13 +913,8 @@
 
         // Calculate shipping
         function calculateShipping(subtotal, country) {
-            if (country === 'UK') {
-                return subtotal >= 50 ? 0 : 5.99;
-            } else if (['US', 'CA'].includes(country)) {
-                return subtotal >= 100 ? 0 : 15.99;
-            } else {
-                return subtotal >= 150 ? 0 : 25.99;
-            }
+            // Free shipping for all countries
+            return 0;
         }
 
         // Update cart count
