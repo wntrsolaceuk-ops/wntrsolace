@@ -367,9 +367,6 @@
         }
 
         .overlay-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
             background: rgba(0, 0, 0, 0.7);
             border: 2px solid rgba(200, 230, 255, 0.3);
             border-radius: 50%;
@@ -386,15 +383,15 @@
         .overlay-nav:hover {
             background: rgba(200, 230, 255, 0.2);
             border-color: rgba(200, 230, 255, 0.5);
-            transform: translateY(-50%) scale(1.1);
+            transform: scale(1.1);
         }
 
         .overlay-nav.prev {
-            left: -70px;
+            margin-right: 20px;
         }
 
         .overlay-nav.next {
-            right: -70px;
+            margin-left: 20px;
         }
 
         .overlay-close {
@@ -421,10 +418,6 @@
         }
 
         .overlay-counter {
-            position: absolute;
-            bottom: -50px;
-            left: 50%;
-            transform: translateX(-50%);
             background: rgba(0, 0, 0, 0.7);
             border: 1px solid rgba(200, 230, 255, 0.3);
             border-radius: 20px;
@@ -432,6 +425,14 @@
             color: #c8e6ff;
             font-size: 14px;
             font-weight: 500;
+            margin: 0 20px;
+        }
+
+        .overlay-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
         }
 
         @media (max-width: 768px) {
@@ -441,17 +442,23 @@
             }
             
             .overlay-nav.prev {
-                left: -50px;
+                margin-right: 15px;
             }
             
             .overlay-nav.next {
-                right: -50px;
+                margin-left: 15px;
             }
             
             .overlay-close {
                 top: -50px;
                 width: 35px;
                 height: 35px;
+            }
+            
+            .overlay-counter {
+                margin: 0 15px;
+                font-size: 12px;
+                padding: 6px 12px;
             }
         }
 
@@ -1035,6 +1042,11 @@
         let selectedSize = 'L';
         let currentOverlayImageIndex = 0;
         let quantity = 1;
+        
+        // Touch/swipe variables
+        let touchStartX = 0;
+        let touchEndX = 0;
+        let isDragging = false;
 
         // Initialize Supabase
         async function initSupabase() {
@@ -1481,6 +1493,39 @@
             overlayCounter.textContent = `${currentOverlayImageIndex + 1} / ${allImages.length}`;
         }
 
+        // Touch/Swipe functions
+        function handleTouchStart(e) {
+            touchStartX = e.touches[0].clientX;
+            isDragging = true;
+        }
+
+        function handleTouchMove(e) {
+            if (!isDragging) return;
+            e.preventDefault(); // Prevent scrolling while swiping
+        }
+
+        function handleTouchEnd(e) {
+            if (!isDragging) return;
+            touchEndX = e.changedTouches[0].clientX;
+            handleSwipe();
+            isDragging = false;
+        }
+
+        function handleSwipe() {
+            const swipeThreshold = 50; // Minimum distance for a swipe
+            const swipeDistance = touchStartX - touchEndX;
+
+            if (Math.abs(swipeDistance) > swipeThreshold) {
+                if (swipeDistance > 0) {
+                    // Swipe left - next image
+                    nextOverlayImage();
+                } else {
+                    // Swipe right - previous image
+                    previousOverlayImage();
+                }
+            }
+        }
+
         // Initialize page
         document.addEventListener('DOMContentLoaded', async function() {
             updateUserProfile();
@@ -1519,6 +1564,12 @@
                     closeImageOverlay();
                 }
             });
+            
+            // Add touch/swipe event listeners to overlay image
+            const overlayImage = document.getElementById('overlayImage');
+            overlayImage.addEventListener('touchstart', handleTouchStart, { passive: false });
+            overlayImage.addEventListener('touchmove', handleTouchMove, { passive: false });
+            overlayImage.addEventListener('touchend', handleTouchEnd, { passive: false });
         });
 
         // Listen for cart updates
@@ -1539,21 +1590,23 @@
                 </svg>
             </button>
             
-            <button class="overlay-nav prev" onclick="previousOverlayImage()">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="15,18 9,12 15,6"></polyline>
-                </svg>
-            </button>
-            
             <img class="overlay-image" id="overlayImage" src="" alt="Product Image">
             
-            <button class="overlay-nav next" onclick="nextOverlayImage()">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="9,18 15,12 9,6"></polyline>
-                </svg>
-            </button>
-            
-            <div class="overlay-counter" id="overlayCounter">1 / 1</div>
+            <div class="overlay-controls">
+                <button class="overlay-nav prev" onclick="previousOverlayImage()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15,18 9,12 15,6"></polyline>
+                    </svg>
+                </button>
+                
+                <div class="overlay-counter" id="overlayCounter">1 / 1</div>
+                
+                <button class="overlay-nav next" onclick="nextOverlayImage()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9,18 15,12 9,6"></polyline>
+                    </svg>
+                </button>
+            </div>
         </div>
     </div>
 </body>
