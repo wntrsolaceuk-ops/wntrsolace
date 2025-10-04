@@ -1570,11 +1570,14 @@
             // Create 4 shipping steps
             createShippingSteps();
             
-            // Update progress based on latest event
+            // Update progress based on latest event from Track123 API
             updateShippingProgress(trackingData.events[0]);
             
             // Show tracking details at bottom
             showTrackingDetails(trackingData.events[0]);
+            
+            // Update the main tracking display with real API data
+            updateTrackingDisplayFromAPI(trackingData.events[0]);
         }
 
         // Create 4 shipping steps
@@ -1765,6 +1768,62 @@
                 if (userNameElement) {
                     userNameElement.textContent = 'User';
                 }
+            }
+        }
+
+        // Update tracking display with real API data
+        function updateTrackingDisplayFromAPI(latestEvent) {
+            const statusIcon = document.getElementById('statusIcon');
+            const statusTitle = document.getElementById('statusTitle');
+            const statusSubtitle = document.getElementById('statusSubtitle');
+            const progressFill = document.getElementById('progressFill');
+            const carrierInfo = document.getElementById('carrierInfo');
+            
+            if (!latestEvent) return;
+            
+            console.log('Updating tracking display with API data:', latestEvent);
+            
+            // Determine status based on event title/description
+            const eventTitle = latestEvent.title.toLowerCase();
+            const eventDesc = latestEvent.description.toLowerCase();
+            
+            if (eventTitle.includes('delivered') || eventDesc.includes('delivered')) {
+                progressFill.style.width = '100%';
+                statusIcon.textContent = '✅';
+                statusTitle.textContent = 'Delivered';
+                statusSubtitle.textContent = 'Package delivered successfully';
+                carrierInfo.textContent = currentOrder.shipping_company || 'Carrier';
+            } else if (eventTitle.includes('out for delivery') || eventDesc.includes('out for delivery')) {
+                progressFill.style.width = '90%';
+                statusIcon.textContent = '🚚';
+                statusTitle.textContent = 'Out for Delivery';
+                statusSubtitle.textContent = 'Package is out for delivery today';
+                carrierInfo.textContent = currentOrder.shipping_company || 'Carrier';
+            } else if (eventTitle.includes('in transit') || eventDesc.includes('in transit') || eventTitle.includes('shipped')) {
+                progressFill.style.width = '60%';
+                statusIcon.textContent = '🚚';
+                statusTitle.textContent = 'In Transit';
+                statusSubtitle.textContent = 'Package is on its way';
+                carrierInfo.textContent = currentOrder.shipping_company || 'Carrier';
+            } else if (eventTitle.includes('processing') || eventDesc.includes('processing')) {
+                progressFill.style.width = '30%';
+                statusIcon.textContent = '📦';
+                statusTitle.textContent = 'Processing';
+                statusSubtitle.textContent = 'Order is being prepared';
+                carrierInfo.textContent = 'Preparing for shipment';
+            } else {
+                // Default to shipped status for unknown events
+                progressFill.style.width = '60%';
+                statusIcon.textContent = '🚚';
+                statusTitle.textContent = latestEvent.title || 'In Transit';
+                statusSubtitle.textContent = latestEvent.description || 'Package is on its way';
+                carrierInfo.textContent = currentOrder.shipping_company || 'Carrier';
+            }
+            
+            // Update last update time
+            const lastUpdateElement = document.getElementById('lastUpdate');
+            if (lastUpdateElement) {
+                lastUpdateElement.textContent = `Last updated: ${latestEvent.date}`;
             }
         }
 
