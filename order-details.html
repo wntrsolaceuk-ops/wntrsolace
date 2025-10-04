@@ -1447,10 +1447,7 @@
         // Load live tracking data from Track123 API
         async function loadLiveTracking() {
             if (!currentOrder.tracking_number) {
-                document.getElementById('trackingDetails').style.display = 'block';
-                document.getElementById('detailsStatus').textContent = 'No tracking number available';
-                document.getElementById('detailsDescription').textContent = 'No tracking number provided for this order';
-                document.getElementById('detailsTime').textContent = '-';
+                console.log('No tracking number available');
                 return;
             }
 
@@ -1470,11 +1467,7 @@
                 }
             }
 
-            // Show loading state
-            document.getElementById('trackingDetails').style.display = 'block';
-            document.getElementById('detailsStatus').textContent = 'Loading...';
-            document.getElementById('detailsDescription').textContent = 'Getting latest tracking information';
-            document.getElementById('detailsTime').textContent = '-';
+            console.log('Loading fresh tracking data...');
 
             try {
                 // Get real tracking data from Track123 API
@@ -1660,18 +1653,12 @@
 
         // Show tracking details at bottom
         function showTrackingDetails(latestEvent) {
-            document.getElementById('trackingDetails').style.display = 'block';
-            document.getElementById('detailsStatus').textContent = latestEvent.title;
-            document.getElementById('detailsDescription').textContent = latestEvent.description;
-            document.getElementById('detailsTime').textContent = latestEvent.date;
+            console.log('Latest tracking event:', latestEvent);
         }
 
         // Show no tracking data message
         function showNoTrackingData() {
-            document.getElementById('trackingDetails').style.display = 'block';
-            document.getElementById('detailsStatus').textContent = 'No tracking data';
-            document.getElementById('detailsDescription').textContent = 'No tracking events available';
-            document.getElementById('detailsTime').textContent = '-';
+            console.log('No tracking data available');
         }
 
         // Generate tracking events based on order status
