@@ -1347,27 +1347,8 @@
             document.getElementById('trackingSection').style.display = 'block';
             document.getElementById('trackingNumber').textContent = `Tracking: ${currentOrder.tracking_number}`;
 
-            // Check cache first (24 hours)
-            const cacheKey = `tracking_${currentOrder.tracking_number}`;
-            const cachedData = localStorage.getItem(cacheKey);
-            const now = Date.now();
-            
-            if (cachedData) {
-                const { data, timestamp } = JSON.parse(cachedData);
-                const hoursSinceCache = (now - timestamp) / (1000 * 60 * 60);
-                
-                if (hoursSinceCache < 24) {
-                    console.log('Using cached tracking data');
-                    displayTrackingTimeline(data);
-                    updateTrackingDisplay();
-                    return;
-                }
-            }
-
-            // Update tracking display based on status
-            updateTrackingDisplay();
-            
-            // Load fresh tracking data
+            // NO CACHE - ALWAYS CALL TRACK123 API
+            console.log('Calling Track123 API directly...');
             loadLiveTracking();
         }
 
@@ -1451,32 +1432,6 @@
                 return;
             }
 
-            // Check cache first (24 hours) - but allow cache bypass for debugging
-            const cacheKey = `tracking_${currentOrder.tracking_number}`;
-            const cachedData = localStorage.getItem(cacheKey);
-            const now = Date.now();
-            const bypassCache = new URLSearchParams(window.location.search).get('refresh') === 'true';
-            
-            if (cachedData && !bypassCache) {
-                const { data, timestamp } = JSON.parse(cachedData);
-                // If cached data contains simulated events (like "Order Placed"), clear it
-                if (data.events && data.events.length > 0 && data.events[0].title === 'Order Placed') {
-                    console.log('Clearing cached fallback data - forcing fresh API call');
-                    localStorage.removeItem(cacheKey);
-                } else {
-                    const hoursSinceCache = (now - timestamp) / (1000 * 60 * 60);
-                    if (hoursSinceCache < 24) {
-                        console.log('Using cached tracking data');
-                        displayTrackingTimeline(data);
-                        return;
-                    }
-                }
-            }
-            
-            if (bypassCache) {
-                console.log('Cache bypassed - generating fresh data');
-            }
-
             console.log('Loading fresh tracking data from Track123 API...');
 
             try {
@@ -1507,31 +1462,13 @@
                     throw new Error('Invalid tracking response from API');
                 }
 
-                // Cache the data for 24 hours
-                localStorage.setItem(cacheKey, JSON.stringify({
-                    data: trackingData,
-                    timestamp: Date.now()
-                }));
-
                 // Format and display the real tracking data
                 const formattedData = formatTrack123Data(trackingData);
                 displayTrackingTimeline(formattedData);
 
             } catch (error) {
                 console.error('Track123 API error:', error);
-                console.log('Falling back to simulated tracking...');
-                
-                // Fallback to simulated tracking if API fails
-                const trackingEvents = generateTrackingEvents(currentOrder.status, currentOrder.created_at);
-                const fallbackData = { events: trackingEvents };
-                
-                // Cache the fallback data
-                localStorage.setItem(cacheKey, JSON.stringify({
-                    data: fallbackData,
-                    timestamp: Date.now()
-                }));
-                
-                displayTrackingTimeline(fallbackData);
+                console.log('Track123 API failed - no fallback data');
             }
         }
 
@@ -1918,6 +1855,8 @@
         // Initialize page
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Order Details - Starting initialization...');
+            
+            // NO CACHE - TRACK123 ONLY
             
             const supabaseInitialized = await initSupabase();
             if (!supabaseInitialized) {
