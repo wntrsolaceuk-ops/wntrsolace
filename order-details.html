@@ -1183,7 +1183,7 @@
                     <div class="quick-info">
                         <div class="info-row">
                             <span class="label">Carrier:</span>
-                            <span class="value" id="carrierInfo">FedEx Ground</span>
+                            <span class="value" id="carrierInfo">-</span>
                         </div>
                         <div class="info-row">
                             <span class="label">Last Update:</span>
@@ -1373,13 +1373,13 @@
                 statusIcon.textContent = '🚚';
                 statusTitle.textContent = 'In Transit';
                 statusSubtitle.textContent = 'Expected delivery: Jan 18, 2024';
-                carrierInfo.textContent = 'FedEx Ground';
+                carrierInfo.textContent = currentOrder.shipping_company || 'Carrier';
             } else if (status === 'delivered') {
                 progressFill.style.width = '100%';
                 statusIcon.textContent = '✅';
                 statusTitle.textContent = 'Delivered';
                 statusSubtitle.textContent = 'Package delivered successfully';
-                carrierInfo.textContent = 'FedEx Ground';
+                carrierInfo.textContent = currentOrder.shipping_company || 'Carrier';
             } else {
                 progressFill.style.width = '10%';
                 statusIcon.textContent = '📦';
