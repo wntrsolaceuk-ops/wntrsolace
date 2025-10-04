@@ -736,10 +736,8 @@
                 }
                 
                 if (!user) {
-                    const userText = document.getElementById('userText');
-                    if (userText) {
-                        userText.textContent = 'Sign In';
-                    }
+                    console.log('No user found, redirecting to login');
+                    window.location.href = 'auth.html';
                     return;
                 }
 
@@ -780,8 +778,8 @@
                 }
                 
                 if (!user) {
-                    console.log('No user found');
-                    showEmptyState();
+                    console.log('No user found, redirecting to login');
+                    window.location.href = 'auth.html';
                     return;
                 }
 
