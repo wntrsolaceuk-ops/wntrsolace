@@ -945,6 +945,26 @@
                 
                 if (data.user) {
                     console.log('Sign in successful:', data.user)
+                    
+                    // Store user data
+                    localStorage.setItem('userLoggedIn', 'true');
+                    localStorage.setItem('userData', JSON.stringify({
+                        id: data.user.id,
+                        email: data.user.email,
+                        full_name: data.user.user_metadata?.full_name,
+                        first_name: data.user.user_metadata?.first_name,
+                        last_name: data.user.user_metadata?.last_name
+                    }));
+                    
+                    // Also store individual values for fallback
+                    if (data.user.user_metadata?.full_name) {
+                        localStorage.setItem('username', data.user.user_metadata.full_name);
+                    } else if (data.user.user_metadata?.first_name) {
+                        localStorage.setItem('username', data.user.user_metadata.first_name);
+                    } else {
+                        localStorage.setItem('username', data.user.email.split('@')[0]);
+                    }
+                    
                     showNotification('Sign in successful! Redirecting...', 'success')
                     
                     // Check if user came from checkout page

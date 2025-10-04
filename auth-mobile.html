@@ -759,6 +759,15 @@
                     last_name: data.user.user_metadata?.last_name
                 }));
                 
+                // Also store individual values for fallback
+                if (data.user.user_metadata?.full_name) {
+                    localStorage.setItem('username', data.user.user_metadata.full_name);
+                } else if (data.user.user_metadata?.first_name) {
+                    localStorage.setItem('username', data.user.user_metadata.first_name);
+                } else {
+                    localStorage.setItem('username', data.user.email.split('@')[0]);
+                }
+                
                 showSuccess('Successfully signed in!');
                 
                 // Redirect after a short delay
