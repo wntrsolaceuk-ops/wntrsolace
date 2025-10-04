@@ -1293,16 +1293,18 @@
                     }
                 };
 
-                // Get user if logged in
+                // Get user if logged in (same as desktop)
                 const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
                 if (isLoggedIn && supabase) {
                     const { data: { user } } = await supabase.auth.getUser();
                     if (user) {
                         orderData.user_id = user.id;
                         debugLog(`User ID set: ${user.id}`, 'info');
+                    } else {
+                        debugLog('User logged in but getUser() returned null', 'warning');
                     }
                 } else {
-                    debugLog('User not logged in - order will not be linked to account', 'warning');
+                    debugLog('User not logged in or Supabase not available - order will not be linked to account', 'warning');
                 }
                 
                 // Create order items in desktop format
