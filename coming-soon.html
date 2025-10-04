@@ -65,16 +65,18 @@
         .logo-image {
             height: 120px;
             width: auto;
-            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.2));
             animation: glow 2s ease-in-out infinite alternate;
+            z-index: 10;
+            position: relative;
         }
 
         @keyframes glow {
             from {
-                filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+                filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.2));
             }
             to {
-                filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.6)) drop-shadow(0 0 40px rgba(255, 255, 255, 0.2));
+                filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.4)) drop-shadow(0 0 35px rgba(255, 255, 255, 0.1));
             }
         }
 
