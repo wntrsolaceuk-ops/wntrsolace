@@ -1515,10 +1515,10 @@
         async function loadUserName() {
             try {
                 const { data: { user } } = await supabase.auth.getUser();
-                const userNameElement = document.getElementById('userName');
+                const userTextElement = document.getElementById('userText');
                 
-                if (!userNameElement) {
-                    console.log('userName element not found, skipping user name display');
+                if (!userTextElement) {
+                    console.log('userText element not found, skipping user name display');
                     return;
                 }
                 
@@ -1539,15 +1539,15 @@
                         userName = user.email?.split('@')[0] || 'User';
                     }
                     
-                    userNameElement.textContent = userName;
+                    userTextElement.textContent = userName;
                 } else {
-                    userNameElement.textContent = 'Guest';
+                    userTextElement.textContent = 'Sign In';
                 }
             } catch (error) {
                 console.error('Error loading user name:', error);
-                const userNameElement = document.getElementById('userName');
-                if (userNameElement) {
-                    userNameElement.textContent = 'User';
+                const userTextElement = document.getElementById('userText');
+                if (userTextElement) {
+                    userTextElement.textContent = 'Sign In';
                 }
             }
         }
