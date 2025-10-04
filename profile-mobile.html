@@ -236,6 +236,45 @@
             padding-left: 0.5rem;
         }
 
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            padding: 0 0.5rem;
+        }
+
+        .pagination-btn {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #ffffff;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .pagination-btn:hover {
+            background: rgba(26, 26, 26, 0.9);
+            border-color: rgba(200, 230, 255, 0.3);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-info {
+            color: #aaaaaa;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
         .order-card {
             background: rgba(26, 26, 26, 0.8);
             backdrop-filter: blur(20px);
@@ -552,6 +591,11 @@
                     <div id="orderHistory">
                         <!-- Orders will be loaded here -->
                     </div>
+                    <div class="pagination" id="pagination" style="display: none;">
+                        <button class="pagination-btn" id="prevBtn" onclick="previousPage()">← Previous</button>
+                        <div class="pagination-info" id="paginationInfo">Page 1 of 1</div>
+                        <button class="pagination-btn" id="nextBtn" onclick="nextPage()">Next →</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -575,6 +619,9 @@
         const CLOUDINARY_CLOUD_NAME = 'dlfsfybx3';
         
         let supabase;
+        let allOrders = [];
+        let currentPage = 1;
+        const ordersPerPage = 5;
 
         // Debug functions
         function addDebugLog(message) {
@@ -695,32 +742,57 @@
                     addDebugLog(`[${new Date().toLocaleTimeString()}] Sample order: ${JSON.stringify(orders[0], null, 2)}`);
                 }
 
-                renderOrderHistory(orders || []);
+                allOrders = orders || [];
+                currentPage = 1;
+                renderOrderHistory();
                 
             } catch (error) {
                 addDebugLog(`[${new Date().toLocaleTimeString()}] Error loading order history: ${error.message}`);
                 console.error('Error loading order history:', error);
-                renderOrderHistory([]);
+                allOrders = [];
+                currentPage = 1;
+                renderOrderHistory();
             }
         }
 
-        // Render order history
-        function renderOrderHistory(orders) {
+        // Render order history with pagination
+        function renderOrderHistory() {
             const orderHistoryContainer = document.getElementById('orderHistory');
+            const paginationContainer = document.getElementById('pagination');
+            const paginationInfo = document.getElementById('paginationInfo');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
             
-            addDebugLog(`[${new Date().toLocaleTimeString()}] Rendering ${orders.length} orders`);
+            const totalOrders = allOrders.length;
+            const totalPages = Math.ceil(totalOrders / ordersPerPage);
+            const startIndex = (currentPage - 1) * ordersPerPage;
+            const endIndex = startIndex + ordersPerPage;
+            const currentOrders = allOrders.slice(startIndex, endIndex);
             
-            if (orders.length === 0) {
+            addDebugLog(`[${new Date().toLocaleTimeString()}] Rendering page ${currentPage} of ${totalPages} (${currentOrders.length} orders)`);
+            
+            if (totalOrders === 0) {
                 orderHistoryContainer.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">📦</div>
                         <div class="empty-state-text">No orders found</div>
                     </div>
                 `;
+                paginationContainer.style.display = 'none';
                 return;
             }
 
-            orderHistoryContainer.innerHTML = orders.map(order => {
+            // Show pagination if more than 5 orders
+            if (totalPages > 1) {
+                paginationContainer.style.display = 'flex';
+                paginationInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+                prevBtn.disabled = currentPage === 1;
+                nextBtn.disabled = currentPage === totalPages;
+            } else {
+                paginationContainer.style.display = 'none';
+            }
+
+            orderHistoryContainer.innerHTML = currentOrders.map(order => {
                 const orderDate = new Date(order.created_at).toLocaleDateString();
                 const orderTotal = order.total || order.total_amount || 0;
                 const status = order.status || 'processing';
@@ -751,6 +823,24 @@
                     </div>
                 `;
             }).join('');
+        }
+
+        // Pagination functions
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                addDebugLog(`[${new Date().toLocaleTimeString()}] Going to previous page: ${currentPage}`);
+                renderOrderHistory();
+            }
+        }
+
+        function nextPage() {
+            const totalPages = Math.ceil(allOrders.length / ordersPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                addDebugLog(`[${new Date().toLocaleTimeString()}] Going to next page: ${currentPage}`);
+                renderOrderHistory();
+            }
         }
 
         // View order details
