@@ -231,4 +231,57 @@
         userPreference: getUserPreference()
     });
 
+    // Show debug info on page for mobile devices
+    function showDebugInfo() {
+        const debugInfo = {
+            userAgent: navigator.userAgent,
+            screenWidth: window.innerWidth,
+            screenHeight: window.innerHeight,
+            isTouchDevice: 'ontouchstart' in window || navigator.maxTouchPoints > 0,
+            isMobile: isMobileDevice(),
+            currentPage: window.location.pathname,
+            mobileUrl: getMobilePageUrl()
+        };
+
+        const debugDiv = document.createElement('div');
+        debugDiv.id = 'mobile-debug-info';
+        debugDiv.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 10px;
+            font-size: 12px;
+            z-index: 10000;
+            border-bottom: 2px solid #c8e6ff;
+            max-height: 200px;
+            overflow-y: auto;
+        `;
+        
+        debugDiv.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong>📱 Mobile Debug Info</strong>
+                <button onclick="document.getElementById('mobile-debug-info').remove()" style="background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">×</button>
+            </div>
+            <div style="margin-top: 8px;">
+                <div><strong>Screen:</strong> ${debugInfo.screenWidth}x${debugInfo.screenHeight}</div>
+                <div><strong>Touch:</strong> ${debugInfo.isTouchDevice ? 'Yes' : 'No'}</div>
+                <div><strong>Mobile:</strong> ${debugInfo.isMobile ? 'Yes' : 'No'}</div>
+                <div><strong>Page:</strong> ${debugInfo.currentPage}</div>
+                <div><strong>Mobile URL:</strong> ${debugInfo.mobileUrl || 'None'}</div>
+                <div style="margin-top: 8px;">
+                    <button onclick="window.location.href='${debugInfo.mobileUrl}'" style="background: #c8e6ff; color: black; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; margin-right: 8px;">Go to Mobile</button>
+                    <button onclick="location.reload()" style="background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Reload</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(debugDiv);
+    }
+
+    // Show debug info after 2 seconds
+    setTimeout(showDebugInfo, 2000);
+
 })();
