@@ -2090,9 +2090,17 @@
                 // Process Stripe refund if requested
                 if (cancellationData.auto_refund) {
                     const order = orders.find(o => o.id === orderId);
-                    const paymentIntentId = order?.payment_details?.stripe_payment_intent_id;
+                    const paymentIntentId = order?.stripe_payment_intent_id;
+                    console.log('=== STRIPE REFUND CHECK ===');
+                    console.log('Order found:', !!order);
+                    console.log('Payment Intent ID:', paymentIntentId);
+                    console.log('Auto refund enabled:', cancellationData.auto_refund);
+                    
                     if (order && paymentIntentId) {
+                        console.log('Processing Stripe refund...');
                         await processStripeRefund(orderId, paymentIntentId, cancellationData.refund_amount);
+                    } else {
+                        console.log('Skipping Stripe refund - missing order or payment intent ID');
                     }
                 }
 
