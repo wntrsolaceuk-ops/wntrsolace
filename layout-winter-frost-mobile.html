@@ -906,9 +906,18 @@
                 }
             };
             
-            // Try to get Supabase user data
+            // Show basic debug info immediately
+            displayDebugInfo(debugInfo);
+            
+            // Try to get Supabase user data with timeout
             if (supabase) {
+                const timeout = setTimeout(() => {
+                    debugInfo.supabase.user = { error: 'Timeout - Supabase call took too long' };
+                    displayDebugInfo(debugInfo);
+                }, 3000); // 3 second timeout
+                
                 supabase.auth.getUser().then(({ data: { user }, error }) => {
+                    clearTimeout(timeout);
                     debugInfo.supabase.user = user ? {
                         id: user.id,
                         email: user.email,
@@ -918,10 +927,12 @@
                     
                     displayDebugInfo(debugInfo);
                 }).catch(err => {
+                    clearTimeout(timeout);
                     debugInfo.supabase.user = { error: err.message };
                     displayDebugInfo(debugInfo);
                 });
             } else {
+                debugInfo.supabase.user = { error: 'Supabase not initialized' };
                 displayDebugInfo(debugInfo);
             }
         }
