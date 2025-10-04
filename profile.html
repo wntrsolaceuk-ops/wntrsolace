@@ -715,18 +715,7 @@
         async function updateUserProfile() {
             try {
                 if (!supabase) {
-                    console.log('Supabase not available, using localStorage fallback');
-                    const username = localStorage.getItem('username') || 'User';
-                    const userText = document.getElementById('userText');
-                    if (userText) {
-                        userText.textContent = username;
-                    }
-                    return;
-                }
-
-                // Check if user is logged in via localStorage first
-                const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
-                if (!isLoggedIn) {
+                    console.log('Supabase not available');
                     const userText = document.getElementById('userText');
                     if (userText) {
                         userText.textContent = 'Sign In';
@@ -734,42 +723,40 @@
                     return;
                 }
 
+                // Get user directly from Supabase auth (like mobile does)
                 const { data: { user }, error } = await supabase.auth.getUser();
                 
                 if (error) {
-                    console.log('Auth error (session missing):', error.message);
-                    // Fallback to localStorage
-                    const username = localStorage.getItem('username') || localStorage.getItem('userData')?.full_name || 'User';
-                    const userText = document.getElementById('userText');
-                    if (userText) {
-                        userText.textContent = username;
-                    }
-                    return;
-                }
-                
-                if (user) {
-                    currentUser = user;
-                    const username = user.user_metadata?.full_name || user.user_metadata?.first_name || user.email?.split('@')[0] || 'User';
-                    const userText = document.getElementById('userText');
-                    if (userText) {
-                        userText.textContent = username;
-                    }
-                    
-                    // Store username in localStorage for consistency
-                    localStorage.setItem('username', username);
-                } else {
+                    console.log('Auth error:', error.message);
                     const userText = document.getElementById('userText');
                     if (userText) {
                         userText.textContent = 'Sign In';
                     }
+                    return;
                 }
-            } catch (error) {
-                console.log('Error updating user profile:', error);
-                // Fallback to localStorage
-                const username = localStorage.getItem('username') || localStorage.getItem('userData')?.full_name || 'User';
+                
+                if (!user) {
+                    const userText = document.getElementById('userText');
+                    if (userText) {
+                        userText.textContent = 'Sign In';
+                    }
+                    return;
+                }
+
+                currentUser = user;
+                const username = user.user_metadata?.full_name || user.user_metadata?.first_name || user.email?.split('@')[0] || 'User';
                 const userText = document.getElementById('userText');
                 if (userText) {
                     userText.textContent = username;
+                }
+                
+                console.log('User profile updated:', username);
+                
+            } catch (error) {
+                console.log('Error updating user profile:', error);
+                const userText = document.getElementById('userText');
+                if (userText) {
+                    userText.textContent = 'Sign In';
                 }
             }
         }
@@ -777,96 +764,43 @@
         // Load orders from Supabase
         async function loadOrders() {
             try {
-                // Check if user is logged in via localStorage first
-                const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
-                if (!isLoggedIn) {
-                    console.log('User not logged in');
-                    showEmptyState();
-                    return;
-                }
-
                 if (!supabase) {
                     console.log('Supabase not available');
                     showEmptyState();
                     return;
                 }
 
-                // Try to get user from Supabase, but fallback to localStorage if session is missing
-                let userId = null;
-                try {
-                    const { data: { user }, error } = await supabase.auth.getUser();
-                    if (user && !error) {
-                        userId = user.id;
-                        currentUser = user;
-                        console.log('Found Supabase user:', user.id);
-                    }
-                } catch (authError) {
-                    console.log('Auth session missing, using localStorage fallback');
+                // Get user directly from Supabase auth (like mobile does)
+                const { data: { user }, error } = await supabase.auth.getUser();
+                
+                if (error) {
+                    console.log('Auth error:', error.message);
+                    showEmptyState();
+                    return;
                 }
-
-                // If no Supabase user, try to get user ID from localStorage
-                if (!userId) {
-                    const userData = localStorage.getItem('userData');
-                    if (userData) {
-                        try {
-                            const parsedUserData = JSON.parse(userData);
-                            userId = parsedUserData.id;
-                            console.log('Found localStorage user ID:', userId);
-                        } catch (e) {
-                            console.log('Could not parse userData from localStorage');
-                        }
-                    }
-                    
-                    // Also try to get from username or email
-                    if (!userId) {
-                        const username = localStorage.getItem('username');
-                        const userEmail = localStorage.getItem('userEmail');
-                        if (username || userEmail) {
-                            // Try to find user by email in Supabase
-                            try {
-                                const { data: users, error } = await supabase
-                                    .from('auth.users')
-                                    .select('id')
-                                    .eq('email', userEmail || username + '@example.com')
-                                    .limit(1);
-                                
-                                if (users && users.length > 0) {
-                                    userId = users[0].id;
-                                    console.log('Found user by email:', userId);
-                                } else {
-                                    console.log('No user found by email, showing empty state');
-                                    showEmptyState();
-                                    return;
-                                }
-                            } catch (e) {
-                                console.log('Error querying users by email:', e);
-                                showEmptyState();
-                                return;
-                            }
-                        }
-                    }
-                }
-
-                if (!userId) {
-                    console.log('No user ID available - showing empty state');
+                
+                if (!user) {
+                    console.log('No user found');
                     showEmptyState();
                     return;
                 }
 
-                console.log('Loading orders for user:', userId);
+                currentUser = user;
+                console.log('Found Supabase user:', user.id);
+
+                console.log('Loading orders for user:', user.id);
                 
-                const { data: ordersData, error } = await supabase
+                const { data: ordersData, error: ordersError } = await supabase
                     .from('orders')
                     .select(`
                         *,
                         order_items (*)
                     `)
-                    .eq('user_id', userId)
+                    .eq('user_id', user.id)
                     .order('created_at', { ascending: false });
 
-                if (error) {
-                    console.error('Error loading orders:', error);
-                    console.log('Orders table might not exist. Creating sample data...');
+                if (ordersError) {
+                    console.error('Error loading orders:', ordersError);
                     showEmptyState();
                     return;
                 }
