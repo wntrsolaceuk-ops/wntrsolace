@@ -1341,12 +1341,9 @@
                 localStorage.removeItem('cart');
                 debugLog('Cart cleared', 'info');
                 
-                // Store order ID for confirmation page
-                localStorage.setItem('confirmedOrderId', orderData.order_number);
-                
-                // Redirect to confirmation
+                // Redirect to confirmation with order number
                 debugLog('Redirecting to confirmation page...', 'info');
-                window.location.href = `order-confirmation-mobile.html`;
+                window.location.href = `order-confirmation-mobile.html?order=${orderData.order_number}`;
                 
             } catch (error) {
                 console.error('Order processing error:', error);

@@ -514,9 +514,10 @@
 
         // Load order details
         async function loadOrderDetails() {
-            const orderId = localStorage.getItem('confirmedOrderId');
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderNumber = urlParams.get('order');
             
-            if (!orderId) {
+            if (!orderNumber) {
                 showError();
                 return;
             }
@@ -534,7 +535,7 @@
                             )
                         )
                     `)
-                    .eq('order_id', orderId)
+                    .eq('order_number', orderNumber)
                     .single();
 
                 if (error) throw error;
@@ -554,7 +555,7 @@
             document.getElementById('orderContent').style.display = 'block';
 
             // Update order information
-            document.getElementById('orderId').textContent = order.order_id;
+            document.getElementById('orderId').textContent = order.order_number;
             document.getElementById('orderDate').textContent = new Date(order.created_at).toLocaleDateString();
             document.getElementById('orderStatus').textContent = order.status || 'Processing';
             document.getElementById('orderEmail').textContent = order.customer_email;
