@@ -118,11 +118,11 @@ function generateInvoicePDF(orderData, outputPath) {
                 doc.text((item.quantity || 1).toString(), 320, yPosition);
 
                 // Unit price
-                doc.text(`$${(item.price || 0).toFixed(2)}`, 380, yPosition);
+                doc.text(`£${(item.price || 0).toFixed(2)}`, 380, yPosition);
 
                 // Total
                 const itemTotal = (item.price || 0) * (item.quantity || 1);
-                doc.text(`$${itemTotal.toFixed(2)}`, 480, yPosition);
+                doc.text(`£${itemTotal.toFixed(2)}`, 480, yPosition);
 
                 // SKU (smaller text)
                 if (item.sku) {

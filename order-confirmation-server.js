@@ -39,7 +39,7 @@ const getOrderConfirmationTemplate = (orderData) => {
 
     // Simple items list
     const itemsList = orderItems.map(item => 
-        `${item.name} (${item.size || 'N/A'}) x${item.quantity || 1} - $${((item.price || 0) * (item.quantity || 1)).toFixed(2)}`
+        `${item.name} (${item.size || 'N/A'}) x${item.quantity || 1} - £${((item.price || 0) * (item.quantity || 1)).toFixed(2)}`
     ).join('<br>');
 
     return {
@@ -124,7 +124,7 @@ const getOrderConfirmationTemplate = (orderData) => {
                                         <h3 style="margin: 0 0 5px 0; font-size: 16px; font-weight: bold;">${item.name}</h3>
                                         <p style="margin: 0 0 3px 0; font-size: 14px;">Size: ${item.size || 'N/A'}</p>
                                         <p style="margin: 0 0 3px 0; font-size: 14px;">Quantity: ${item.quantity || 1}</p>
-                                        <p style="margin: 0; font-size: 16px; font-weight: bold;">$${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</p>
+                                        <p style="margin: 0; font-size: 16px; font-weight: bold;">£${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</p>
                                     </div>
                                 </div>
                             </div>
@@ -199,7 +199,7 @@ ${orderItems.map(item => `
 • ${item.name}
   Size: ${item.size || 'N/A'}
   Quantity: ${item.quantity || 1}
-  Price: $${((item.price || 0) * (item.quantity || 1)).toFixed(2)}
+  Price: £${((item.price || 0) * (item.quantity || 1)).toFixed(2)}
 `).join('')}
 
 ═══════════════════════════════════════════════════════════════

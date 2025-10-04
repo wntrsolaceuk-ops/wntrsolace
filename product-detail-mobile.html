@@ -750,7 +750,7 @@
 
                     <div class="product-info">
                         <h1 class="product-title" id="productTitle">Product Title</h1>
-                        <div class="product-price" id="productPrice">$0</div>
+                        <div class="product-price" id="productPrice">£0</div>
 
                         <div class="size-selector">
                             <h3 class="size-title">Size</h3>
@@ -977,7 +977,7 @@
 
             // Update product info
             document.getElementById('productTitle').textContent = product.name;
-            document.getElementById('productPrice').textContent = `$${product.price}`;
+            document.getElementById('productPrice').textContent = `£${product.price}`;
 
             // Show preorder badge if applicable
             if (product.is_preorder) {
