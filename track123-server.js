@@ -6,14 +6,14 @@ const cors = require('cors');
 const fetch = require('node-fetch');
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // Track123 API configuration
-const TRACK123_API_KEY = '32fe8c7f7fcc4b0daab974bfc06b5415';
+const TRACK123_API_KEY = process.env.TRACK123_API_KEY || '32fe8c7f7fcc4b0daab974bfc06b5415';
 const TRACK123_BASE_URL = 'https://api.track123.com/gateway/open-api/tk/v2';
 
 // Evri API configuration (if we want to call Evri directly)
