@@ -1140,7 +1140,7 @@
                 // Send email notification
                 try {
                     console.log('Sending email notification with data:', contactData);
-                    const emailResponse = await fetch('http://localhost:3003/api/send-contact-notification', {
+                    const emailResponse = await fetch('https://wntrsolace-payment.onrender.com/api/send-contact-notification', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

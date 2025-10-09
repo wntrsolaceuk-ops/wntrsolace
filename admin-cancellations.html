@@ -987,7 +987,7 @@
         // Process Stripe refund
         async function processStripeRefund(paymentIntentId, amount) {
             try {
-                const response = await fetch('http://localhost:3002/api/process-refund', {
+                const response = await fetch('https://wntrsolace-payment.onrender.com/api/process-refund', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1029,7 +1029,7 @@
         // Send cancellation email
         async function sendCancellationEmail(cancellationData) {
             try {
-                const response = await fetch('http://localhost:3005/api/send-cancellation-email', {
+                const response = await fetch('https://wntrsolace-payment.onrender.com/api/send-cancellation-email', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1050,7 +1050,7 @@
         // Send return email
         async function sendReturnEmail(returnData) {
             try {
-                const response = await fetch('http://localhost:3005/api/send-return-email', {
+                const response = await fetch('https://wntrsolace-payment.onrender.com/api/send-return-email', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
