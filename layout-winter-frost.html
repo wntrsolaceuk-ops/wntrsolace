@@ -1086,10 +1086,8 @@
             try {
                 if (window.supabase && window.supabase.createClient) {
                     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-                    console.log('Supabase initialized successfully')
                     return true
                 } else {
-                    console.log('Supabase library not yet available, retrying...')
                     return false
                 }
             } catch (error) {
@@ -1227,10 +1225,6 @@
 
         // Check authentication state on page load
         document.addEventListener('DOMContentLoaded', async function() {
-            console.log('=== AUTH STATUS CHECK ===')
-            console.log('Supabase available:', !!supabase)
-            console.log('localStorage userLoggedIn:', localStorage.getItem('userLoggedIn'))
-            console.log('localStorage username:', localStorage.getItem('username'))
             
             // Check for signup success message
             const signupSuccess = localStorage.getItem('signupSuccess');
@@ -1243,7 +1237,6 @@
             const supabaseReady = initializeSupabase();
             
             if (supabaseReady) {
-                console.log('Supabase initialized, checking for admin users...')
                 
                 // Only check for admin redirect if not already on an admin page
                 const currentPage = window.location.pathname;
@@ -1260,7 +1253,6 @@
                             .single();
                         
                         if (profile && profile.is_admin) {
-                            console.log('Admin user detected, redirecting to admin dashboard')
                             window.location.href = 'admin-dashboard.html';
                             return;
                         }
@@ -1273,21 +1265,17 @@
             
             try {
                 if (!supabase) {
-                    console.log('Using localStorage fallback')
                     // Use localStorage fallback
                     if (localStorage.getItem('userLoggedIn') === 'true') {
                         const username = localStorage.getItem('username') || 'User'
                         updateUIForLoggedInUser(username)
-                        console.log('Updated UI with localStorage data')
                     }
                     return
                 }
                 
                 const { data: { user }, error } = await supabase.auth.getUser()
-                console.log('Supabase user data:', user, 'Error:', error)
                 
                 if (user && !error) {
-                    console.log('Using Supabase data')
                     updateUIForLoggedInUser(user.user_metadata?.full_name || user.email.split('@')[0])
                     // Sync with localStorage
                     localStorage.setItem('userLoggedIn', 'true')

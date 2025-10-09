@@ -322,19 +322,14 @@
                 document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
                 document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
             } else {
-                // Countdown reached zero - redirect to main website
-                document.getElementById('countdown').innerHTML = '<div class="coming-soon">Launching Now...</div>';
-                
-                // Detect if user is on mobile or desktop and redirect accordingly
+                // Countdown reached zero - redirect immediately to main website
                 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
                 
-                setTimeout(() => {
-                    if (isMobile) {
-                        window.location.href = '/layout-winter-frost-mobile.html';
-                    } else {
-                        window.location.href = '/layout-winter-frost.html';
-                    }
-                }, 2000); // Wait 2 seconds before redirecting
+                if (isMobile) {
+                    window.location.href = '/layout-winter-frost-mobile.html';
+                } else {
+                    window.location.href = '/layout-winter-frost.html';
+                }
             }
         }
 
