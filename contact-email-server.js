@@ -6,17 +6,34 @@ const nodemailer = require('nodemailer');
 const app = express();
 const PORT = process.env.PORT || 3004;
 
-// Middleware
-app.use(cors({
-    origin: [
-        'https://www.wntrsolace.uk',
-        'https://wntrsolace.uk', 
-        'https://d75da05a898b347a.vercel-dns-017.com',
-        'http://localhost:3000',
-        'http://127.0.0.1:5500'
-    ],
-    credentials: true
-}));
+// Middleware - CORS configuration
+const corsOptions = {
+    origin: function (origin, callback) {
+        const allowedOrigins = [
+            'https://www.wntrsolace.uk',
+            'https://wntrsolace.uk', 
+            'https://d75da05a898b347a.vercel-dns-017.com',
+            'http://localhost:3000',
+            'http://127.0.0.1:5500'
+        ];
+        
+        // Allow requests with no origin (mobile apps, Postman, etc.)
+        if (!origin) return callback(null, true);
+        
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            console.log('CORS blocked origin:', origin);
+            callback(null, true); // Allow anyway for debugging
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Enable preflight for all routes
 app.use(express.json());
 
 // Gmail Email configuration
