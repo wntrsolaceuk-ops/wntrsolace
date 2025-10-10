@@ -41,7 +41,7 @@ const EMAIL_CONFIG = {
     service: 'gmail',
     auth: {
         user: 'wntrsolace.uk@gmail.com',
-        pass: 'afrq uoya outa tpcr' // Gmail app password
+        pass: 'afrquoyaoutatpcr' // Gmail app password (spaces removed)
     }
 };
 
