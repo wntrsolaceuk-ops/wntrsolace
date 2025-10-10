@@ -1,26 +1,35 @@
 {
-  "name": "wntrsolace-contact-email-server",
+  "name": "wintersolace-payment-server",
   "version": "1.0.0",
-  "description": "Contact form email server for WinterSolace using Gmail",
-  "main": "contact-email-server.js",
+  "description": "Payment and email server for WinterSolace",
+  "main": "payment-server.js",
   "scripts": {
-    "start": "node contact-email-server.js",
-    "dev": "nodemon contact-email-server.js"
+    "start": "node payment-server.js",
+    "dev": "nodemon payment-server.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
+    "@sendgrid/mail": "^8.1.6",
+    "@supabase/supabase-js": "^2.58.0",
     "cors": "^2.8.5",
-    "nodemailer": "^6.9.7"
+    "express": "^4.18.2",
+    "node-fetch": "^3.3.2",
+    "nodemailer": "^6.9.7",
+    "pdfkit": "^0.17.2",
+    "stripe": "^18.5.0",
+    "resend": "^4.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   },
   "engines": {
     "node": ">=18.0.0"
   },
   "keywords": [
     "email",
-    "contact",
-    "gmail",
-    "nodemailer",
-    "wntrsolace"
+    "notifications",
+    "wintersolace",
+    "stripe",
+    "payment"
   ],
   "author": "WinterSolace",
   "license": "MIT"
