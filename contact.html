@@ -1137,10 +1137,10 @@
                 
                 console.log('Contact message saved:', data);
                 
-                // Send email notification
+                // Send email notification - Updated for new contact email server
                 try {
                     console.log('Sending email notification with data:', contactData);
-                    const emailResponse = await fetch('https://wntrsolace-payment.onrender.com/api/send-contact-notification', {
+                    const emailResponse = await fetch('https://wntrsolace-contact-email.onrender.com/api/send-contact-notification', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -1211,7 +1211,7 @@
             const navMenu = document.getElementById('navMenu');
             const mobileToggle = document.querySelector('.mobile-menu-toggle');
             
-            if (!navMenu.contains(event.target) && !mobileToggle.contains(event.target)) {
+            if (navMenu && mobileToggle && !navMenu.contains(event.target) && !mobileToggle.contains(event.target)) {
                 navMenu.classList.remove('active');
             }
         });
