@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Details - Wntrsolace Admin</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
         * {
             margin: 0;
@@ -16,206 +16,258 @@
         body {
             font-family: 'Inter', sans-serif;
             background: #0a0a0a;
-            color: #ffffff;
-            line-height: 1.6;
+            color: #fff;
+            line-height: 1.5;
         }
 
-        .wrapper {
-            max-width: 1000px;
+        .page-wrapper {
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 3rem 2rem;
+            padding: 3rem 3rem;
         }
 
         /* Header */
-        .page-header {
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #222;
         }
 
         .back-link {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
             color: #888;
             text-decoration: none;
             font-size: 0.9rem;
-            margin-bottom: 1.5rem;
-            transition: color 0.2s;
+            font-weight: 500;
+            padding: 0.75rem 1.25rem;
+            border: 1px solid #222;
+            border-radius: 8px;
+            transition: all 0.2s;
         }
 
         .back-link:hover {
             color: #fff;
+            border-color: #444;
+            background: #111;
         }
 
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-print {
+            background: #fff;
+            color: #000;
+        }
+
+        .btn-print:hover {
+            background: #e0e0e0;
+        }
+
+        /* Order Header */
         .order-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            flex-wrap: wrap;
-            gap: 1rem;
+            margin-bottom: 3rem;
         }
 
-        .order-number {
-            font-size: 2rem;
+        .order-info h1 {
+            font-size: 2.5rem;
             font-weight: 700;
-            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .order-meta {
+            display: flex;
+            gap: 2rem;
+            color: #888;
+            font-size: 0.9rem;
         }
 
         .status-badge {
-            padding: 0.5rem 1.25rem;
-            border-radius: 50px;
+            padding: 0.65rem 1.5rem;
+            border-radius: 6px;
             font-size: 0.85rem;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
 
-        .status-pending { background: #ffa500; color: #000; }
+        .status-pending { background: #ff9800; color: #000; }
         .status-processing { background: #2196f3; color: #fff; }
         .status-shipped { background: #9c27b0; color: #fff; }
         .status-delivered { background: #4caf50; color: #fff; }
         .status-cancelled { background: #f44336; color: #fff; }
         .status-refunded { background: #ff6b9d; color: #fff; }
 
-        /* Main Content */
-        .content {
+        /* Layout */
+        .content-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 2rem;
+            grid-template-columns: 1fr 400px;
+            gap: 3rem;
         }
 
-        .main-column {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        /* Cards */
-        .card {
-            background: #151515;
-            border-radius: 12px;
-            padding: 2rem;
+        /* Sections */
+        .section {
+            background: #111;
             border: 1px solid #222;
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
         }
 
-        .card-title {
-            font-size: 0.75rem;
-            font-weight: 600;
+        .section-header {
+            font-size: 0.8rem;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #888;
-            margin-bottom: 1.5rem;
+            letter-spacing: 1.5px;
+            color: #666;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #1a1a1a;
         }
 
         /* Order Items */
-        .item {
+        .item-row {
             display: flex;
-            gap: 1.5rem;
-            padding-bottom: 1.5rem;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid #222;
+            align-items: center;
+            gap: 2rem;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid #1a1a1a;
         }
 
-        .item:last-child {
+        .item-row:last-child {
             border-bottom: none;
-            padding-bottom: 0;
-            margin-bottom: 0;
         }
 
         .item-image {
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             border-radius: 8px;
             object-fit: cover;
-            background: #222;
+            background: #1a1a1a;
+            border: 1px solid #222;
             flex-shrink: 0;
         }
 
-        .item-details {
+        .item-content {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
         }
 
-        .item-name {
+        .item-title {
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 1.05rem;
             margin-bottom: 0.5rem;
             color: #fff;
         }
 
-        .item-meta {
-            font-size: 0.9rem;
+        .item-specs {
             color: #888;
+            font-size: 0.9rem;
         }
 
-        .item-price {
+        .item-specs span {
+            margin-right: 1.5rem;
+        }
+
+        .item-pricing {
             text-align: right;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
         }
 
         .item-total {
+            font-size: 1.15rem;
             font-weight: 700;
-            font-size: 1.1rem;
             color: #fff;
         }
 
-        .item-unit {
+        .item-unit-price {
             font-size: 0.85rem;
-            color: #888;
+            color: #666;
             margin-top: 0.25rem;
         }
 
         /* Summary */
-        .summary-row {
+        .summary {
+            margin-top: 2.5rem;
+            padding-top: 2rem;
+            border-top: 1px solid #222;
+        }
+
+        .summary-line {
             display: flex;
             justify-content: space-between;
-            padding: 0.75rem 0;
+            margin-bottom: 1rem;
             font-size: 0.95rem;
         }
 
-        .summary-row.subtotal {
+        .summary-line.subtotal {
             color: #888;
         }
 
-        .summary-row.total {
-            border-top: 1px solid #222;
-            margin-top: 0.5rem;
-            padding-top: 1rem;
-            font-size: 1.25rem;
+        .summary-line.total {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid #222;
+            font-size: 1.5rem;
             font-weight: 700;
         }
 
-        /* Info Rows */
-        .info-row {
-            margin-bottom: 1.25rem;
+        /* Info Cards */
+        .info-card {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
         }
 
-        .info-row:last-child {
+        .info-card-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-field {
+            margin-bottom: 1.5rem;
+        }
+
+        .info-field:last-child {
             margin-bottom: 0;
         }
 
         .info-label {
-            font-size: 0.8rem;
-            color: #888;
-            margin-bottom: 0.25rem;
+            font-size: 0.75rem;
+            color: #666;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
             font-weight: 600;
         }
 
         .info-value {
             font-size: 0.95rem;
             color: #fff;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         .info-value a {
@@ -227,98 +279,14 @@
             text-decoration: underline;
         }
 
-        /* Timeline */
-        .timeline-item {
-            margin-bottom: 1.5rem;
-            padding-left: 2rem;
-            position: relative;
-        }
-
-        .timeline-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 6px;
-            width: 8px;
-            height: 8px;
-            background: #2196f3;
-            border-radius: 50%;
-        }
-
-        .timeline-item::after {
-            content: '';
-            position: absolute;
-            left: 3px;
-            top: 14px;
-            width: 2px;
-            height: calc(100% + 10px);
-            background: #222;
-        }
-
-        .timeline-item:last-child::after {
-            display: none;
-        }
-
-        .timeline-label {
-            font-size: 0.85rem;
-            color: #888;
-            margin-bottom: 0.25rem;
-        }
-
-        .timeline-value {
-            font-size: 0.95rem;
-            color: #fff;
-        }
-
-        /* Actions */
-        .actions {
-            display: flex;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 1rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-primary {
-            background: #fff;
-            color: #000;
-        }
-
-        .btn-primary:hover {
-            background: #e0e0e0;
-        }
-
-        .btn-secondary {
-            background: #222;
-            color: #fff;
-            border: 1px solid #333;
-        }
-
-        .btn-secondary:hover {
-            background: #2a2a2a;
-        }
-
         /* Loading */
-        .loading {
+        .loading-state {
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 60vh;
+            min-height: 70vh;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.5rem;
         }
 
         .spinner {
@@ -327,71 +295,42 @@
             border: 3px solid #222;
             border-top-color: #fff;
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            animation: spin 0.7s linear infinite;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .wrapper {
-                padding: 2rem 1rem;
-            }
-
-            .content {
-                grid-template-columns: 1fr;
-            }
-
-            .sidebar {
-                order: -1;
-            }
-
-            .order-header {
-                flex-direction: column;
-            }
-
-            .order-number {
-                font-size: 1.5rem;
-            }
-
-            .item {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .item-image {
-                margin: 0 auto;
-            }
-
-            .item-price {
-                text-align: center;
-            }
-
-            .actions {
-                flex-direction: column;
-            }
+        .loading-text {
+            color: #666;
+            font-size: 0.9rem;
         }
 
         @media print {
-            .back-link, .actions {
+            .back-link, .header-actions {
                 display: none !important;
+            }
+            .page-wrapper {
+                padding: 1rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="wrapper">
-        <div class="page-header">
+    <div class="page-wrapper">
+        <div class="top-bar">
             <a href="admin-orders.html" class="back-link">
-                ← Back to orders
+                ← Back to All Orders
             </a>
+            <div class="header-actions">
+                <button class="btn btn-print" onclick="window.print()">Print Order</button>
+            </div>
         </div>
 
-        <div id="orderContent" class="loading">
+        <div id="orderContent" class="loading-state">
             <div class="spinner"></div>
-            <p style="color: #888;">Loading order...</p>
+            <div class="loading-text">Loading order details...</div>
         </div>
     </div>
 
@@ -400,11 +339,11 @@
         const SUPABASE_URL = 'https://pbbmrajuptceokpjnynz.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiYm1yYWp1cHRjZW9rcGpueW56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NzY1MzcsImV4cCI6MjA3NDA1MjUzN30.BYxGzM6G7MROTDTdj6KN3gCcrs6nxUaa_ylFZwMBT9o';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        const CLOUDINARY_CLOUD_NAME = 'dkkxapqok';
+        const CLOUDINARY_CLOUD_NAME = 'dlfsfybx3';
 
         function getCloudinaryUrl(publicId, width = 200, height = 200) {
             if (!publicId) return null;
-            return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/c_fill,w_${width},h_${height}/v1/${publicId}`;
+            return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/w_${width},h_${height},c_fill/${publicId}`;
         }
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -412,9 +351,9 @@
 
         if (!orderId) {
             document.getElementById('orderContent').innerHTML = `
-                <div style="text-align: center; color: #888;">
-                    <h2>No order selected</h2>
-                    <p>Please go back and select an order.</p>
+                <div style="text-align: center; color: #666;">
+                    <h2 style="margin-bottom: 1rem;">No Order Selected</h2>
+                    <p>Please select an order from the orders list.</p>
                 </div>
             `;
         } else {
@@ -423,6 +362,7 @@
 
         async function loadOrder(orderId) {
             try {
+                // Load order
                 const { data: order, error: orderError } = await supabase
                     .from('orders')
                     .select('*')
@@ -432,13 +372,17 @@
                 if (orderError) throw orderError;
                 if (!order) throw new Error('Order not found');
 
+                // Load order items
                 const { data: items, error: itemsError } = await supabase
                     .from('order_items')
                     .select('*')
                     .eq('order_id', orderId);
 
-                if (itemsError) console.error('Error loading items:', itemsError);
+                if (itemsError) {
+                    console.error('Error loading items:', itemsError);
+                }
 
+                // Load product details for each item
                 const itemsWithImages = await Promise.all((items || []).map(async (item) => {
                     if (item.product_id) {
                         const { data: product } = await supabase
@@ -447,19 +391,27 @@
                             .eq('id', item.product_id)
                             .single();
                         
-                        if (product) {
-                            item.main_image_public_id = product.main_image_public_id;
+                        if (product?.main_image_public_id) {
+                            item.image_public_id = product.main_image_public_id;
                         }
+                    }
+                    // Fallback to product_image_public_id or main_image_public_id from order_items
+                    if (!item.image_public_id && item.product_image_public_id) {
+                        item.image_public_id = item.product_image_public_id;
+                    }
+                    if (!item.image_public_id && item.main_image_public_id) {
+                        item.image_public_id = item.main_image_public_id;
                     }
                     return item;
                 }));
 
+                console.log('Items with images:', itemsWithImages);
                 renderOrder(order, itemsWithImages);
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error loading order:', error);
                 document.getElementById('orderContent').innerHTML = `
-                    <div style="text-align: center; color: #888;">
-                        <h2>Error loading order</h2>
+                    <div style="text-align: center; color: #666;">
+                        <h2 style="margin-bottom: 1rem; color: #f44336;">Error Loading Order</h2>
                         <p>${error.message}</p>
                     </div>
                 `;
@@ -487,45 +439,54 @@
 
             document.getElementById('orderContent').innerHTML = `
                 <div class="order-header">
-                    <h1 class="order-number">#${order.order_number}</h1>
-                    <span class="status-badge status-${order.status}">${order.status}</span>
+                    <div class="order-info">
+                        <h1>#${order.order_number}</h1>
+                        <div class="order-meta">
+                            <span>${formattedDate} at ${formattedTime}</span>
+                            ${order.stripe_payment_intent_id ? `<span>Payment: ${order.stripe_payment_intent_id}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="status-badge status-${order.status}">${order.status}</div>
                 </div>
 
-                <div class="content">
-                    <div class="main-column">
+                <div class="content-grid">
+                    <div class="main-content">
                         <!-- Order Items -->
-                        <div class="card">
-                            <div class="card-title">Order Items</div>
+                        <div class="section">
+                            <div class="section-header">Order Items</div>
                             ${items.map(item => {
-                                const imageUrl = item.main_image_public_id 
-                                    ? getCloudinaryUrl(item.main_image_public_id, 160, 160)
-                                    : 'data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27100%27 height=%27100%27 viewBox=%270 0 100 100%27%3E%3Crect fill=%27%23222%27 width=%27100%27 height=%27100%27/%3E%3C/svg%3E';
+                                const imageUrl = item.image_public_id 
+                                    ? getCloudinaryUrl(item.image_public_id, 200, 200)
+                                    : 'data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27100%27 height=%27100%27 viewBox=%270 0 100 100%27%3E%3Crect fill=%27%231a1a1a%27 width=%27100%27 height=%27100%27/%3E%3Ctext fill=%27%23444%27 x=%2750%27 y=%2750%27 text-anchor=%27middle%27 dominant-baseline=%27middle%27 font-family=%27Arial%27 font-size=%2712%27%3ENo Image%3C/text%3E%3C/svg%3E';
                                 
                                 return `
-                                <div class="item">
-                                    <img src="${imageUrl}" alt="${item.product_name}" class="item-image">
-                                    <div class="item-details">
-                                        <div class="item-name">${item.product_name}</div>
-                                        <div class="item-meta">Size: ${item.size || 'N/A'} • Qty: ${item.quantity}</div>
+                                <div class="item-row">
+                                    <img src="${imageUrl}" alt="${item.product_name}" class="item-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27100%27 height=%27100%27 viewBox=%270 0 100 100%27%3E%3Crect fill=%27%231a1a1a%27 width=%27100%27 height=%27100%27/%3E%3Ctext fill=%27%23444%27 x=%2750%27 y=%2750%27 text-anchor=%27middle%27 dominant-baseline=%27middle%27 font-family=%27Arial%27 font-size=%2712%27%3ENo Image%3C/text%3E%3C/svg%3E'">
+                                    <div class="item-content">
+                                        <div class="item-title">${item.product_name}</div>
+                                        <div class="item-specs">
+                                            <span>Size: ${item.size || 'N/A'}</span>
+                                            <span>Quantity: ${item.quantity}</span>
+                                        </div>
                                     </div>
-                                    <div class="item-price">
+                                    <div class="item-pricing">
                                         <div class="item-total">£${(item.total_price || item.unit_price * item.quantity).toFixed(2)}</div>
-                                        <div class="item-unit">£${item.unit_price.toFixed(2)} each</div>
+                                        <div class="item-unit-price">£${item.unit_price.toFixed(2)} each</div>
                                     </div>
                                 </div>
                                 `;
                             }).join('')}
-                            
-                            <div style="margin-top: 2rem;">
-                                <div class="summary-row subtotal">
+
+                            <div class="summary">
+                                <div class="summary-line subtotal">
                                     <span>Subtotal</span>
                                     <span>£${subtotal.toFixed(2)}</span>
                                 </div>
-                                <div class="summary-row subtotal">
+                                <div class="summary-line subtotal">
                                     <span>Shipping</span>
                                     <span>£${shipping.toFixed(2)}</span>
                                 </div>
-                                <div class="summary-row total">
+                                <div class="summary-line total">
                                     <span>Total</span>
                                     <span>£${total.toFixed(2)}</span>
                                 </div>
@@ -533,82 +494,61 @@
                         </div>
 
                         ${order.notes ? `
-                        <div class="card">
-                            <div class="card-title">Order Notes</div>
-                            <p style="color: #ccc; line-height: 1.6;">${order.notes}</p>
+                        <div class="section">
+                            <div class="section-header">Order Notes</div>
+                            <p style="color: #ccc; line-height: 1.7;">${order.notes}</p>
                         </div>
                         ` : ''}
                     </div>
 
                     <div class="sidebar">
                         <!-- Customer -->
-                        <div class="card">
-                            <div class="card-title">Customer</div>
-                            <div class="info-row">
-                                <div class="info-label">Name</div>
+                        <div class="info-card">
+                            <div class="info-card-title">Customer Information</div>
+                            <div class="info-field">
+                                <div class="info-label">Full Name</div>
                                 <div class="info-value">${order.first_name} ${order.last_name}</div>
                             </div>
-                            <div class="info-row">
-                                <div class="info-label">Email</div>
+                            <div class="info-field">
+                                <div class="info-label">Email Address</div>
                                 <div class="info-value">${order.email}</div>
                             </div>
                             ${order.phone ? `
-                            <div class="info-row">
-                                <div class="info-label">Phone</div>
+                            <div class="info-field">
+                                <div class="info-label">Phone Number</div>
                                 <div class="info-value">${order.phone}</div>
                             </div>
                             ` : ''}
                         </div>
 
-                        <!-- Shipping Address -->
-                        <div class="card">
-                            <div class="card-title">Shipping Address</div>
+                        <!-- Shipping -->
+                        <div class="info-card">
+                            <div class="info-card-title">Shipping Address</div>
                             <div class="info-value">${fullAddress}</div>
                         </div>
 
                         ${order.tracking_number ? `
-                        <!-- Tracking -->
-                        <div class="card">
-                            <div class="card-title">Tracking</div>
-                            <div class="info-row">
+                        <div class="info-card">
+                            <div class="info-card-title">Tracking Information</div>
+                            <div class="info-field">
                                 <div class="info-label">Carrier</div>
                                 <div class="info-value">${order.shipping_company || 'N/A'}</div>
                             </div>
-                            <div class="info-row">
+                            <div class="info-field">
                                 <div class="info-label">Tracking Number</div>
                                 <div class="info-value">
                                     ${order.tracking_link ? `<a href="${order.tracking_link}" target="_blank">${order.tracking_number}</a>` : order.tracking_number}
                                 </div>
                             </div>
                             ${order.estimated_delivery ? `
-                            <div class="info-row">
-                                <div class="info-label">Est. Delivery</div>
-                                <div class="info-value">${new Date(order.estimated_delivery).toLocaleDateString('en-GB')}</div>
+                            <div class="info-field">
+                                <div class="info-label">Estimated Delivery</div>
+                                <div class="info-value">${new Date(order.estimated_delivery).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
                             </div>
                             ` : ''}
                         </div>
                         ` : ''}
-
-                        <!-- Timeline -->
-                        <div class="card">
-                            <div class="card-title">Timeline</div>
-                            <div class="timeline-item">
-                                <div class="timeline-label">Order Placed</div>
-                                <div class="timeline-value">${formattedDate} at ${formattedTime}</div>
-                            </div>
-                            ${order.stripe_payment_intent_id ? `
-                            <div class="timeline-item">
-                                <div class="timeline-label">Payment ID</div>
-                                <div class="timeline-value" style="font-size: 0.8rem; word-break: break-all;">${order.stripe_payment_intent_id}</div>
-                            </div>
-                            ` : ''}
-                        </div>
                     </div>
-                </div>
-
-                <div class="actions">
-                    <button class="btn btn-primary" onclick="window.print()">Print Order</button>
-                    <button class="btn btn-secondary" onclick="window.location.href='admin-orders.html'">Back to Orders</button>
                 </div>
             `;
         }
