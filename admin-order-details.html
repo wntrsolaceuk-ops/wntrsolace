@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details - Wntrsolace Admin</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Heavy Fog overlay effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 120%;
+            height: 120%;
+            background: 
+                radial-gradient(ellipse 800px 400px at 20% 10%, rgba(255, 255, 255, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse 600px 300px at 80% 30%, rgba(200, 230, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 700px 350px at 10% 80%, rgba(220, 240, 255, 0.18) 0%, transparent 55%),
+                radial-gradient(ellipse 900px 450px at 90% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 65%);
+            pointer-events: none;
+            z-index: 1;
+            animation: heavyFogDrift 20s ease-in-out infinite;
+        }
+
+        @keyframes heavyFogDrift {
+            0% { 
+                transform: translateX(-50px) translateY(0) scale(1);
+                opacity: 0.8;
+            }
+            25% { 
+                transform: translateX(-20px) translateY(-30px) scale(1.1);
+                opacity: 1;
+            }
+            50% { 
+                transform: translateX(30px) translateY(20px) scale(0.9);
+                opacity: 0.7;
+            }
+            75% { 
+                transform: translateX(-10px) translateY(-15px) scale(1.05);
+                opacity: 0.9;
+            }
+            100% { 
+                transform: translateX(-50px) translateY(0) scale(1);
+                opacity: 0.8;
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(200, 230, 255, 0.3);
+            border-radius: 10px;
+            color: #c8e6ff;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(200, 230, 255, 0.5);
+            transform: translateX(-5px);
+        }
+
+        .page-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .order-header {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(200, 230, 255, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .order-number {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #c8e6ff;
+            margin-bottom: 1rem;
+        }
+
+        .order-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .meta-label {
+            font-size: 0.85rem;
+            color: rgba(200, 230, 255, 0.6);
+            font-weight: 500;
+        }
+
+        .meta-value {
+            font-size: 1rem;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .order-status {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .status-pending { background: rgba(255, 193, 7, 0.2); color: #ffc107; border: 2px solid #ffc107; }
+        .status-processing { background: rgba(33, 150, 243, 0.2); color: #2196f3; border: 2px solid #2196f3; }
+        .status-shipped { background: rgba(156, 39, 176, 0.2); color: #9c27b0; border: 2px solid #9c27b0; }
+        .status-delivered { background: rgba(76, 175, 80, 0.2); color: #4caf50; border: 2px solid #4caf50; }
+        .status-cancelled { background: rgba(244, 67, 54, 0.2); color: #f44336; border: 2px solid #f44336; }
+        .status-refunded { background: rgba(156, 39, 176, 0.2); color: #9c27b0; border: 2px solid #9c27b0; }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(200, 230, 255, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+        }
+
+        .info-card-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #c8e6ff;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid rgba(200, 230, 255, 0.2);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: rgba(200, 230, 255, 0.7);
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: #ffffff;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .items-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(200, 230, 255, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            grid-column: 1 / -1;
+        }
+
+        .order-item {
+            display: grid;
+            grid-template-columns: 80px 1fr auto auto auto;
+            gap: 1rem;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .order-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .item-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px solid rgba(200, 230, 255, 0.2);
+        }
+
+        .item-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .item-name {
+            font-weight: 600;
+            color: #ffffff;
+            font-size: 1rem;
+        }
+
+        .item-size {
+            color: rgba(200, 230, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .item-quantity, .item-price, .item-total {
+            font-weight: 600;
+            color: #ffffff;
+            text-align: right;
+        }
+
+        .order-summary {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid rgba(200, 230, 255, 0.2);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            font-size: 1rem;
+        }
+
+        .summary-row.total {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #c8e6ff;
+            padding-top: 1rem;
+            border-top: 2px solid rgba(200, 230, 255, 0.3);
+            margin-top: 0.5rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 1rem 2rem;
+            border: 2px solid;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-update {
+            background: rgba(33, 150, 243, 0.1);
+            border-color: #2196f3;
+            color: #2196f3;
+        }
+
+        .btn-update:hover {
+            background: rgba(33, 150, 243, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-cancel {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: #f44336;
+            color: #f44336;
+        }
+
+        .btn-cancel:hover {
+            background: rgba(244, 67, 54, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-print {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: #4caf50;
+            color: #4caf50;
+        }
+
+        .btn-print:hover {
+            background: rgba(76, 175, 80, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            gap: 1rem;
+        }
+
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(200, 230, 255, 0.2);
+            border-top-color: #c8e6ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .order-item {
+                grid-template-columns: 60px 1fr;
+                gap: 0.75rem;
+            }
+
+            .item-quantity, .item-price, .item-total {
+                grid-column: 2;
+                text-align: left;
+                font-size: 0.9rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="admin-orders.html" class="back-btn">
+                <span>←</span> Back to Orders
+            </a>
+            <h1 class="page-title">Order Details</h1>
+        </div>
+
+        <div id="orderContent" class="loading">
+            <div class="loader"></div>
+            <p>Loading order details...</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Initialize Supabase
+        const SUPABASE_URL = 'https://pbbmrajuptceokpjnynz.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiYm1yYWp1cHRjZW9rcGpueW56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NzY1MzcsImV4cCI6MjA3NDA1MjUzN30.BYxGzM6G7MROTDTdj6KN3gCcrs6nxUaa_ylFZwMBT9o';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentOrder = null;
+
+        // Get order ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('id');
+
+        if (!orderId) {
+            document.getElementById('orderContent').innerHTML = `
+                <div style="text-align: center;">
+                    <h2 style="color: #f44336;">No order ID provided</h2>
+                    <p>Please select an order from the orders list.</p>
+                    <a href="admin-orders.html" class="back-btn" style="margin-top: 1rem;">Back to Orders</a>
+                </div>
+            `;
+        } else {
+            loadOrderDetails(orderId);
+        }
+
+        async function loadOrderDetails(orderId) {
+            try {
+                // Load order data
+                const { data: order, error: orderError } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .eq('id', orderId)
+                    .single();
+
+                if (orderError) {
+                    throw orderError;
+                }
+
+                if (!order) {
+                    throw new Error('Order not found');
+                }
+
+                currentOrder = order;
+
+                // Load order items
+                const { data: items, error: itemsError } = await supabase
+                    .from('order_items')
+                    .select('*')
+                    .eq('order_id', orderId);
+
+                if (itemsError) {
+                    console.error('Error loading order items:', itemsError);
+                }
+
+                renderOrderDetails(order, items || []);
+            } catch (error) {
+                console.error('Error loading order:', error);
+                document.getElementById('orderContent').innerHTML = `
+                    <div style="text-align: center;">
+                        <h2 style="color: #f44336;">Error loading order</h2>
+                        <p>${error.message}</p>
+                        <a href="admin-orders.html" class="back-btn" style="margin-top: 1rem;">Back to Orders</a>
+                    </div>
+                `;
+            }
+        }
+
+        function renderOrderDetails(order, items) {
+            const orderDate = new Date(order.created_at).toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const subtotal = items.reduce((sum, item) => sum + (item.total_price || item.unit_price * item.quantity), 0);
+            const shipping = order.shipping_cost || 0;
+            const total = order.total || (subtotal + shipping);
+
+            document.getElementById('orderContent').innerHTML = `
+                <div class="order-header">
+                    <div class="order-number">Order #${order.order_number}</div>
+                    <div class="order-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Status</span>
+                            <span class="order-status status-${order.status}">${order.status}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Order Date</span>
+                            <span class="meta-value">${orderDate}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Payment ID</span>
+                            <span class="meta-value">${order.stripe_payment_intent_id || 'N/A'}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Total Amount</span>
+                            <span class="meta-value">£${total.toFixed(2)}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-grid">
+                    <div class="info-card">
+                        <h2 class="info-card-title">Customer Information</h2>
+                        <div class="info-row">
+                            <span class="info-label">Name</span>
+                            <span class="info-value">${order.first_name} ${order.last_name}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Email</span>
+                            <span class="info-value">${order.email}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Phone</span>
+                            <span class="info-value">${order.phone || 'N/A'}</span>
+                        </div>
+                        ${order.user_id ? `
+                        <div class="info-row">
+                            <span class="info-label">User ID</span>
+                            <span class="info-value">${order.user_id}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="info-card">
+                        <h2 class="info-card-title">Shipping Address</h2>
+                        <div class="info-row">
+                            <span class="info-label">Address</span>
+                            <span class="info-value">${order.address || 'N/A'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">City</span>
+                            <span class="info-value">${order.city || 'N/A'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">State/Region</span>
+                            <span class="info-value">${order.state || 'N/A'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Postal Code</span>
+                            <span class="info-value">${order.zip_code || 'N/A'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Country</span>
+                            <span class="info-value">${order.country || 'N/A'}</span>
+                        </div>
+                    </div>
+
+                    ${order.tracking_number ? `
+                    <div class="info-card">
+                        <h2 class="info-card-title">Shipping Information</h2>
+                        <div class="info-row">
+                            <span class="info-label">Tracking Number</span>
+                            <span class="info-value">${order.tracking_number}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Shipping Company</span>
+                            <span class="info-value">${order.shipping_company || 'N/A'}</span>
+                        </div>
+                        ${order.tracking_link ? `
+                        <div class="info-row">
+                            <span class="info-label">Track Package</span>
+                            <span class="info-value"><a href="${order.tracking_link}" target="_blank" style="color: #2196f3;">Track Here</a></span>
+                        </div>
+                        ` : ''}
+                        ${order.estimated_delivery ? `
+                        <div class="info-row">
+                            <span class="info-label">Estimated Delivery</span>
+                            <span class="info-value">${new Date(order.estimated_delivery).toLocaleDateString('en-GB')}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                    ` : ''}
+
+                    ${order.notes ? `
+                    <div class="info-card">
+                        <h2 class="info-card-title">Order Notes</h2>
+                        <p style="color: rgba(200, 230, 255, 0.9); line-height: 1.6;">${order.notes}</p>
+                    </div>
+                    ` : ''}
+                </div>
+
+                <div class="items-card">
+                    <h2 class="info-card-title">Order Items</h2>
+                    ${items.map(item => `
+                        <div class="order-item">
+                            <img src="${getProductImage(item)}" alt="${item.product_name}" class="item-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27100%27 height=%27100%27%3E%3Crect fill=%27%23333%27 width=%27100%27 height=%27100%27/%3E%3Ctext fill=%27%23999%27 x=%2750%%27 y=%2750%%27 dominant-baseline=%27middle%27 text-anchor=%27middle%27 font-family=%27sans-serif%27 font-size=%2714%27%3ENo Image%3C/text%3E%3C/svg%3E'">
+                            <div class="item-details">
+                                <div class="item-name">${item.product_name}</div>
+                                <div class="item-size">Size: ${item.size || 'N/A'}</div>
+                                ${item.product_id ? `<div class="item-size">Product ID: ${item.product_id}</div>` : ''}
+                            </div>
+                            <div class="item-quantity">Qty: ${item.quantity}</div>
+                            <div class="item-price">£${item.unit_price.toFixed(2)}</div>
+                            <div class="item-total">£${(item.total_price || item.unit_price * item.quantity).toFixed(2)}</div>
+                        </div>
+                    `).join('')}
+
+                    <div class="order-summary">
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span>£${subtotal.toFixed(2)}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Shipping</span>
+                            <span>£${shipping.toFixed(2)}</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total</span>
+                            <span>£${total.toFixed(2)}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="action-btn btn-update" onclick="goToOrdersPage()">Update Status</button>
+                    ${(order.status === 'pending' || order.status === 'processing') ? `
+                        <button class="action-btn btn-cancel" onclick="goToOrdersPage()">Cancel Order</button>
+                    ` : ''}
+                    <button class="action-btn btn-print" onclick="window.print()">Print Order</button>
+                </div>
+            `;
+        }
+
+        function getProductImage(item) {
+            // If product has an image URL, use it
+            if (item.product_image) {
+                return item.product_image;
+            }
+            
+            // Try to construct Cloudinary URL from product_id
+            if (item.product_id) {
+                return `https://res.cloudinary.com/dkkxapqok/image/upload/c_fill,w_200,h_200/v1/${item.product_id}`;
+            }
+
+            // Default placeholder
+            return 'data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27100%27 height=%27100%27%3E%3Crect fill=%27%23333%27 width=%27100%27 height=%27100%27/%3E%3Ctext fill=%27%23999%27 x=%2750%%27 y=%2750%%27 dominant-baseline=%27middle%27 text-anchor=%27middle%27 font-family=%27sans-serif%27 font-size=%2714%27%3ENo Image%3C/text%3E%3C/svg%3E';
+        }
+
+        function goToOrdersPage() {
+            window.location.href = `admin-orders.html`;
+        }
+
+        // Print styles
+        const printStyles = `
+            @media print {
+                body::before {
+                    display: none;
+                }
+                .back-btn, .action-buttons {
+                    display: none !important;
+                }
+                .container {
+                    max-width: 100%;
+                }
+            }
+        `;
+        const styleSheet = document.createElement("style");
+        styleSheet.textContent = printStyles;
+        document.head.appendChild(styleSheet);
+    </script>
+</body>
+</html>
+

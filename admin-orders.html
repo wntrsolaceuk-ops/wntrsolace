@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Management - WinterSolace Admin</title>
+    <title>Order Management - Wntrsolace Admin</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap');
 
@@ -1634,11 +1634,8 @@
 
         // View order details
         function viewOrder(orderId) {
-            // For now, just show an alert - you can implement order details modal later
-            const order = orders.find(o => o.id === orderId);
-            if (order) {
-                alert(`Order Details:\n\nOrder: ${order.order_number}\nCustomer: ${order.first_name} ${order.last_name}\nEmail: ${order.email}\nStatus: ${order.status}\nTotal: £${order.total.toFixed(2)}\n\nThis feature will be implemented in the next update.`);
-            }
+            // Navigate to detailed order page
+            window.location.href = `admin-order-details.html?id=${orderId}`;
         }
 
         // Open cancellation modal
