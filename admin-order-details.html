@@ -341,9 +341,10 @@
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const CLOUDINARY_CLOUD_NAME = 'dlfsfybx3';
 
-        function getCloudinaryUrl(publicId, width = 200, height = 200) {
+        // Same function as admin-products.html
+        function getCloudinaryUrl(publicId, width = 400, height = 400, quality = 'auto') {
             if (!publicId) return null;
-            return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/w_${width},h_${height},c_fill/${publicId}`;
+            return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/w_${width},h_${height},c_fill,q_${quality},f_auto/${publicId}`;
         }
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -384,28 +385,38 @@
 
                 // Load product details for each item
                 const itemsWithImages = await Promise.all((items || []).map(async (item) => {
+                    console.log('Processing item:', item);
+                    
                     if (item.product_id) {
-                        const { data: product } = await supabase
+                        console.log('Fetching product for ID:', item.product_id);
+                        const { data: product, error: prodError } = await supabase
                             .from('products')
                             .select('main_image_public_id')
                             .eq('id', item.product_id)
                             .single();
                         
+                        if (prodError) {
+                            console.error('Error fetching product:', prodError);
+                        }
+                        
+                        console.log('Product data:', product);
+                        
                         if (product?.main_image_public_id) {
                             item.image_public_id = product.main_image_public_id;
+                            console.log('Set image_public_id to:', item.image_public_id);
                         }
                     }
-                    // Fallback to product_image_public_id or main_image_public_id from order_items
-                    if (!item.image_public_id && item.product_image_public_id) {
-                        item.image_public_id = item.product_image_public_id;
+                    
+                    // Fallback to default hoodie image if no image found
+                    if (!item.image_public_id) {
+                        item.image_public_id = 'front_g9w8zc'; // Default hoodie front image
+                        console.log('Using default image: front_g9w8zc');
                     }
-                    if (!item.image_public_id && item.main_image_public_id) {
-                        item.image_public_id = item.main_image_public_id;
-                    }
+                    
                     return item;
                 }));
 
-                console.log('Items with images:', itemsWithImages);
+                console.log('Final items with images:', itemsWithImages);
                 renderOrder(order, itemsWithImages);
             } catch (error) {
                 console.error('Error loading order:', error);
@@ -455,9 +466,13 @@
                         <div class="section">
                             <div class="section-header">Order Items</div>
                             ${items.map(item => {
+                                console.log('Rendering item:', item.product_name, 'Image public_id:', item.image_public_id);
+                                
                                 const imageUrl = item.image_public_id 
                                     ? getCloudinaryUrl(item.image_public_id, 200, 200)
                                     : 'data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27100%27 height=%27100%27 viewBox=%270 0 100 100%27%3E%3Crect fill=%27%231a1a1a%27 width=%27100%27 height=%27100%27/%3E%3Ctext fill=%27%23444%27 x=%2750%27 y=%2750%27 text-anchor=%27middle%27 dominant-baseline=%27middle%27 font-family=%27Arial%27 font-size=%2712%27%3ENo Image%3C/text%3E%3C/svg%3E';
+                                
+                                console.log('Generated image URL:', imageUrl);
                                 
                                 return `
                                 <div class="item-row">
